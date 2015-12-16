@@ -107,10 +107,13 @@ public abstract class Dialect {
         if (metaData == null) {
             metaData = conn.getMetaData();
         }
-        try (ResultSet rs = metaData.getColumns(null,
+
+        ResultSet rs = null;
+        try {
+            rs = metaData.getColumns(null,
                                                 normalizeSchemaName(schema),
                                                 normalizeTableName(tableName),
-                                                normalizeColumnName(colName))) {
+                                                normalizeColumnName(colName));
             if (!rs.next()) {
                 throw new SQLException(tableName + "に" + colName + "を見つけられません。");
             }
@@ -121,6 +124,10 @@ public abstract class Dialect {
                 return UN_USABLE_TYPE;
             }
             return rs.getInt("DATA_TYPE");
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
         }
     }
 

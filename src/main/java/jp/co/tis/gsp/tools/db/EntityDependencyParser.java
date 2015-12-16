@@ -36,7 +36,7 @@ import org.seasar.framework.util.ResultSetUtil;
 
 
 public class EntityDependencyParser {
-    private Map<String, Table> tableMap = new HashMap<>();
+    private Map<String, Table> tableMap = new HashMap<String, Table>();
 
     public void parse(Connection conn, String url, String schema) {
         try {
@@ -54,18 +54,26 @@ public class EntityDependencyParser {
 
     private List<String> getAllTableNames(DatabaseMetaData metaData, String normalizedSchemaName)
             throws SQLException {
-        List<String> allNames = new ArrayList<>();
+        List<String> allNames = new ArrayList<String>();
         String[] types = {"TABLE"};
-        try (ResultSet rs = metaData.getTables(null, normalizedSchemaName, "%", types);){
+        ResultSet rs = null;
+        try {
+            rs = metaData.getTables(null, normalizedSchemaName, "%", types);
             while (rs.next()) {
                 allNames.add(rs.getString("TABLE_NAME"));
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
             }
         }
         return allNames;
     }
 
     private void parseReference(DatabaseMetaData metaData, String normalizedSchemaName, String tableName) throws SQLException {
-        try (ResultSet rs = metaData.getImportedKeys(null, normalizedSchemaName, tableName)) {
+        ResultSet rs = null;
+        try {
+            rs = metaData.getImportedKeys(null, normalizedSchemaName, tableName);
             while (rs.next()) {
                 String child = rs.getString("FKTABLE_NAME");
                 String parent = rs.getString("PKTABLE_NAME");
@@ -81,6 +89,10 @@ public class EntityDependencyParser {
                 }
                 childTable.parents.add(parentTable);
                 parentTable.children.add(childTable);
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
             }
         }
     }

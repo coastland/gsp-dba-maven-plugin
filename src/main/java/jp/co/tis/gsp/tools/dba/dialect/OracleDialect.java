@@ -323,10 +323,14 @@ public class OracleDialect extends Dialect {
         if (metaData == null) {
             metaData = conn.getMetaData();
         }
-        try (ResultSet rs = metaData.getColumns(null,
-                                                normalizeSchemaName(schema),
-                                                normalizeTableName(tableName),
-                                                normalizeColumnName(colName))) {
+
+		ResultSet rs = null;
+		try {
+			rs = metaData.getColumns(null,
+					normalizeSchemaName(schema),
+					normalizeTableName(tableName),
+					normalizeColumnName(colName));
+
             if (!rs.next()) {
                 throw new SQLException(tableName + "に" + colName + "を見つけられません。");
             }
@@ -342,7 +346,11 @@ public class OracleDialect extends Dialect {
                 return Types.TIMESTAMP;
             }
             return rs.getInt("DATA_TYPE");
-        }
+        } finally {
+			if (rs != null) {
+				rs.close();
+			}
+		}
     }
 
     @Override

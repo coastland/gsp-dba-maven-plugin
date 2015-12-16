@@ -8,7 +8,7 @@
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>3.0.3-SNAPSHOT</version>
+    <version>3.1.0</version>
     <name>GSP Maven Mojo for DBA</name>
     <url>http://maven.apache.org</url>
 
@@ -74,17 +74,25 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.2</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.6</source>
+                        <target>1.6</target>
                         <encoding>UTF-8</encoding>
-                        <fork>true</fork>
-                        <meminitial>64m</meminitial>
-                        <maxmem>368m</maxmem>
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+    <repositories>
+        <repository>
+            <id>maven.seasar.org</id>
+            <name>The Seasar Foundation Maven Repository</name>
+            <url>http://maven.seasar.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -137,11 +145,6 @@
             <version>${seasarVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.seasar.sastruts</groupId>
-            <artifactId>sa-struts</artifactId>
-            <version>1.0.4-sp9</version>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
@@ -190,38 +193,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>4.1.0</version>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>4.1.0</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-ejb_3.0_spec</artifactId>
             <version>1.0.1</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>net.unit8.solr</groupId>
-            <artifactId>solr-jdbc-s2jdbc</artifactId>
-            <version>0.2.0</version>
-            <optional>true</optional>
-        </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -237,4 +213,61 @@
         <!--</dependency>-->
 
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>solr</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/addon/solr/java</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.solr</groupId>
+                    <artifactId>solr-solrj</artifactId>
+                    <version>4.1.0</version>
+                    <optional>true</optional>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.solr</groupId>
+                    <artifactId>solr-core</artifactId>
+                    <version>4.1.0</version>
+                    <optional>true</optional>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>woodstox</groupId>
+                            <artifactId>wstx-asl</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>net.unit8.solr</groupId>
+                    <artifactId>solr-jdbc-s2jdbc</artifactId>
+                    <version>0.2.0</version>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

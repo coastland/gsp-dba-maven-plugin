@@ -29,8 +29,8 @@ public class ForeignKey {
 	private Relation relation;
 
 	public ForeignKey() {
-		columnList = new ArrayList<>();
-		referenceColumnList = new ArrayList<>();
+		columnList = new ArrayList<Column>();
+		referenceColumnList = new ArrayList<Column>();
 	}
 
 	public String getName() {

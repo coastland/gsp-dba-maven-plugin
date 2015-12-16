@@ -16,6 +16,7 @@
 
 package jp.co.tis.gsp.tools.db.beans;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +119,7 @@ public class Entity {
 
 	public void init() {
 		Map<Integer, ForeignKey> foreignKeyMap = new HashMap<Integer, ForeignKey>();
-		foreignKeyList = new ArrayList<>();
+		foreignKeyList = new ArrayList<ForeignKey>();
 		if (columnList == null) return;
 		for(Column column : columnList) {
             column.setEntity(this);

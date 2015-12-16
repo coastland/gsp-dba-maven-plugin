@@ -150,7 +150,7 @@ public class PostgresqlDialect extends Dialect {
     public void importSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
 
-        Map<String, String> environment = new HashMap<>();
+        Map<String, String> environment = new HashMap<String, String>();
         if (StringUtils.isNotEmpty(password)) {
             environment.put("PGPASSWORD", password);
         }

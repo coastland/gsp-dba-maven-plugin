@@ -16,9 +16,6 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.dialect.SolrDialect;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.seasar.extension.jdbc.gen.command.CommandInvoker;
@@ -81,10 +78,6 @@ public class GenerateService extends AbstractDbaMojo {
 		if (ignoreEntityClassNamePattern == null)
 			ignoreEntityClassNamePattern = "";
 		executeGenerateNames();
-        Dialect dialect = DialectFactory.getDialect(url);
-        if (dialect instanceof SolrDialect) {
-            executeGenerateAbstractSolrService();
-        }
 		executeGenerateService();
 	}
 
@@ -129,16 +122,12 @@ public class GenerateService extends AbstractDbaMojo {
         }
     }
 	private void executeGenerateService() {
-        Dialect dialect = DialectFactory.getDialect(url);
         final GenerateServiceCommand command = new GenerateServiceCommand();
 		command.setClasspathDir(diconDir);
 		command.setNamesPackageName(namesPackageName);
 		command.setEntityPackageName(entityPackageName);
 		command.setServicePackageName(servicePackageName);
 		command.setIgnoreEntityClassNamePattern(ignoreEntityClassNamePattern);
-        if (dialect instanceof SolrDialect) {
-            command.setServiceTemplateFileName("java/gsp_solr_service.ftl");
-        }
 
 		final List<URL> urlList = new ArrayList<URL>();
 		try {

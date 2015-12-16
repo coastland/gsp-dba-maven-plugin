@@ -48,7 +48,7 @@ public class DialectFactory {
 		return dialect;
 	}
 
-    private static Map<String, Class<?>> classMap = new HashMap<>();
+    private static Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
     public static void registerOptionalDialects(Map<String, String> optionalDialectClassNames) {
         if (optionalDialectClassNames == null) {
             return;

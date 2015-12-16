@@ -79,7 +79,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
             }};
 
 		// 拡張子.sqlが実行対象
-		List<File> files = new ArrayList<>(Arrays.asList(ddlDirectory.listFiles(sqlFileFilter)));
+		List<File> files = new ArrayList<File>(Arrays.asList(ddlDirectory.listFiles(sqlFileFilter)));
         if (extraDdlDirectory != null && extraDdlDirectory.isDirectory()) {
             Collections.addAll(files, extraDdlDirectory.listFiles(sqlFileFilter));
         }

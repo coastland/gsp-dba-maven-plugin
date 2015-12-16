@@ -38,7 +38,7 @@ public class AbstractDbObjectParser {
 	protected String schema;
 	protected String url;
 	private final Configuration fmConfig = new Configuration();
-	protected final LinkedList<ClassTemplateLoader> templateLoaderList = new LinkedList<>();
+	protected final LinkedList<ClassTemplateLoader> templateLoaderList = new LinkedList<ClassTemplateLoader>();
 	protected TypeMapper typeMapper;
 
 	public AbstractDbObjectParser() {
