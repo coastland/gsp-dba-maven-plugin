@@ -192,11 +192,7 @@ public class OracleDialect extends Dialect {
 			if(existsUser(conn, user)) {
 				return;
 			}
-			try {
-				stmt.execute("DROP USER "+ user);
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
+			
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
             String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
