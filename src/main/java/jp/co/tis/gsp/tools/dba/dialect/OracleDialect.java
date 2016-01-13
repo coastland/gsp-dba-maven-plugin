@@ -192,24 +192,13 @@ public class OracleDialect extends Dialect {
 			if(existsUser(conn, user)) {
 				return;
 			}
-			try {
-				stmt.execute("DROP USER "+ user);
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
+			
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-            String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
+			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " + 
+			                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
+			                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
             System.err.println(grantSql);
-            String grantExecuteSql = "GRANT EXECUTE ON SYS.DBMS_ALERT TO " + user;
-            try {
-                stmt.execute(grantExecuteSql);
-            } catch (SQLException e) {
-                System.err.println("DBMS_ALERT 権限の付与に失敗しました。\n"
-                        + "本権限は、tesloggerのDBキャプチャに必要になります。\n"
-                        + "DBキャプチャが必要であれば、手動で権限を設定してください。\n"
-                        + "実行SQL： [" + grantExecuteSql + "]");
-            }
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
