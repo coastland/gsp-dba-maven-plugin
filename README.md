@@ -69,6 +69,18 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | password       | ×     | userに設定したユーザのパスワード。                             |
 | schema         | ×     | データベースのスキーマ名。                                     |
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
+|optionalDialects | ×    | 使用するダイアレクトクラスのFQCN。|
+
+ * optionalDialectsの指定方法  
+ 使用するダイアレクトクラスを変更する場合、以下の形式でデータベースと対応するダイアレクトクラスを定義します。
+
+```
+<configuration>
+  <optionalDialects>
+    <oracle>jp.co.tis.gsp.tools.dba.dialect.CustomOracleDialect</oracle>
+  </optionalDialects>
+</configuration>
+```
 
 ### generate-ddl
 
@@ -257,7 +269,10 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。PostgreSQLを使用する場合で、バージョン8.1以上を使用する場合は、明示的にorg.seasar.extension.jdbc.dialect.Postgre81Dialectを指定してください。|
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
-| entityTemplate         | ×    | entity の自動生成テンプレート。                                           |
+| entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"                                           |
+|diconDir                | ×    |自動生成されるdiconファイルのディレクトリ。|
+|javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
+|templateFilePrimaryDir | ×      |entityTemplateまでのパス。  |
 
 ### export-schema
 
@@ -326,6 +341,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | groupId                | ×     | ダンプファイルのグループID。デフォルトは、プロジェクトのグループID。                  |
 | artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
 | version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
+| localRepository  | ×   | export-schemaで出力されたjarが配置されているリポジトリ。"localRipository"固定。 |
 
 
 ## データベースの対応状況
