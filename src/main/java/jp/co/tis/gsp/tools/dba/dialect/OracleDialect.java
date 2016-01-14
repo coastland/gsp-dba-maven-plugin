@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -117,7 +116,7 @@ public class OracleDialect extends Dialect {
 			Process process = pb.start();
 
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                    Charset.forName("Shift_JIS") : StandardCharsets.UTF_8;
+                    Charset.forName("Shift_JIS") : Charset.forName("UTF-8");
 
             reader = new BufferedReader(
 		            new InputStreamReader(process.getInputStream(), terminalCharset));
@@ -155,7 +154,7 @@ public class OracleDialect extends Dialect {
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                    Charset.forName("Shift_JIS") : StandardCharsets.UTF_8;
+                    Charset.forName("Shift_JIS") : Charset.forName("UTF-8");
 
 			reader = new BufferedReader(
 		            new InputStreamReader(process.getInputStream(), terminalCharset));
