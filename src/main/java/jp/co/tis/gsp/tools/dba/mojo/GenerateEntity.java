@@ -189,6 +189,7 @@ public class GenerateEntity extends AbstractDbaMojo {
         command.setEntityTemplateFileName(entityTemplate);
         command.setGenDialectClassName(genDialectClassName);
         command.setShowTableName(true);
+        command.setShowSchemaName(true);
         command.setGenerationType(dialect.getGenerationType());
         command.setFactoryClassName(GspFactoryImpl.class.getName());
         command.setUseAccessor(useAccessor);
