@@ -201,15 +201,7 @@ public class OracleDialect extends Dialect {
             String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
             System.err.println(grantSql);
-            String grantExecuteSql = "GRANT EXECUTE ON SYS.DBMS_ALERT TO " + user;
-            try {
-                stmt.execute(grantExecuteSql);
-            } catch (SQLException e) {
-                System.err.println("DBMS_ALERT 権限の付与に失敗しました。\n"
-                        + "本権限は、tesloggerのDBキャプチャに必要になります。\n"
-                        + "DBキャプチャが必要であれば、手動で権限を設定してください。\n"
-                        + "実行SQL： [" + grantExecuteSql + "]");
-            }
+
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
