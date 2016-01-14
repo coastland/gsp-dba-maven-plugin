@@ -140,6 +140,14 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 		// View
 		if(viewList != null) {
 			for(View view : viewList) {
+			    
+		         //スキーマが設定されている場合セットする
+	            if(schema != null){
+	                if(!schema.isEmpty()){
+	                    view.setSchema(schema);
+	                }
+	            }
+			    
 				if (!printView || view.getShowType() != 0) {
 					continue;
 				}
