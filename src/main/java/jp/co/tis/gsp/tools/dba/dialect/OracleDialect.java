@@ -42,7 +42,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
-import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
@@ -252,14 +251,15 @@ public class OracleDialect extends Dialect {
 		Statement stmt = null;
 		try {
 			conn = DriverManager.getConnection(url, user, password);
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM user_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM')");
-
+			//stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM user_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM')");
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = '" + schema + "'");
+			
 			ResultSet rsMeta = stmtMeta.executeQuery();
 			while(rsMeta.next()) {
 				String objectType = rsMeta.getString("OBJECT_TYPE");
 				String objectName = rsMeta.getString("OBJECT_NAME");
 				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, objectName);
+					dropObject(conn, objectType, schema + "." + objectName);
 				}
 			}
 			stmt = conn.createStatement();
