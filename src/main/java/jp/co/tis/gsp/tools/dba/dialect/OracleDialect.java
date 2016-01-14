@@ -192,7 +192,9 @@ public class OracleDialect extends Dialect {
 			}
 
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-            String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
+			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " + 
+	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
+	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
             System.err.println(grantSql);
 
