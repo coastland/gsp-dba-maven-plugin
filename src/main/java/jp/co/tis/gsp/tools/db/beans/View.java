@@ -38,6 +38,8 @@ public class View {
 	
 	private List<ViewEntity> viewEntityList;
 	
+    private String schema;
+	
 	@XmlAttribute(name="ID")
 	public Integer getId() {
 		return id;
@@ -109,6 +111,15 @@ public class View {
 	public void setViewColumnList(List<ViewColumn> viewColumnList) {
 		this.viewColumnList = viewColumnList;
 	}
+	  
+    @XmlAttribute(name="SCHEMA")
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 
 	private List<ViewColumn> viewColumnList;
 }

@@ -149,7 +149,8 @@ public class OracleDialect extends Dialect {
                     "directory=exp_dir",
 					"dumpfile=" + dumpFile.getName(),
 					"schemas=" + schema,
-                    "nologfile=y");
+                    "nologfile=y",
+                    "exclude=user");
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
