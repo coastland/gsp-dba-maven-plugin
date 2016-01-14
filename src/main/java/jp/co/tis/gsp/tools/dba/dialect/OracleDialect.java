@@ -34,17 +34,16 @@ import java.util.Properties;
 
 import javax.persistence.GenerationType;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
-import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
+
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class OracleDialect extends Dialect {
 	private String url;
@@ -191,11 +190,7 @@ public class OracleDialect extends Dialect {
 			if(existsUser(conn, user)) {
 				return;
 			}
-			try {
-				stmt.execute("DROP USER "+ user);
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
+
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
             String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
