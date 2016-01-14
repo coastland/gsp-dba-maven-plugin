@@ -63,9 +63,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 |:---------------|:-----:|:----------------------------------------------------------------|
 | driver         | ○     | 使用するJDBCドライバ。                                         |
 | url            | ○     | データベースのURL。 jdbc:subprotocol:subname 形式。            |
-| adminUser      | ○     | データベースのadminユーザ名。                                  |
+| adminUser      | ○     | データベースのadminユーザ名。Oracleの場合はsysは指定出来ません。|
 | adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
-| user           | ○     | データベースのユーザ名。                                       |
+| user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。   |
 | password       | ×     | userに設定したユーザのパスワード。                             |
 | schema         | ×     | データベースのスキーマ名。                                     |
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
@@ -266,7 +266,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
 | genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。                    |
-| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。PostgreSQLを使用する場合で、バージョン8.1以上を使用する場合は、明示的にorg.seasar.extension.jdbc.dialect.Postgre81Dialectを指定してください。|
+| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。                        |
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
 | entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"                                           |
