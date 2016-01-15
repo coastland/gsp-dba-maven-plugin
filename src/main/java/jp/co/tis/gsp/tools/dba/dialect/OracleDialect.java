@@ -242,6 +242,7 @@ public class OracleDialect extends Dialect {
 		Statement stmt = null;
 		try {
 			conn = DriverManager.getConnection(url, user, password);
+			
 			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
 			stmtMeta.setString(1, schema);
 			
