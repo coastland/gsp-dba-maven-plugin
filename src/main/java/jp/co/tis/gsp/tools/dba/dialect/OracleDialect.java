@@ -34,6 +34,8 @@ import java.util.Properties;
 
 import javax.persistence.GenerationType;
 
+import jp.co.tis.gsp.tools.db.TypeMapper;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -42,8 +44,6 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
-
-import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class OracleDialect extends Dialect {
 	private String url;
@@ -242,8 +242,8 @@ public class OracleDialect extends Dialect {
 		Statement stmt = null;
 		try {
 			conn = DriverManager.getConnection(url, user, password);
-			//stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM user_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM')");
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = '" + schema + "'");
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
+			stmtMeta.setString(1, schema);
 			
 			ResultSet rsMeta = stmtMeta.executeQuery();
 			while(rsMeta.next()) {
