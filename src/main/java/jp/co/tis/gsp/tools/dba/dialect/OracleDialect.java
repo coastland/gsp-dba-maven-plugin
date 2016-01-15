@@ -300,12 +300,12 @@ public class OracleDialect extends Dialect {
 
 	@Override
 	public String getViewDefinitionSql() {
-		return "select text as view_definition from user_views where view_name=?";
+		return "select text as view_definition from dba_views where view_name= ? and owner = ?";
 	}
 
 	@Override
     public String getSequenceDefinitionSql() {
-        return "select sequence_name from user_sequences where sequence_name=?";
+        return "select sequence_name from dba_sequences where sequence_name= ? and sequence_owner = ?";
     }
 
     @Override
