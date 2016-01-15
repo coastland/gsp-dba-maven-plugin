@@ -98,7 +98,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
                     PreparedStatement stmt = conn.prepareStatement(sequenceDefinitionSql);
                     try {
                         stmt.setString(1, columnMeta.getName() + "_USEQ");
-                        stmt.setString(2, tableMeta.getSchemaName());
+                        stmt.setString(2, schemaName);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.next()) {
                             columnMeta.setAutoIncrement(true);

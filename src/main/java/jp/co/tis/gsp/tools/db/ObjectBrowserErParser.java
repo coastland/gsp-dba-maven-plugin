@@ -76,11 +76,10 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 
 		for(Entity entity : entityList) {
 		    
-		    //スキーマが設定されている場合、Entityにスキーマをセットする
-		    if(schema != null){
-		        if(!schema.isEmpty()){
-		            entity.setSchema(schema);
-		        }
+		    //スキーマ != ユーザの場合、スキーマ名をセットする
+		    if(!user.equals(schema)){
+		      //ftlで.(ピリオド)が常に表示されるため、ここで設定しておく
+		        entity.setSchema(schema + ".");
 		    }
 		    
 		    
@@ -141,11 +140,10 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 		if(viewList != null) {
 			for(View view : viewList) {
 			    
-		         //スキーマが設定されている場合セットする
-	            if(schema != null){
-	                if(!schema.isEmpty()){
-	                    view.setSchema(schema);
-	                }
+	            //スキーマ != ユーザの場合、スキーマ名をセットする
+	            if(!user.equals(schema)){
+	                //ftlで.(ピリオド)が常に表示されるため、ここで設定しておく
+	                view.setSchema(schema + ".");
 	            }
 			    
 				if (!printView || view.getShowType() != 0) {
