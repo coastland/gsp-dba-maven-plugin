@@ -68,6 +68,7 @@ public class LoadDataMojo extends AbstractDbaMojo {
 	 * </p>
 	 * @parameter
 	 */
+    @Parameter
 	@SuppressWarnings("rawtypes")
 	protected Map specifiedEncodingFiles;
 
