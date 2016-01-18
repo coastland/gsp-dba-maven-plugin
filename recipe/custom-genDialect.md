@@ -49,7 +49,9 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
   <plugin>
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
-    <version>3.0.0</version>
+    <version>
+      使用するGSPプラグインのバージョン
+    </version>
     <executions>
       <execution>
         <id>generate-entity</id>
