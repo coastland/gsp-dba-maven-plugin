@@ -265,7 +265,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 |:-----------------------|:-----:|:--------------------------------------------------------------------------|
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
-| genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。                    |
+| genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。<br>カスタマイズする際は[GenDialectクラスのカスタマイズ例](./recipe/custom-genDialect.md)を参照してください。<br> |
 | dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。                        |
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
