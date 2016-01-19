@@ -34,7 +34,7 @@ public class CustomOracleDialect extends OracleDialect{
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するGSPプラグインのバージョン
+      使用するgsp-dba-maven-pluginのバージョン
     </version>
     <executions>
       <execution>
