@@ -40,7 +40,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
             <plugin>
                 <groupId>jp.co.tis.gsp</groupId>
                 <artifactId>gsp-dba-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>
+                    使用するgsp-dba-maven-pluginのバージョン
+                </version>
                 <dependencies>
                     <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
                     <dependency>
@@ -105,7 +107,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>generate-ddl</id>
@@ -141,7 +145,9 @@ DDLを実行します。
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>execute-ddl</id>
@@ -174,7 +180,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>load-data</id>
@@ -242,7 +250,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>generate-entity</id>
@@ -291,7 +301,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>export-schema</id>
@@ -314,7 +326,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
 | outputDirectory        | ×     | データベーススキーマをエクスポートするディレクトリのパス。デフォルトは”target/dump”。 |
 
-現在、export-schemaはDB2とSQLServerには対応しておりません。  
+export-schemaはDB2とSQLServerには対応しておりません。  
 これらのDBを使用する際は、上記の`<execution>~</execution>`をコメントアウト、もしくは削除してください。
 
 ### import-schema
@@ -327,7 +339,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <configuration>
         <!-- 設定を追加 -->
         </configuration>
@@ -343,7 +357,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
 | version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
 
-現在、import-schemaはDB2とSQLServerには対応しておりません。
+import-schemaはDB2とSQLServerには対応しておりません。
 
 ## データベースの対応状況
 
