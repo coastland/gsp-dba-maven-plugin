@@ -89,7 +89,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
             // 使用するDB製品がOracleの時は、
             // ユーザが所有していないスキーマにDDLを流し込んだ場合は個別に権限を付与する。
             try {
-                grantAnyToSchema(files);
+                grantAllToSchema();
             } catch (SQLException e) {
                 getLog().warn(e);
             }
@@ -161,24 +161,18 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 
     private boolean isOracle() {
         // 前の処理で接続文字列自体の構造が正しいことは分かっているのでそれ自体の精査は行わない。
-        // 接続文字列は文字の大小を区別しないため単純なequalsは使用しない。
-        return StringUtils.equalsIgnoreCase("oracle", StringUtils.split(url, ':')[1]);
+        return "oracle".equals(StringUtils.split(url, ':')[1]);
     }
 
-    private void grantAnyToSchema(List<File> files) throws SQLException {
-        for (File file : files) {
-            String fileName = file.getName();
-            if (!fileName.contains("10_CREATE_")) {
-                // filesは昇順にソートされていることを利用して、テーブル生成DDLの読み込みが終わったらループを終了する
-                break;
-            }
-            String tableName = fileName.replaceAll("10_CREATE_|.sql", "");
-//            System.out.println("GRANT ALL ON " + schema + "." + tableName + " TO " + user);
-
+    private void grantAllToSchema() throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
+        stmt.setString(1, schema);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            String tableName = rs.getString("TABLE_NAME");
             // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
             String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
-            Statement stmt = conn.createStatement();
-            stmt.execute(sql);
+            conn.createStatement().execute(sql);
         }
     }
 }
