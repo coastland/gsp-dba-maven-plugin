@@ -59,7 +59,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 			}
 		}
 		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
-		getLog().info(user+"スキーマのExportを開始します。:" + exportFile);
+		getLog().info(schema+"スキーマのExportを開始します。:" + exportFile);
 		try {
 			dialect.exportSchema(adminUser, adminPassword, schema, exportFile);
 

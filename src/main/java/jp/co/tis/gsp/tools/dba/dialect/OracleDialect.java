@@ -197,7 +197,7 @@ public class OracleDialect extends Dialect {
 	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
 	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
-            System.err.println(grantSql);
+            System.err.println("GRANT文を実行しました:\n" + grantSql);
 
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
@@ -228,8 +228,8 @@ public class OracleDialect extends Dialect {
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
-			// 目的のユーザがいなければ何もしない
-			if(!existsUser(conn, user)) {
+			// 目的のスキーマがなければ何もしない
+			if(!existsUser(conn, schema)) {
 				return;
 			}
 		} catch (SQLException e) {
