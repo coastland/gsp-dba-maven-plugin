@@ -195,7 +195,7 @@ public class OracleDialect extends Dialect {
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
 			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " + 
 	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
-	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY, SELECT_CATALOG_ROLE TO " + user;
+	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
             System.err.println(grantSql);
 
@@ -241,7 +241,7 @@ public class OracleDialect extends Dialect {
 		PreparedStatement stmtMeta = null;
 		Statement stmt = null;
 		try {
-			conn = DriverManager.getConnection(url, user, password);
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
 			
 			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
 			stmtMeta.setString(1, schema);

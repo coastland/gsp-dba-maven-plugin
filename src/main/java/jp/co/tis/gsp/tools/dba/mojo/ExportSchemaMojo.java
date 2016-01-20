@@ -61,7 +61,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
 		getLog().info(user+"スキーマのExportを開始します。:" + exportFile);
 		try {
-			dialect.exportSchema(user, password, schema, exportFile);
+			dialect.exportSchema(adminUser, adminPassword, schema, exportFile);
 
 		} catch (Exception e) {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);
@@ -73,7 +73,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
         } catch(IOException e) {
             throw new MojoExecutionException("アーカイブに失敗しました。", e);
         }
-		getLog().info(user+"スキーマのExport完了 ");
+		getLog().info(schema+"スキーマのExport完了 ");
 	}
 
 
