@@ -179,7 +179,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
      */
     private void grantAllToSchema() throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
-        stmt.setString(1, schema);
+        stmt.setString(1, StringUtils.upperCase(schema));
         ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             String tableName = rs.getString("TABLE_NAME");
@@ -195,8 +195,8 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
      */
     private void createSchemaIfNotExist() throws SQLException {
         setConnection();
-        PreparedStatement userStmt = conn.prepareStatement("SELECT count(*) AS num FROM dba_users WHERE username=?");
-        userStmt.setString(1, schema);
+        PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
+        userStmt.setString(1, StringUtils.upperCase(schema));
         ResultSet rs = userStmt.executeQuery();
         rs.next();
         if (rs.getInt("num") > 0) {
@@ -216,6 +216,12 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
         StatementUtil.close(createUserStmt);
     }
 
+    /**
+     * ユーザ名とスキーマ名に応じて適切なコネクションを設定する。
+     * データベースがOracleでかつユーザ名とスキーマ名が異なる時、
+     * DDLの実行に管理者ユーザでのログインが必要なため。
+     * @throws SQLException SQLエラー
+     */
     private void setConnection() throws SQLException {
         if (schema.equals(user)) {
             conn = DriverManager.getConnection(url, user, password);
