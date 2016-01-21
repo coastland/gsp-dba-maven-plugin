@@ -134,8 +134,8 @@ public class GenerateEntity extends AbstractDbaMojo {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("driver", driver);
         param.put("url", url);
-        param.put("user", user);
-        param.put("password", password);
+        param.put("user", adminUser);
+        param.put("password", adminPassword);
         param.put("rootPackage", rootPackage);
 
         String[] urlTokens = StringUtils.split(url, ':');
