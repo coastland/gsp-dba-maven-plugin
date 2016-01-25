@@ -2,7 +2,7 @@
 
 generate-entityで使用するテンプレートのカスタマイズ方法を記述します。
 
-このgsp-dba-maven-pluginでは、エンティティ生成時のテンプレートエンジンとしてfreemakerを使用しています。ですので、エンティティをカスタマイズする際は、まずfreemakerを使用しテンプレートを作成してください。  
+このgsp-dba-maven-pluginでは、エンティティ生成時のテンプレートエンジンとしてfreemakerを使用しています。ですので、カスタマイズする際はfreemakerのルールに従いテンプレートを作成してください。  
 以下、簡単な作成例です。
 
 ```
@@ -116,7 +116,7 @@ public class SystemAccount implements Serializable {
 
 使用できる変数は[デフォルトのテンプレート](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)を参考にしてしてください。
 
-カスタマイズしたら、適用するプロジェクトのpomのGSPプラグインに、作成したテンプレートを読み込ませるよう設定を追加してください。
+カスタマイズしたら、適用するプロジェクトのpomのgsp-dba-maven-pluginに、作成したテンプレートを読み込ませるよう設定を追加してください。
 以下、src/main/resource/gsp/template/gsp_entity_custom.ftlに配置した場合の設定例です
 
 ```
