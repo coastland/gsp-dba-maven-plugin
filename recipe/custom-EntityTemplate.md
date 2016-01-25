@@ -114,7 +114,7 @@ public class SystemAccount implements Serializable {
     ～以下省略～
 ```
 
-使用できる変数は[デフォルトのテンプレート](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)を参考にしてしてください。
+使用できる変数は[デフォルトのテンプレート](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)を参考にしてください。
 
 カスタマイズしたら、適用するプロジェクトのpomのgsp-dba-maven-pluginに、作成したテンプレートを読み込ませるよう設定を追加してください。
 以下、src/main/resource/gsp/template/gsp_entity_custom.ftlに配置した場合の設定例です
