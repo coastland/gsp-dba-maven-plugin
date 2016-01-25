@@ -115,7 +115,7 @@ public class SystemAccount implements Serializable {
     ～以下省略～
 ```
 
-使用できる変数は[デフォルトのテンプレート](../src\main\resources\org\seasar\extension\jdbc\gen\internal\generator\tempaltes\java\gsp_entity.ftl)を参考にしてしてください。
+使用できる変数は[デフォルトのテンプレート](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)を参考にしてしてください。
 
 
 
