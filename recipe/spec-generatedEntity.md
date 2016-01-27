@@ -5,16 +5,16 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 
 ### クラスに付与されるアノテーション
 
-|Java|説明|ER図|
-|:-:|:-|:-:|
-|@Generated  | 自動生成されたことを表します。 |     |
+|アノテーション|説明|ER図|
+|:--:|:--|:--|
+|@Generated  | 自動生成されたことを表します。 |なし。     |
 |@Entity|エンティティであることを表します。 |![entity](image/entity.png) |
 |@Table|主テーブルを表します。属性は以下の通り。<br/> ・name:テーブル名<br/>・catalog:カタログ名<br/>・schema:スキーマ名<br/>・uniqueConstraints:複合ユニークキー制約|![table](image/table.png) |
 
 
-### アクセサ(使用しない場合はプロパティ)に付与されるアノテーション
+### getter(使用しない場合はプロパティ)に付与されるアノテーション
 
-|Java|説明|ER図|
+|アノテーション|説明|ER図|
 |:--:|:--|:--|
 |@Id | 主キーであることを表します。|<br/>![id](image/id.png)|
 |@GeneratedValue|DBによって自動採番されることを表します。<br/>属性は以下の通り<br/>・generator:@SequenceGeneratorや@TableGeneratorのname属性に設定する値<br/>・strategy:主キーの値を生成する方法|DB毎に自動採番となる条件は異なります。<br/>例:Oracleの場合<br/>・単独主キーかつ外部キーではない<br/>・2桁以上のNUMBER型を持つ<br/>![generatedvalue](image/generatedvalue.png)|
