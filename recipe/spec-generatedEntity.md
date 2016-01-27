@@ -6,7 +6,7 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 クラスに対して付与されます
 
 |アノテーション|説明|
-|:--:|:--|:--|
+|:--:|:--|
 |@Generated  | 自動生成されたことを表します。 | 
 |@Entity|エンティティであることを表します。 | 
 |@Table|主テーブルを表します。属性は以下の通り。<br/> ・name:テーブル名<br/>・catalog:カタログ名<br/>・schema:スキーマ名<br/>・uniqueConstraints:複合ユニークキー制約| 
@@ -15,17 +15,17 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 ### カラムに関するアノテーション
 各カラムに対応するプロパティのgetterメソッド(パラメータのuseAccessorがfalseの場合はプロパティ自体)に付与されます。
 
-|アノテーション|説明|補足|
-|:--:|:--|:--|
-|@Id | 主キーであることを表します。||
-|@GeneratedValue|DBによって自動採番されることを表します。<br/>属性は以下の通り<br/>・generator:@SequenceGeneratorや@TableGeneratorのname属性に設定する値<br/>・strategy:主キーの値を生成する方法|DB毎に自動採番となる条件は異なります。<br/>例:Oracleの場合<br/>・単独主キーかつ外部キーではない<br/>・2桁以上のNUMBER型を持つ<br/>|
-| @SequenceGenerator|主キーを作成するシーケンスジェネレータの設定を表します。<br>属性は以下の通り<br/>・name:@GeneratedValueのgenerator属性で指定された名前<br/>・sequenceName:使用するデータベースシーケンスオブジェクトの名前<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|@GeneratedValueが付与された中で、シーケンスを使用して自動生成する際に付与されます|
-|@TableGenerator|主キーを作成するジェネレータの設定を表します。<br/>属性は以下の通り<br/>・name:@GeneratedValueのgenerator属性で指定された名前<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|@GeneratedValueが付与された中で、テーブルを使用して自動生成する際に付与されます。|
-|@Lob|largeオブジェクト型の永続化フィールドまたは永続化プロパティであることを表します。||
-|@Temporal|時刻を表します型（java.util.Dateおよびjava.util.Calendar）を持つ永続化プロパティまたは永続化フィールドを表します。||
-|@Transient|永続化対象外とするプロパティやフィールドを表します。||
-|@Version|楽観的ロック機能を使用するために用いるversionフィールドまたはversionプロパティを表します。||
-|@Column|永続化フィールドまたは永続化プロパティと，データベース上のカラムとのマッピングを表します。<br/>使用される属性は以下の通り。<br/>・name:カラム名<br>・columnDefinition:カラムに付加される制約<br/>・length:カラムの長さ<br/>・precision:カラムの精度<br/>・scale:カラムのスケール<br/>・nullable:null値を指定できるかどうか<br/>・unique:ユニークキーであるかどうか|　|
+|アノテーション|説明|
+|:--:|:--|
+|@Id | 主キーであることを表します。|
+|@GeneratedValue|DBによって自動採番されることを表します。<br/>属性は以下の通り<br/>・generator:使用するジェネレータ。<br/>・strategy:主キーの値を生成する方法|
+| @SequenceGenerator|主キーを作成するシーケンスジェネレータの設定を表します。<br/>@GeneratedValueと同時に使用する必要があります。<br/>属性は以下の通り<br/>・name:このジェネレータを識別するための名前。@GeneratedValueのgeneratorに指定する。<br/>・sequenceName:使用するデータベースシーケンスオブジェクトの名前<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|
+|@TableGenerator|主キーを作成するジェネレータの設定を表します。<br/>@GeneratedValueと同時に使用する必要があります。<br/>属性は以下の通り<br/>・name:このジェネレータを識別するための名前。@GeneratedValueのgeneratorに指定する。<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|
+|@Lob|largeオブジェクト型の永続化フィールドまたは永続化プロパティであることを表します。|
+|@Temporal|時刻を表します型（java.util.Dateおよびjava.util.Calendar）を持つ永続化プロパティまたは永続化フィールドを表します。|
+|@Transient|永続化対象外とするプロパティやフィールドを表します。|
+|@Version|楽観的ロック機能を使用するために用いるversionフィールドまたはversionプロパティを表します。|
+|@Column|永続化フィールドまたは永続化プロパティと，データベース上のカラムとのマッピングを表します。<br/>使用される属性は以下の通り。<br/>・name:カラム名<br>・columnDefinition:カラムに付加される制約<br/>・length:カラムの長さ<br/>・precision:カラムの精度<br/>・scale:カラムのスケール<br/>・nullable:null値を指定できるかどうか<br/>・unique:ユニークキーであるかどうか|
 
 ### リレーションシップに関するアノテーション
 結合するテーブルに対応するプロパティのgetterメソッド(パラメータのuseAccessorがfalseの場合はプロパティ自体)に付与されます。
