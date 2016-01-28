@@ -16,9 +16,6 @@
   <#if attr.temporalType??>
     @Temporal(TemporalType.${attr.temporalType})
   </#if>
-  <#if attr.transient>
-    @Transient
-  </#if>
   <#if attr.version>
     @Version
   </#if>

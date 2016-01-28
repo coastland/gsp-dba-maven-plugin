@@ -23,7 +23,6 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 |@TableGenerator|主キーを作成するジェネレータの設定を表します。<br/>@GeneratedValueと同時に使用する必要があります。<br/>属性は以下の通り<br/>・name:このジェネレータを識別するための名前。@GeneratedValueのgeneratorに指定する。<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|
 |@Lob|largeオブジェクト型の永続化フィールドまたは永続化プロパティであることを表します。|
 |@Temporal|時刻を表します型（java.util.Dateおよびjava.util.Calendar）を持つ永続化プロパティまたは永続化フィールドを表します。|
-|@Transient|永続化対象外とするプロパティやフィールドを表します。|
 |@Version|楽観的ロック機能を使用するために用いるversionフィールドまたはversionプロパティを表します。|
 |@Column|永続化フィールドまたは永続化プロパティと，データベース上のカラムとのマッピングを表します。<br/>使用される属性は以下の通り。<br/>・name:カラム名<br>・columnDefinition:カラムに付加される制約<br/>・length:カラムの長さ<br/>・precision:カラムの精度<br/>・scale:カラムのスケール<br/>・nullable:null値を指定できるかどうか<br/>・unique:ユニークキーであるかどうか|
 
