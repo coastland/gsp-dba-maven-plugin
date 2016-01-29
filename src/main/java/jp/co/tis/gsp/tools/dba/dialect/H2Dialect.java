@@ -88,6 +88,16 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user) {
+        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+    }
+
+    @Override
+    public void createSchemaIfNotExist(Connection conn, String schema) {
+        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+    }
+
+    @Override
     public void setUrl(String url) {
         this.url = url;
 

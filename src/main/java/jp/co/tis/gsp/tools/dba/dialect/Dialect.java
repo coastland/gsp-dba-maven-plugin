@@ -27,10 +27,12 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.GenerationType;
+import javax.resource.NotSupportedException;
 
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StringUtil;
@@ -50,6 +52,11 @@ public abstract class Dialect {
 
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
+
+    public abstract void grantAllToAnotherSchema(Connection conn, String schema, String user)
+            throws SQLException, UnsupportedOperationException;
+
+    public abstract void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException;
 
 	public abstract void setUrl(String url);
 

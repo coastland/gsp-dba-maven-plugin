@@ -154,6 +154,16 @@ public class MysqlDialect extends Dialect {
 		}
 	}
 
+	@Override
+	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
+		throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+ 	}
+
+	@Override
+	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
+		throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+	}
+
 	private boolean existsUser(Connection conn, String user) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
