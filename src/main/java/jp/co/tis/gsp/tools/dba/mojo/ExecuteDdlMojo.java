@@ -16,33 +16,21 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 import jp.co.tis.gsp.tools.dba.util.SqlSplitter;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
+
+import java.io.*;
+import java.sql.*;
+import java.util.*;
 
 /**
  *
@@ -71,6 +59,13 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 		Dialect dialect = DialectFactory.getDialect(url);
 		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		dialect.createUser(user, password, adminUser, adminPassword);
+        if (isOracle() && !schema.equals(user)) {
+            try {
+                createSchemaIfNotExist();
+            } catch (SQLException e) {
+                getLog().warn(e);
+            }
+        }
 
         FilenameFilter sqlFileFilter = new FilenameFilter() {
             @Override
@@ -96,6 +91,16 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 		} catch (Exception e) {
 			getLog().warn(e);
 		}
+
+        if (isOracle() && !schema.equals(user)) {
+            // 使用するDB製品がOracleの時は、
+            // ユーザが所有していないスキーマにDDLを流し込んだ場合は個別に権限を付与する。
+            try {
+                grantAllToSchema();
+            } catch (SQLException e) {
+                getLog().warn(e);
+            }
+        }
 	}
 
     private void executeSql(String sql) throws SQLException {
@@ -138,8 +143,9 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
     }
 
     private void executeBySqlFiles(File...sqlFiles) throws SQLException, IOException {
-        if (conn == null || conn.isClosed())
-            conn = DriverManager.getConnection(url, user, password);
+        if (conn == null || conn.isClosed()) {
+            setConnection();
+        }
 
         successfulStatements = 0;
         totalStatements = 0;
@@ -156,5 +162,71 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
         }
         getLog().info(successfulStatements + " of " + totalStatements
                 + " SQL statements executed successfully");
+    }
+
+    private boolean isOracle() {
+        // 前の処理で接続文字列自体の構造が正しいことは分かっているのでそれ自体の精査は行わない。
+        return "oracle".equals(StringUtils.split(url, ':')[1]);
+    }
+
+    /**
+     * ユーザに対して、スキーマの全オブジェクトへのALL権限を付与する。
+     * NOTE! 本メソッドはOracle専用の処理のため、本来 {@link jp.co.tis.gsp.tools.dba.dialect.OracleDialect} に
+     * 配置されるべきだが、これ単体の修正のためにインターフェースとその実相クラスを全て修正するコストをかんがみて
+     * ここに配置している。
+     * 今後このような、Dialectインターフェースの修正を伴う変更が増えたら、インターフェースの変更を検討してください。
+     * @throws SQLException SQLエラー
+     */
+    private void grantAllToSchema() throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
+        stmt.setString(1, StringUtils.upperCase(schema));
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            String tableName = rs.getString("TABLE_NAME");
+            // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
+            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
+            conn.createStatement().execute(sql);
+        }
+    }
+
+    /**
+     * 流し込み先のスキーマがなければ作る。
+     * @throws SQLException SQLエラー
+     */
+    private void createSchemaIfNotExist() throws SQLException {
+        setConnection();
+        PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
+        userStmt.setString(1, StringUtils.upperCase(schema));
+        ResultSet rs = userStmt.executeQuery();
+        rs.next();
+        if (rs.getInt("num") > 0) {
+            // すでにデータ流し込み対象のスキーマが存在していれば何もしない
+            return;
+        }
+        StatementUtil.close(userStmt);
+
+        Statement createUserStmt = conn.createStatement();
+        createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
+        String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
+                "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
+                "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
+        createUserStmt.execute(grantSql);
+        System.err.println("GRANT文を実行しました:\n" + grantSql);
+
+        StatementUtil.close(createUserStmt);
+    }
+
+    /**
+     * ユーザ名とスキーマ名に応じて適切なコネクションを設定する。
+     * データベースがOracleでかつユーザ名とスキーマ名が異なる時、
+     * DDLの実行に管理者ユーザでのログインが必要なため。
+     * @throws SQLException SQLエラー
+     */
+    private void setConnection() throws SQLException {
+        if (schema.equals(user)) {
+            conn = DriverManager.getConnection(url, user, password);
+        } else {
+            conn = DriverManager.getConnection(url, adminUser, adminPassword);
+        }
     }
 }

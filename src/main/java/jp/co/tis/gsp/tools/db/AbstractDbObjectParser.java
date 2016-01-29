@@ -37,6 +37,7 @@ public class AbstractDbObjectParser {
 	protected File outputDirectory;
 	protected String schema;
 	protected String url;
+	protected String user;
 	private final Configuration fmConfig = new Configuration();
 	protected final LinkedList<ClassTemplateLoader> templateLoaderList = new LinkedList<ClassTemplateLoader>();
 	protected TypeMapper typeMapper;
@@ -105,4 +106,7 @@ public class AbstractDbObjectParser {
 		return outputDirectory;
 	}
 
+    public void setUser(String user) {
+        this.user = user;
+    }
 }

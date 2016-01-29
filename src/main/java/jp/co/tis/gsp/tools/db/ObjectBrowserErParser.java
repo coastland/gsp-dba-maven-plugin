@@ -16,21 +16,30 @@
 
 package jp.co.tis.gsp.tools.db;
 
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import jp.co.tis.gsp.tools.db.beans.*;
-import org.apache.commons.lang.StringUtils;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import jp.co.tis.gsp.tools.db.beans.Column;
+import jp.co.tis.gsp.tools.db.beans.Entity;
+import jp.co.tis.gsp.tools.db.beans.Erd;
+import jp.co.tis.gsp.tools.db.beans.ForeignKey;
+import jp.co.tis.gsp.tools.db.beans.Index;
+import jp.co.tis.gsp.tools.db.beans.ModelView;
+import jp.co.tis.gsp.tools.db.beans.View;
+
+import org.apache.commons.lang.StringUtils;
+
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 public class ObjectBrowserErParser extends AbstractDbObjectParser {
     protected boolean printTable = true;
@@ -66,6 +75,14 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 		}
 
 		for(Entity entity : entityList) {
+		    
+		    //スキーマ != ユーザの場合、スキーマ名をセットする
+		    if(!user.equals(schema)){
+		      //ftlで.(ピリオド)が常に表示されるため、ここで設定しておく
+		        entity.setSchema(schema + ".");
+		    }
+		    
+		    
 			// SHOWTYPEが0以外は論理のみ項目
 			if (entity.getShowType() != 0) {
 				continue;
@@ -122,6 +139,13 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 		// View
 		if(viewList != null) {
 			for(View view : viewList) {
+			    
+	            //スキーマ != ユーザの場合、スキーマ名をセットする
+	            if(!user.equals(schema)){
+	                //ftlで.(ピリオド)が常に表示されるため、ここで設定しておく
+	                view.setSchema(schema + ".");
+	            }
+			    
 				if (!printView || view.getShowType() != 0) {
 					continue;
 				}

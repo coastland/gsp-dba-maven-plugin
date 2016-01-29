@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -43,7 +42,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
-import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
@@ -117,7 +115,7 @@ public class OracleDialect extends Dialect {
 			Process process = pb.start();
 
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                    Charset.forName("Shift_JIS") : StandardCharsets.UTF_8;
+                    Charset.forName("Shift_JIS") : Charset.forName("UTF-8");
 
             reader = new BufferedReader(
 		            new InputStreamReader(process.getInputStream(), terminalCharset));
@@ -151,11 +149,12 @@ public class OracleDialect extends Dialect {
                     "directory=exp_dir",
 					"dumpfile=" + dumpFile.getName(),
 					"schemas=" + schema,
-                    "nologfile=y");
+                    "nologfile=y",
+                    "exclude=user");
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                    Charset.forName("Shift_JIS") : StandardCharsets.UTF_8;
+                    Charset.forName("Shift_JIS") : Charset.forName("UTF-8");
 
 			reader = new BufferedReader(
 		            new InputStreamReader(process.getInputStream(), terminalCharset));
@@ -192,24 +191,14 @@ public class OracleDialect extends Dialect {
 			if(existsUser(conn, user)) {
 				return;
 			}
-			try {
-				stmt.execute("DROP USER "+ user);
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
+
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-            String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
+			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " + 
+	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
+	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
-            System.err.println(grantSql);
-            String grantExecuteSql = "GRANT EXECUTE ON SYS.DBMS_ALERT TO " + user;
-            try {
-                stmt.execute(grantExecuteSql);
-            } catch (SQLException e) {
-                System.err.println("DBMS_ALERT 権限の付与に失敗しました。\n"
-                        + "本権限は、tesloggerのDBキャプチャに必要になります。\n"
-                        + "DBキャプチャが必要であれば、手動で権限を設定してください。\n"
-                        + "実行SQL： [" + grantExecuteSql + "]");
-            }
+            System.err.println("GRANT文を実行しました:\n" + grantSql);
+
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
@@ -239,8 +228,8 @@ public class OracleDialect extends Dialect {
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
-			// 目的のユーザがいなければ何もしない
-			if(!existsUser(conn, user)) {
+			// 目的のスキーマがなければ何もしない
+			if(!existsUser(conn, schema)) {
 				return;
 			}
 		} catch (SQLException e) {
@@ -252,15 +241,17 @@ public class OracleDialect extends Dialect {
 		PreparedStatement stmtMeta = null;
 		Statement stmt = null;
 		try {
-			conn = DriverManager.getConnection(url, user, password);
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM user_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM')");
-
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
+			stmtMeta.setString(1, schema);
+			
 			ResultSet rsMeta = stmtMeta.executeQuery();
 			while(rsMeta.next()) {
 				String objectType = rsMeta.getString("OBJECT_TYPE");
 				String objectName = rsMeta.getString("OBJECT_NAME");
 				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, objectName);
+					dropObject(conn, objectType, schema + "." + objectName);
 				}
 			}
 			stmt = conn.createStatement();
@@ -310,12 +301,12 @@ public class OracleDialect extends Dialect {
 
 	@Override
 	public String getViewDefinitionSql() {
-		return "select text as view_definition from user_views where view_name=?";
+		return "select text as view_definition from dba_views where view_name= ? and owner = ?";
 	}
 
 	@Override
     public String getSequenceDefinitionSql() {
-        return "select sequence_name from user_sequences where sequence_name=?";
+        return "select sequence_name from dba_sequences where sequence_name= ? and sequence_owner = ?";
     }
 
     @Override

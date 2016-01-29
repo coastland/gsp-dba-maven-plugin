@@ -200,6 +200,16 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+    }
+
+    @Override
+    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+    }
+
+    @Override
     public void setUrl(String url) {
         this.url = url;
     }
@@ -226,12 +236,12 @@ public class PostgresqlDialect extends Dialect {
 
     @Override
     public String getViewDefinitionSql() {
-        return "SELECT definition AS view_definition FROM pg_views WHERE viewname=?";
+        return "SELECT definition AS view_definition FROM pg_views WHERE viewname=? and schemaname=?";
     }
 
     @Override
     public String getSequenceDefinitionSql() {
-        return "SELECT relname FROM pg_statio_user_sequences WHERE relname=?";
+        return "SELECT relname FROM pg_statio_user_sequences WHERE relname=? and schemaname=?";
     }
 
     @Override

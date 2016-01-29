@@ -63,12 +63,24 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 |:---------------|:-----:|:----------------------------------------------------------------|
 | driver         | ○     | 使用するJDBCドライバ。                                         |
 | url            | ○     | データベースのURL。 jdbc:subprotocol:subname 形式。            |
-| adminUser      | ○     | データベースのadminユーザ名。                                  |
+| adminUser      | ○     | データベースのadminユーザ名。Oracleの場合はsysは指定出来ません。|
 | adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
-| user           | ○     | データベースのユーザ名。                                       |
+| user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。   |
 | password       | ×     | userに設定したユーザのパスワード。                             |
 | schema         | ×     | データベースのスキーマ名。                                     |
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
+|optionalDialects | ×    | 使用するダイアレクトクラスのFQCN。|
+
+ * optionalDialectsの指定方法  
+ 使用するダイアレクトクラスを変更する場合、以下の形式でデータベースと対応するダイアレクトクラスを定義します。
+
+```
+<configuration>
+  <optionalDialects>
+    <oracle>jp.co.tis.gsp.tools.dba.dialect.CustomOracleDialect</oracle>
+  </optionalDialects>
+</configuration>
+```
 
 ### generate-ddl
 
@@ -254,10 +266,12 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
 | genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。                    |
-| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。PostgreSQLを使用する場合で、バージョン8.1以上を使用する場合は、明示的にorg.seasar.extension.jdbc.dialect.Postgre81Dialectを指定してください。|
+| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。                        |
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
-| entityTemplate         | ×    | entity の自動生成テンプレート。                                           |
+| entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"                                           |
+|javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
+|templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
 
 ### export-schema
 
@@ -505,7 +519,8 @@ IDENTITYを指定したカラムは使用できません。<br />
 #### execute-ddl
 
 * Oracle<br />
-  ユーザ名とスキーマ名は同一のものしか指定できません。
+  ユーザー名とスキーマ名で別の物を指定可能です。もし存在しなければどちらも作成されます。<br />
+  ただしスキーマを本プラグインで新規作成した時、そのログインパスワードはスキーマ名と同じになります。
 * DB2<br />
   ユーザ名とスキーマ名は同一のものしか指定できません。
 
