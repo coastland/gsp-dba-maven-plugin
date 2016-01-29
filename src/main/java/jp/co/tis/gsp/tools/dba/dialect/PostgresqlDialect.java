@@ -224,11 +224,19 @@ public class PostgresqlDialect extends Dialect {
         return StringUtils.lowerCase(colmunName);
     }
 
+    /**
+     * ビュー定義を検索するSQLを返却する。
+     * @return ビュー定義を検索するSQL文
+     */
     @Override
     public String getViewDefinitionSql() {
         return "SELECT definition AS view_definition FROM pg_views WHERE viewname=? and schemaname=?";
     }
 
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
     @Override
     public String getSequenceDefinitionSql() {
         return "SELECT relname FROM pg_statio_user_sequences WHERE relname=? and schemaname=?";
