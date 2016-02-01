@@ -16,25 +16,19 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import jp.co.tis.gsp.tools.db.EntityDependencyParser;
 import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
+
+import java.io.File;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SqlserverDialect extends Dialect {
     private String url;
