@@ -16,37 +16,27 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jp.co.tis.gsp.tools.db.TypeMapper;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.seasar.extension.jdbc.gen.dialect.GenDialect;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
     private String url;
@@ -201,12 +191,24 @@ public class PostgresqlDialect extends Dialect {
 
     @Override
     public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
-        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+//        PreparedStatement stmt =
+//                conn.prepareStatement("select relname as TABLE_NAME from pg_stat_user_tables where schemaname = ?");
+//        stmt.setString(1, schema);
+//        ResultSet rs = stmt.executeQuery();
+//        while (rs.next()) {
+//            String tableName = rs.getString("TABLE_NAME");
+//            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
+//            conn.createStatement().execute(sql);
+//        }
+//        StatementUtil.close(stmt);
+        conn.createStatement().execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
+        conn.createStatement().execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
+        ConnectionUtil.close(conn);
     }
 
     @Override
     public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
-        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+        // nop
     }
 
     @Override
