@@ -339,12 +339,20 @@ public class OracleDialect extends Dialect {
 	@Override
 	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
 
+    /**
+	 * ビュー定義を検索するSQLを返却する。
+	 * @return ビュー定義を検索するSQL文
+     */
 	@Override
-	public String getViewDefinitionSql() {
+    public String getViewDefinitionSql() {
 		return "select text as view_definition from dba_views where view_name= ? and owner = ?";
-	}
+    }
 
-	@Override
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
+    @Override
     public String getSequenceDefinitionSql() {
         return "select sequence_name from dba_sequences where sequence_name= ? and sequence_owner = ?";
     }

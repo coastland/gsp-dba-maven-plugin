@@ -241,12 +241,20 @@ public class Db2Dialect extends Dialect {
     public String normalizeColumnName(String colmunName) {
         return StringUtils.upperCase(colmunName);
     }
-    
+
+    /**
+     * ビュー定義を検索するSQLを返却する。
+     * @return ビュー定義を検索するSQL文
+     */
     @Override
     public String getViewDefinitionSql() {
         return "select TEXT as VIEW_DEFINITION from SYSCAT.VIEWS where VIEWNAME=?";
     }
 
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
     @Override
     public String getSequenceDefinitionSql() {
         return "select SEQNAME from SYSCAT.SEQUENCES where SEQNAME=? AND OWNER=?";
