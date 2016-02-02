@@ -40,7 +40,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
             <plugin>
                 <groupId>jp.co.tis.gsp</groupId>
                 <artifactId>gsp-dba-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>
+                    使用するgsp-dba-maven-pluginのバージョン
+                </version>
                 <dependencies>
                     <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
                     <dependency>
@@ -97,6 +99,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 
     データモデル上のオブジェクトは「論理・物理モデル」として定義して下さい。
     「論理モデルのみ」または「物理モデルのみ」と定義した場合、対象のDDLは生成されません。
+    また、文字列型や日付型を持つカラムのデフォルト値を設定する際は値をシングルクォーテーションで囲まないとexecute-ddl時にエラーが発生します。
 
 
 使用する場合、pom.xmlに以下を追加してください。
@@ -105,7 +108,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>generate-ddl</id>
@@ -141,7 +146,9 @@ DDLを実行します。
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>execute-ddl</id>
@@ -174,7 +181,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>load-data</id>
@@ -217,7 +226,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 * ファイル名は、[テーブルの物理名].csv。
 * 先頭行は、カラムの物理名(:カラムの型名)。DBによっては型名を指定しなくても自動で推定し、設定される。
 * 二行目以降にテストデータを記載。
-* 全角空白のみの項目はnullとして扱われる。
+* 全角空白、半角空白のみの項目はnullとして扱われる。変更する際は[Dialectクラスのカスタマイズ例](./recipe/custom-Dialect.md)を参照すること。
 
 データの例を記載します。
 
@@ -233,7 +242,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 ### generate-entity
 
-データベースのメタデータから、テーブルに対応するエンティティを生成します。
+データベースのメタデータから、テーブルに対応するエンティティを生成します。自動生成時に付与される各種アノテーションに関しては、[エンティティで使用されるアノテーション](recipe/spec-generatedEntity.md)をご確認ください。
 生成処理はカスタマイズしたS2JDBC-Genを使用しています。
 
 使用する場合、pom.xmlに以下を追加してください。
@@ -242,7 +251,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>generate-entity</id>
@@ -265,13 +276,14 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 |:-----------------------|:-----:|:--------------------------------------------------------------------------|
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
-| genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。                    |
+| genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。<br>カスタマイズする際は[GenDialectクラスのカスタマイズ例](./recipe/custom-genDialect.md)を参照してください。<br> |
 | dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。                        |
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
 | entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"                                           |
 |javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
 |templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
+テンプレートをカスタマイズする際は、[generate-entityで使用するテンプレートのカスタマイズ例](./recipe/custom-EntityTemplate.md)を参照してください。
 
 ### export-schema
 
@@ -291,7 +303,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <executions>
           <execution>
             <id>export-schema</id>
@@ -314,6 +328,8 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
 | outputDirectory        | ×     | データベーススキーマをエクスポートするディレクトリのパス。デフォルトは”target/dump”。 |
 
+export-schemaはDB2とSQLServerには対応しておりません。  
+これらのDBを使用する際は、上記の`<execution>~</execution>`をコメントアウト、もしくは削除してください。
 
 ### import-schema
 
@@ -325,7 +341,9 @@ CSV形式で定義したデータを、データベースの指定したスキ�
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>
+            使用するgsp-dba-maven-pluginのバージョン
+        </version>
         <configuration>
         <!-- 設定を追加 -->
         </configuration>
@@ -341,6 +359,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
 | version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
 
+import-schemaはDB2とSQLServerには対応しておりません。
 
 ## データベースの対応状況
 
@@ -385,24 +404,24 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 | 型名          | 使用可否 | 記入例 | 備考 |
 |:--------------|:--------:|:-------|:-----|
-| BFILE         | ×       | ?                                                  | BFILE型のカラム名がCSVファイル内に記載されているとエラーが発生し、正常にデータが登録されない。 |
-| BINARY_DOUBLE | ×       | ?                                                  | ? |
-| BINARY_FLOAT  | ×       | ?                                                  | ? |
-| BLOB          | ×       | ?                                                  | ? |
-| CHAR          | ○       | text                                                | ? |
-| CLOB          | ×       | ?                                                  | ? |
-| DATE          | ○       | 1990-08-08                                          | ? |
-| LONG          | ○       | 1234567890                                          | ? |
-| LONG ROW      | ×       | ?                                                  | ? |
-| NCHAR         | ○       | text                                                | ? |
-| NCLOB         | ×       | ?                                                  | ? |
-| NUMBER        | ○       | 1234567890                                          | ? |
-| VARCHAR       | ○       | text                                                | ? |
-| RAW           | ×       | ?                                                  | ? |
-| ROWID         | ×       | ?                                                  | ? |
-| TIMESTAMP     | ○       | 1990-08-08 12:12:12 / 1990-08-08 12:12:12.123456789 | ? |
-| UROWID        | ×       | ?                                                  | ? |
-| VARCHAR2      | ○       | text                                                | ? |
+| BFILE         | ×       | -                                                  | BFILE型のカラム名がCSVファイル内に記載されているとエラーが発生し、正常にデータが登録されない。 |
+| BINARY_DOUBLE | ×       | -                                                  | - |
+| BINARY_FLOAT  | ×       | -                                                  | - |
+| BLOB          | ×       | -                                                  | - |
+| CHAR          | ○       | text                                                | - |
+| CLOB          | ×       | -                                                  | - |
+| DATE          | ○       | 1990-08-08                                          | - |
+| LONG          | ○       | 1234567890                                          | - |
+| LONG ROW      | ×       | -                                                  | - |
+| NCHAR         | ○       | text                                                | - |
+| NCLOB         | ×       | -                                                  | - |
+| NUMBER        | ○       | 1234567890                                          | - |
+| VARCHAR       | ○       | text                                                | - |
+| RAW           | ×       | -                                                  | - |
+| ROWID         | ×       | -                                                  | - |
+| TIMESTAMP     | ○       | 1990-08-08 12:12:12 / 1990-08-08 12:12:12.123456789 | - |
+| UROWID        | ×       | -                                                  | - |
+| VARCHAR2      | ○       | text                                                | - |
 
 
 **Postgresql**
@@ -411,36 +430,36 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 | 型名      | 使用可否 | 記入例                        | 備考 |
 |:----------|:--------:|:------------------------------|:-----|
-| BIGINT    | ○       | -9223372036854770000          | ?   |
-| BIGSERIAL | ○       | 9223372036854770000           | ?   |
-| BIT       | ×       | ?                            | ?   |
-| BOOL      | ○       | t/TRUE/y/yes/1/f/FALSE/n/no/0 | ?   |
-| BOX       | ×       | ?                            | ?   |
-| BYTEA     | ×       | ?                            | ?   |
-| CHAR      | ○       | text                          | ?   |
-| CIDR      | ×       | ?                            | ?   |
-| CIRCLE    | ×       | ?                            | ?   |
-| DATE      | ○       | 1999-01-08                    | ?   |
-| FLOAT8    | ○       | 1.111                         | ?   |
-| INET      | ×       | ?                            | ?   |
-| INTEGER   | ○       | -2147483648                   | ?   |
-| INTERVAL  | ×       | ?                            | ?   |
-| LINE      | ×       | ?                            | ?   |
-| LSEG      | ×       | ?                            | ?   |
-| MACADDR   | ×       | ?                            | ?   |
-| MONEY     | ×       | ?                            | ?   |
-| NUMERIC   | ○       | 1.111                         | ?   |
-| PATH      | ×       | ?                            | ?   |
-| POINT     | ×       | ?                            | ?   |
-| POLYGON   | ×       | ?                            | ?   |
-| REAL      | ○       | 1.111                         | ?   |
-| SERIAL    | ○       | 1                             | ?   |
-| SMALLINT  | ○       | -32768                        | ?   |
-| TEXT      | ○       | text                          | ?   |
-| TIME      | ×       | ?                            | ?   |
-| TIMESTAMP | ○       | 1999-01-08 12:12:12           | ?   |
-| VARBIT    | ×       | ?                            | ?   |
-| VARCHAR   | ○       | text                          | ?   |
+| BIGINT    | ○       | -9223372036854770000          | -   |
+| BIGSERIAL | ○       | 9223372036854770000           | -   |
+| BIT       | ×       | -                            | -   |
+| BOOL      | ○       | t/TRUE/y/yes/1/f/FALSE/n/no/0 | -   |
+| BOX       | ×       | -                            | -   |
+| BYTEA     | ×       | -                            | -   |
+| CHAR      | ○       | text                          | -   |
+| CIDR      | ×       | -                            | -   |
+| CIRCLE    | ×       | -                            | -   |
+| DATE      | ○       | 1999-01-08                    | -   |
+| FLOAT8    | ○       | 1.111                         | -   |
+| INET      | ×       | -                            | -   |
+| INTEGER   | ○       | -2147483648                   | -   |
+| INTERVAL  | ×       | -                            | -   |
+| LINE      | ×       | -                            | -   |
+| LSEG      | ×       | -                            | -   |
+| MACADDR   | ×       | -                            | -   |
+| MONEY     | ×       | -                            | -   |
+| NUMERIC   | ○       | 1.111                         | -   |
+| PATH      | ×       | -                            | -   |
+| POINT     | ×       | -                            | -   |
+| POLYGON   | ×       | -                            | -   |
+| REAL      | ○       | 1.111                         | -   |
+| SERIAL    | ○       | 1                             | -   |
+| SMALLINT  | ○       | -32768                        | -   |
+| TEXT      | ○       | text                          | -   |
+| TIME      | ×       | -                            | -   |
+| TIMESTAMP | ○       | 1999-01-08 12:12:12           | -   |
+| VARBIT    | ×       | -                            | -   |
+| VARCHAR   | ○       | text                          | -   |
 
 **MS SQL Server**
 
@@ -449,38 +468,38 @@ IDENTITYを指定したカラムは使用できません。<br />
 
 | 型名 | 使用可否 | 記入例 | 備考 |
 |:----|:-------:|:-----|:----|
-| BIGINT | ○ | -9223372036854770000 | ? |
+| BIGINT | ○ | -9223372036854770000 | - |
 | BINARY | ○ | 000101001100 | 16進数のビット表記 |
 | BIT | ○ | 000101001100 | 16進数のビット表記 |
-| CHAR | ○ | text | ? |
-| DATE | ○ | 1990-08-08 | ? |
-| DATETIME | ○ | 2007-05-08 12:35:29 | ? |
-| DATETIME2 | ○ | 2007-05-08 12:35:29 | ? |
-| DATETIMEOFFSET | ○ | 2007-05-08 12:35:29.1234567 | ? |
-| DECIMAL | ○ | 1.111 | ? |
-| FLOAT | ○ | 1.111 | ? |
-| GEOGRAPHY | × | ? | ? |
-| GEOMETRY | × | ? | ? |
+| CHAR | ○ | text | - |
+| DATE | ○ | 1990-08-08 | - |
+| DATETIME | ○ | 2007-05-08 12:35:29 | - |
+| DATETIME2 | ○ | 2007-05-08 12:35:29 | - |
+| DATETIMEOFFSET | ○ | 2007-05-08 12:35:29.1234567 | - |
+| DECIMAL | ○ | 1.111 | - |
+| FLOAT | ○ | 1.111 | - |
+| GEOGRAPHY | × | - | - |
+| GEOMETRY | × | - | - |
 | HIERARCHYID | ○ | 000101001100 | 16進数のビット表記 |
 | IMAGE | ○ | 000101001100 | 16進数のビット表記 |
-| INT | ○ | -2147483648 | ? |
-| MONEY | ○ | 1.111 | ? |
-| NCHAR | ○ | text | ? |
-| NTEXT | ○ | text | ? |
-| NUMERIC | ○ | 1.111 | ? |
-| NVARCHAR | ○ | text | ? |
-| REAL | ○ | 1.111 | ? |
-| SMALLDATETIME | ○ | ? | ? |
-| SMALLINT | ○ | -32768 | ? |
-| SMALLMONEY | ○ | 1.111 | ? |
-| SQL_VARIANT | × | ? | ? |
-| TEXT | ○ | text | ? |
+| INT | ○ | -2147483648 | - |
+| MONEY | ○ | 1.111 | - |
+| NCHAR | ○ | text | - |
+| NTEXT | ○ | text | - |
+| NUMERIC | ○ | 1.111 | - |
+| NVARCHAR | ○ | text | - |
+| REAL | ○ | 1.111 | - |
+| SMALLDATETIME | ○ | - | - |
+| SMALLINT | ○ | -32768 | - |
+| SMALLMONEY | ○ | 1.111 | - |
+| SQL_VARIANT | × | - | - |
+| TEXT | ○ | text | - |
 | TIME | ○ | 12:35:29.123 | fractional second precisionに7を設定していても小数点第3位までの精度しか登録できない。 |
-| TIMESTAMP | × | ? | ? |
-| TINYINT | ○ | 255 | ? |
-| UNIQUEIDENTIFIER | ○ | 6F9619FF-8B86-D011-B42D-00C04FC964FF | ? |
+| TIMESTAMP | × | - | - |
+| TINYINT | ○ | 255 | - |
+| UNIQUEIDENTIFIER | ○ | 6F9619FF-8B86-D011-B42D-00C04FC964FF | - |
 | VARBINARY | ○ | 000101001100 | 16進数のビット表記 |
-| VARCHAR | ○ | text | ? |
+| VARCHAR | ○ | text | - |
 
 **DB2**
 
@@ -489,27 +508,27 @@ IDENTITYを指定したカラムは使用できません。<br />
 
 | 型名 | 使用可否 | 記入例 | 備考 |
 |:----|:-------:|:-----|:----|
-| BIGINT | ○ | -9223372036854770000 | ? |
-| BLOB | × | ? |
-| CHARACTER | ○ | text | ? |
-| CLOB | ○ | text | ? |
-| DATE | ○ | 2009-04-06 | ? |
-| DBCLOB | ○ | text | ? |
-| DECIMAL | ○ | 1.111 | ? |
-| DOUBLE | ○ | 1.111 | ? |
-| FLOAT | ○ | 1.111 | ? |
-| GRAPHIC | ○ | text | ? |
-| INTEGER | ○ | -2147483648 | ? |
-| LONG VARCHAR | ○ | text | ? |
-| LONG VARGRAPHIC | ○ | text | ? |
-| NUMERIC | ○ | 1.111 | ? |
-| REAL | ○ | 1.111 | ? |
-| SMALLINT | ○ | -32768 | ? |
-| TIME | ○ | 05:04:14.0 | ? |
-| TIMESTAMP | ○ | 2009-04-06 05:04:14.0 | ? |
-| VARCHAR | ○ | text | ? |
-| VARGRAPHIC | ○ | text | ? |
-| XML | × | ? | ? |
+| BIGINT | ○ | -9223372036854770000 | - |
+| BLOB | × | - |
+| CHARACTER | ○ | text | - |
+| CLOB | ○ | text | - |
+| DATE | ○ | 2009-04-06 | - |
+| DBCLOB | ○ | text | - |
+| DECIMAL | ○ | 1.111 | - |
+| DOUBLE | ○ | 1.111 | - |
+| FLOAT | ○ | 1.111 | - |
+| GRAPHIC | ○ | text | - |
+| INTEGER | ○ | -2147483648 | - |
+| LONG VARCHAR | ○ | text | - |
+| LONG VARGRAPHIC | ○ | text | - |
+| NUMERIC | ○ | 1.111 | - |
+| REAL | ○ | 1.111 | - |
+| SMALLINT | ○ | -32768 | - |
+| TIME | ○ | 05:04:14.0 | - |
+| TIMESTAMP | ○ | 2009-04-06 05:04:14.0 | - |
+| VARCHAR | ○ | text | - |
+| VARGRAPHIC | ○ | text | - |
+| XML | × | - | - |
 
 
 ### 制約事項
