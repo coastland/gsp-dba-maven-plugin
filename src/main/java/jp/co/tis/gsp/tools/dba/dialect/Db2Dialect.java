@@ -16,24 +16,18 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
+
+import java.io.File;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Db2Dialect extends Dialect {
     private String url;
@@ -79,10 +73,6 @@ public class Db2Dialect extends Dialect {
         throw new UnsupportedOperationException("db2を用いたexport-schemaはサポートしていません。");
     }
 
-    /**
-     * スキーマは指定できない。
-     * ユーザのデフォルトスキーマを使用する。
-     */
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
@@ -91,8 +81,8 @@ public class Db2Dialect extends Dialect {
         PreparedStatement stmt = null;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
-            // 目的のユーザがいなければ何もしない
-            if(!existsUser(conn, user)) {
+            // 目的のスキーマがなければ何もしない
+            if(!existsSchema(conn, schema)) {
                 return;
             }
             // テーブル・ビューの削除
@@ -117,11 +107,11 @@ public class Db2Dialect extends Dialect {
         }
     }
     
-    private boolean existsUser(Connection conn, String user) throws SQLException {
+    private boolean existsSchema(Connection conn, String schema) throws SQLException {
         PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement("select count(*) as num from SYSIBM.SYSDBAUTH where GRANTEE=?");
-            stmt.setString(1, StringUtils.upperCase(user));
+            stmt = conn.prepareStatement("select count(*) as num from SYSIBM.SYSSCHEMAAUTH where SCHEMANAME=?");
+            stmt.setString(1, StringUtils.upperCase(schema));
             ResultSet rs = stmt.executeQuery();
             rs.next();
             return (rs.getInt("num") > 0);
@@ -191,6 +181,37 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+                "select TABNAME from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U'");
+        stmt.setString(1, StringUtils.upperCase(schema));
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            String tableName = rs.getString("TABNAME");
+            // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
+            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
+            conn.createStatement().execute(sql);
+        }
+    }
+
+    @Override
+    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+ 		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
+		userStmt.setString(1, StringUtils.upperCase(schema));
+		ResultSet rs = userStmt.executeQuery();
+		rs.next();
+		if (rs.getInt("num") > 0) {
+			// すでにデータ流し込み対象のスキーマが存在していれば何もしない
+			return;
+		}
+		StatementUtil.close(userStmt);
+
+		Statement createUserStmt = conn.createStatement();
+		createUserStmt.execute("CREATE SCHEMA "+ schema);
+		StatementUtil.close(createUserStmt);
+    }
+
+    @Override
     public void setUrl(String url) {
         this.url = url;
     }
@@ -230,7 +251,7 @@ public class Db2Dialect extends Dialect {
      */
     @Override
     public String getSequenceDefinitionSql() {
-        return "select SEQNAME from SYSCAT.SEQUENCES where SEQNAME=?";
+        return "select SEQNAME from SYSCAT.SEQUENCES where SEQNAME=? AND OWNER=?";
     }
     
     @Override

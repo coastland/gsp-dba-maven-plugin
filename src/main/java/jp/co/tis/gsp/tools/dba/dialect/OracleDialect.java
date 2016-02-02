@@ -199,6 +199,46 @@ public class OracleDialect extends Dialect {
 		}
 	}
 
+	@Override
+	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
+		stmt.setString(1, StringUtils.upperCase(schema));
+		ResultSet rs = stmt.executeQuery();
+		while (rs.next()) {
+			String tableName = rs.getString("TABLE_NAME");
+			// PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
+			String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
+			conn.createStatement().execute(sql);
+		}
+	}
+
+    /**
+     * 流し込み先のスキーマがなければ作る。
+     * @throws SQLException SQLエラー
+     */
+	@Override
+	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
+		userStmt.setString(1, StringUtils.upperCase(schema));
+		ResultSet rs = userStmt.executeQuery();
+		rs.next();
+		if (rs.getInt("num") > 0) {
+			// すでにデータ流し込み対象のスキーマが存在していれば何もしない
+			return;
+		}
+		StatementUtil.close(userStmt);
+
+		Statement createUserStmt = conn.createStatement();
+		createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
+		String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
+				"CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
+				"CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
+		createUserStmt.execute(grantSql);
+		System.out.println("GRANT文を実行しました:\n" + grantSql);
+
+		StatementUtil.close(createUserStmt);
+	}
+
 	private boolean existsUser(Connection conn, String user) throws SQLException {
 		PreparedStatement stmt = null;
 		try {

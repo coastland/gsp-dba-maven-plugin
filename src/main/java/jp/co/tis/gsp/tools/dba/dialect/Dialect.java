@@ -16,24 +16,16 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.Collections;
-import java.util.List;
-
-import javax.persistence.GenerationType;
-
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.maven.plugin.MojoExecutionException;
-import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StringUtil;
+
+import javax.persistence.GenerationType;
+import java.io.File;
+import java.sql.*;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class Dialect {
 
@@ -50,6 +42,34 @@ public abstract class Dialect {
 
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
+
+    /**
+     * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
+     * アプリユーザが操作を行えるよう権限を付与する。
+     * デフォルトでは何もしない。
+     * @param conn DBコネクション
+     * @param schema スキーマ名
+     * @param user ユーザ名
+     * @throws SQLException SQL実行時のエラー
+     * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
+     */
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
+            throws SQLException, UnsupportedOperationException {
+        // nop
+    }
+
+    /**
+     * ユーザ名とスキーマ名が不一致の場合、別名のスキーマがもし存在しなければ作成する。
+     * デフォルトでは何もしない。
+     * @param conn DBコネクション
+     * @param schema スキーマ名
+     * @throws SQLException SQL実行時のエラー
+     * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
+     */
+    public void createSchemaIfNotExist(Connection conn, String schema)
+            throws SQLException, UnsupportedOperationException {
+        // nop
+    }
 
 	public abstract void setUrl(String url);
 

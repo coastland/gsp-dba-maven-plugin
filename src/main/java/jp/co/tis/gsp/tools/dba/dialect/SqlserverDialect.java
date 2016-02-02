@@ -189,6 +189,16 @@ public class SqlserverDialect extends Dialect {
     }
 
     @Override
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+    }
+
+    @Override
+    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+    }
+
+    @Override
     public void setUrl(String url) {
         this.url = url;
     }

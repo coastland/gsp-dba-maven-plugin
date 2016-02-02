@@ -59,9 +59,10 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 		Dialect dialect = DialectFactory.getDialect(url);
 		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		dialect.createUser(user, password, adminUser, adminPassword);
-        if (isOracle() && !schema.equals(user)) {
+        if (!schema.equals(user)) {
             try {
-                createSchemaIfNotExist();
+                setConnection();
+                dialect.createSchemaIfNotExist(conn, schema);
             } catch (SQLException e) {
                 getLog().warn(e);
             }
@@ -92,11 +93,9 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 			getLog().warn(e);
 		}
 
-        if (isOracle() && !schema.equals(user)) {
-            // 使用するDB製品がOracleの時は、
-            // ユーザが所有していないスキーマにDDLを流し込んだ場合は個別に権限を付与する。
+        if (!schema.equals(user)) {
             try {
-                grantAllToSchema();
+                dialect.grantAllToAnotherSchema(conn, schema, user);
             } catch (SQLException e) {
                 getLog().warn(e);
             }
@@ -162,58 +161,6 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
         }
         getLog().info(successfulStatements + " of " + totalStatements
                 + " SQL statements executed successfully");
-    }
-
-    private boolean isOracle() {
-        // 前の処理で接続文字列自体の構造が正しいことは分かっているのでそれ自体の精査は行わない。
-        return "oracle".equals(StringUtils.split(url, ':')[1]);
-    }
-
-    /**
-     * ユーザに対して、スキーマの全オブジェクトへのALL権限を付与する。
-     * NOTE! 本メソッドはOracle専用の処理のため、本来 {@link jp.co.tis.gsp.tools.dba.dialect.OracleDialect} に
-     * 配置されるべきだが、これ単体の修正のためにインターフェースとその実相クラスを全て修正するコストをかんがみて
-     * ここに配置している。
-     * 今後このような、Dialectインターフェースの修正を伴う変更が増えたら、インターフェースの変更を検討してください。
-     * @throws SQLException SQLエラー
-     */
-    private void grantAllToSchema() throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
-        stmt.setString(1, StringUtils.upperCase(schema));
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            String tableName = rs.getString("TABLE_NAME");
-            // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
-            conn.createStatement().execute(sql);
-        }
-    }
-
-    /**
-     * 流し込み先のスキーマがなければ作る。
-     * @throws SQLException SQLエラー
-     */
-    private void createSchemaIfNotExist() throws SQLException {
-        setConnection();
-        PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
-        userStmt.setString(1, StringUtils.upperCase(schema));
-        ResultSet rs = userStmt.executeQuery();
-        rs.next();
-        if (rs.getInt("num") > 0) {
-            // すでにデータ流し込み対象のスキーマが存在していれば何もしない
-            return;
-        }
-        StatementUtil.close(userStmt);
-
-        Statement createUserStmt = conn.createStatement();
-        createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
-        String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
-                "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
-                "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
-        createUserStmt.execute(grantSql);
-        System.err.println("GRANT文を実行しました:\n" + grantSql);
-
-        StatementUtil.close(createUserStmt);
     }
 
     /**
