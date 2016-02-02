@@ -16,24 +16,18 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
+
+import java.io.File;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Db2Dialect extends Dialect {
     private String url;
@@ -241,12 +235,20 @@ public class Db2Dialect extends Dialect {
     public String normalizeColumnName(String colmunName) {
         return StringUtils.upperCase(colmunName);
     }
-    
+
+    /**
+     * ビュー定義を検索するSQLを返却する。
+     * @return ビュー定義を検索するSQL文
+     */
     @Override
     public String getViewDefinitionSql() {
         return "select TEXT as VIEW_DEFINITION from SYSCAT.VIEWS where VIEWNAME=?";
     }
 
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
     @Override
     public String getSequenceDefinitionSql() {
         return "select SEQNAME from SYSCAT.SEQUENCES where SEQNAME=? AND OWNER=?";

@@ -16,15 +16,10 @@
   <#if attr.temporalType??>
     @Temporal(TemporalType.${attr.temporalType})
   </#if>
-  <#if attr.transient>
-    @Transient
-  </#if>
   <#if attr.version>
     @Version
   </#if>
-  <#if !attr.transient>
     @Column(<#if attr.columnName??>name = "${attr.columnName}", </#if><#if attr.columnDefinition??>columnDefinition = "${attr.columnDefinition}", <#else><#if attr.length??>length = ${attr.length}, </#if><#if attr.precision??>precision = ${attr.precision}, </#if><#if attr.scale??>scale = ${attr.scale}, </#if></#if>nullable = ${attr.nullable?string}, unique = ${attr.unique?string})
-  </#if>
 </#macro>
 <#macro printAssoAnnotations asso>
     @${asso.associationType.annotation.simpleName}<#if asso.mappedBy??>(mappedBy = "${asso.mappedBy}")</#if>

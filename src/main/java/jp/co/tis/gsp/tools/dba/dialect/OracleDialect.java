@@ -16,26 +16,7 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.persistence.GenerationType;
-
 import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -44,6 +25,17 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
+
+import javax.persistence.GenerationType;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class OracleDialect extends Dialect {
 	private String url;
@@ -339,12 +331,20 @@ public class OracleDialect extends Dialect {
 	@Override
 	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
 
+    /**
+	 * ビュー定義を検索するSQLを返却する。
+	 * @return ビュー定義を検索するSQL文
+     */
 	@Override
-	public String getViewDefinitionSql() {
+    public String getViewDefinitionSql() {
 		return "select text as view_definition from dba_views where view_name= ? and owner = ?";
-	}
+    }
 
-	@Override
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
+    @Override
     public String getSequenceDefinitionSql() {
         return "select sequence_name from dba_sequences where sequence_name= ? and sequence_owner = ?";
     }
