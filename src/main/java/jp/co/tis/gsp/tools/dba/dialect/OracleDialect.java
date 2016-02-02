@@ -16,24 +16,7 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.persistence.GenerationType;
-
+import jp.co.tis.gsp.tools.db.TypeMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -43,7 +26,16 @@ import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import javax.persistence.GenerationType;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class OracleDialect extends Dialect {
 	private String url;
@@ -149,7 +141,8 @@ public class OracleDialect extends Dialect {
                     "directory=exp_dir",
 					"dumpfile=" + dumpFile.getName(),
 					"schemas=" + schema,
-                    "nologfile=y");
+                    "nologfile=y",
+                    "exclude=user");
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
@@ -196,7 +189,7 @@ public class OracleDialect extends Dialect {
 	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
 	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
 			stmt.execute(grantSql);
-            System.err.println(grantSql);
+            System.err.println("GRANT文を実行しました:\n" + grantSql);
 
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
@@ -227,8 +220,8 @@ public class OracleDialect extends Dialect {
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
-			// 目的のユーザがいなければ何もしない
-			if(!existsUser(conn, user)) {
+			// 目的のスキーマがなければ何もしない
+			if(!existsUser(conn, schema)) {
 				return;
 			}
 		} catch (SQLException e) {
@@ -240,15 +233,17 @@ public class OracleDialect extends Dialect {
 		PreparedStatement stmtMeta = null;
 		Statement stmt = null;
 		try {
-			conn = DriverManager.getConnection(url, user, password);
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM user_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM')");
-
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
+			stmtMeta.setString(1, schema);
+			
 			ResultSet rsMeta = stmtMeta.executeQuery();
 			while(rsMeta.next()) {
 				String objectType = rsMeta.getString("OBJECT_TYPE");
 				String objectName = rsMeta.getString("OBJECT_NAME");
 				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, objectName);
+					dropObject(conn, objectType, schema + "." + objectName);
 				}
 			}
 			stmt = conn.createStatement();
@@ -296,14 +291,22 @@ public class OracleDialect extends Dialect {
 	@Override
 	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
 
+    /**
+	 * ビュー定義を検索するSQLを返却する。
+	 * @return ビュー定義を検索するSQL文
+     */
 	@Override
-	public String getViewDefinitionSql() {
-		return "select text as view_definition from user_views where view_name=?";
-	}
+    public String getViewDefinitionSql() {
+		return "select text as view_definition from dba_views where view_name= ? and owner = ?";
+    }
 
-	@Override
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
+    @Override
     public String getSequenceDefinitionSql() {
-        return "select sequence_name from user_sequences where sequence_name=?";
+        return "select sequence_name from dba_sequences where sequence_name= ? and sequence_owner = ?";
     }
 
     @Override

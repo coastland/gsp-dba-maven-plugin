@@ -34,8 +34,8 @@ import javax.sql.DataSource;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-
 import jp.co.tis.gsp.tools.dba.util.DialectUtil;
+
 import org.apache.commons.lang.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
 import org.seasar.extension.jdbc.gen.internal.meta.DbTableMetaReaderImpl;
@@ -43,7 +43,6 @@ import org.seasar.extension.jdbc.gen.meta.DbColumnMeta;
 import org.seasar.extension.jdbc.gen.meta.DbForeignKeyMeta;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.gen.meta.DbUniqueKeyMeta;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.ArrayMap;
 import org.seasar.framework.util.ResultSetUtil;
@@ -99,6 +98,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
                     PreparedStatement stmt = conn.prepareStatement(sequenceDefinitionSql);
                     try {
                         stmt.setString(1, columnMeta.getName() + "_USEQ");
+                        stmt.setString(2, schemaName);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.next()) {
                             columnMeta.setAutoIncrement(true);
@@ -168,11 +168,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             DbTableMeta tableMeta) {
     	Set<String> result = new HashSet<String>();
         try {
+            String schemaName = tableMeta.getSchemaName();
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableName);
+	        	String sql = getViewDefinitionSql(metaData, tableName, schemaName);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -218,11 +219,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         @SuppressWarnings("unchecked")
         Map<String, DbForeignKeyMeta> map = new ArrayMap();
         try {
+            String schemaName = tableMeta.getSchemaName();
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName());
+	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName(), schemaName);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -318,6 +320,33 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     		StatementUtil.close(stmt);
     	}
     	return null;
+
+    }
+    
+    //SQLにスキーマ名を渡す必要があったため一時的に作成
+    protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName, String schemaName) throws SQLException {
+        Dialect gspDialect = DialectFactory.getDialect(metaData.getURL());
+        String sql = gspDialect.getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        Connection conn = metaData.getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, viewName);
+            stmt.setString(2, schemaName);
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString("VIEW_DEFINITION");
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
 
     }
 }

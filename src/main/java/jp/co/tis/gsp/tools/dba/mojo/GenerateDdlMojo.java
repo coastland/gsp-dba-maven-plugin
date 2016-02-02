@@ -78,6 +78,7 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
 		parser.setOutputDirectory(outputDirectory);
 		parser.setSchema(schema);
 		parser.setUrl(url);
+		parser.setUser(user);
 
 		Dialect dialect = DialectFactory.getDialect(url);
 		parser.setTypeMapper(dialect.getTypeMapper());

@@ -17,6 +17,7 @@
 package jp.co.tis.gsp.tools.dba.mojo;
 
 import java.util.Map;
+
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -113,6 +114,9 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     public final void execute() throws MojoExecutionException, MojoFailureException {
         registerOptionalDialect();
         setupEnvironments();
+        if(schema == null){
+            schema = user;
+        }
         executeMojoSpec();
     }
 

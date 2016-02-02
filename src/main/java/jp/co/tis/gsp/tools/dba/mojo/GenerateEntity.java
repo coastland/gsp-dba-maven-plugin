@@ -134,8 +134,8 @@ public class GenerateEntity extends AbstractDbaMojo {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("driver", driver);
         param.put("url", url);
-        param.put("user", user);
-        param.put("password", password);
+        param.put("user", adminUser);
+        param.put("password", adminPassword);
         param.put("rootPackage", rootPackage);
 
         String[] urlTokens = StringUtils.split(url, ':');
@@ -189,6 +189,9 @@ public class GenerateEntity extends AbstractDbaMojo {
         command.setEntityTemplateFileName(entityTemplate);
         command.setGenDialectClassName(genDialectClassName);
         command.setShowTableName(true);
+        if(!user.equals(schema)){
+            command.setShowSchemaName(true);
+        }
         command.setGenerationType(dialect.getGenerationType());
         command.setFactoryClassName(GspFactoryImpl.class.getName());
         command.setUseAccessor(useAccessor);

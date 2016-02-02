@@ -203,6 +203,10 @@ public class SqlserverDialect extends Dialect {
         return USABLE_TYPE_NAMES.contains(type);
     }
 
+    /**
+     * ビュー定義を検索するSQLを返却する。
+     * @return ビュー定義を検索するSQL文
+     */
     @Override
     public String getViewDefinitionSql() {
         return "SELECT definition AS VIEW_DEFINITION FROM sys.sql_modules WHERE object_id = OBJECT_ID(?)";

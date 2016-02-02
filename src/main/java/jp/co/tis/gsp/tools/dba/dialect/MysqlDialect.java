@@ -216,6 +216,10 @@ public class MysqlDialect extends Dialect {
 		return generators;
 	}
 
+    /**
+     * ビュー定義を検索するSQLを返却する。
+     * @return ビュー定義を検索するSQL文
+     */
 	@Override
 	public String getViewDefinitionSql() {
 		return "SELECT view_definition FROM information_schema.views WHERE table_name=?";
