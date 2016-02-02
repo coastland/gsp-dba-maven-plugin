@@ -191,24 +191,9 @@ public class PostgresqlDialect extends Dialect {
 
     @Override
     public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
-//        PreparedStatement stmt =
-//                conn.prepareStatement("select relname as TABLE_NAME from pg_stat_user_tables where schemaname = ?");
-//        stmt.setString(1, schema);
-//        ResultSet rs = stmt.executeQuery();
-//        while (rs.next()) {
-//            String tableName = rs.getString("TABLE_NAME");
-//            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
-//            conn.createStatement().execute(sql);
-//        }
-//        StatementUtil.close(stmt);
         conn.createStatement().execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
         conn.createStatement().execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
         ConnectionUtil.close(conn);
-    }
-
-    @Override
-    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
-        // nop
     }
 
     @Override
