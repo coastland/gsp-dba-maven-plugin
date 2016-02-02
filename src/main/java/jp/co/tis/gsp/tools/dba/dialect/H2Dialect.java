@@ -85,7 +85,6 @@ public class H2Dialect extends Dialect {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
             stmt.execute("CREATE USER " + user + " PASSWORD '" + password + "'");
-//            stmt.execute("ALTER USER " + user + " ADMIN TRUE");
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER 実行中にエラー: ", e);
         } finally {
