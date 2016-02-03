@@ -135,7 +135,9 @@ public class GenerateEntity extends AbstractDbaMojo {
         param.put("driver", driver);
         param.put("url", url);
         param.put("user", adminUser);
-        param.put("password", adminPassword);
+        /* NULLがfreemarkerに渡るとInvalidReferenceExceptionになるが、
+           Mojoのparameterは空要素をNULLと認識するため、ここで空文字に変換する */
+        param.put("password", (adminPassword == null) ? "" : adminPassword);
         param.put("rootPackage", rootPackage);
 
         String[] urlTokens = StringUtils.split(url, ':');

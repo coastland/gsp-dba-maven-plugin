@@ -115,7 +115,11 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
         registerOptionalDialect();
         setupEnvironments();
         if(schema == null){
-            schema = user;
+            if (url.split(":")[1].equals("h2")) {
+                schema = "PUBLIC";
+            } else {
+                schema = user;
+            }
         }
         executeMojoSpec();
     }
