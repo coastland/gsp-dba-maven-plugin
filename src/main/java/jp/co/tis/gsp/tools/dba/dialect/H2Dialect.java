@@ -1,6 +1,7 @@
 package jp.co.tis.gsp.tools.dba.dialect;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
@@ -96,7 +97,7 @@ public class H2Dialect extends Dialect {
     @Override
     public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
         PreparedStatement pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
-        pstmt.setString(1, schema);
+        pstmt.setString(1, StringUtils.upperCase(schema));
         ResultSet rs = pstmt.executeQuery();
         StringBuilder sb = new StringBuilder();
         while (rs.next()) {
