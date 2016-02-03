@@ -18,6 +18,7 @@ package jp.co.tis.gsp.tools.dba.dialect;
 
 import jp.co.tis.gsp.tools.db.EntityDependencyParser;
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
@@ -93,7 +94,7 @@ public class SqlserverDialect extends Dialect {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
-        PreparedStatement dropStmt = null;
+        PreparedStatement dropStmt;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
@@ -145,35 +146,20 @@ public class SqlserverDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            if(!existsUser(adminUser, adminPassword, user)) {
-                
-                try {
-                    stmt.execute("DROP SCHEMA " + schema);
-                } catch(SQLException ignore) {
-                    // DROP SCHEMAに失敗しても気にしない
-                    ignore.printStackTrace();
-                }
-                
-                try {
-                    stmt.execute("DROP USER " + user);
-                } catch(SQLException ignore) {
-                    // DROP USERに失敗しても気にしない
-                    ignore.printStackTrace();
-                }
-                
-                try {
-                    stmt.execute("DROP LOGIN " + user);
-                } catch(SQLException ignore) {
-                    // DROP LOGINに失敗しても気にしない
-                    ignore.printStackTrace();
-                } 
-                
+            if (!existsSchema(conn, schema)) {
                 stmt.execute("CREATE SCHEMA " + schema);
+            }
+            if(!existsUser(adminUser, adminPassword, user)) {
                 stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
                 stmt.execute("CREATE USER " + user + " FOR LOGIN " + user + " WITH DEFAULT_SCHEMA = " + schema);
+                stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
             }
-            stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
-            stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
+            // dbo, sys, INFORMATION_SCHEMAのスキーマ権限は変更できないためここでスキーマごと権限移譲はしない。
+            if (!StringUtils.equalsIgnoreCase(schema, "dbo")
+                    && !StringUtils.equalsIgnoreCase(schema, "sys")
+                    && !StringUtils.equalsIgnoreCase(schema, "INFORMATION_SCHEMA")) {
+                stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
+            }
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
@@ -245,6 +231,33 @@ public class SqlserverDialect extends Dialect {
         } finally {
             StatementUtil.close(stmt);
         }
+    }
+
+    /**
+     * ユーザ名とスキーマ名が不一致の時、そのスキーマ内の全オブジェクトに対して
+     * オブジェクト権限を付与する。
+     * SQL Serverは自分で新規作成したスキーマならスキーマごど権限を任意のユーザに委譲できるが、
+     * dbo(ユーザ新規作成時のデフォルトスキーマ)などの特殊なスキーマだけは
+     * スキーマの権限移譲ができないため、このように対応する必要があった。
+     * @param conn DBコネクション
+     * @param schema スキーマ名
+     * @param user ユーザ名
+     * @throws SQLException SQL実行時のエラー
+     */
+    @Override
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
+            throws SQLException {
+        PreparedStatement stmt =
+                conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
+        stmt.setString(1, schema);
+        ResultSet rs = stmt.executeQuery();
+        StringBuilder sb = new StringBuilder();
+        Statement grantStmt = conn.createStatement();
+        while (rs.next()) {
+            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
+            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("TABLE_NAME") + " TO " + user);
+        }
+        StatementUtil.close(stmt);
     }
 
     private String getUrlReplaceDatabaseName(String newDatabaseName) {
