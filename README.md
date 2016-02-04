@@ -67,9 +67,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | url            | ○     | データベースのURL。 jdbc:subprotocol:subname 形式。            |
 | adminUser      | ○     | データベースのadminユーザ名。Oracleの場合はsysは指定出来ません。|
 | adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
-| user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。   |
+| user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。PostgreSQLの場合は常に小文字に変換して処理されます。|
 | password       | ×     | userに設定したユーザのパスワード。                             |
-| schema         | ×     | データベースのスキーマ名。指定しなかった場合はユーザ名と同じスキーマ名を使用すると解釈されます。ただしH2Databaseの場合のみ、PUBLICスキーマと解釈されます。|
+| schema         | ×     | データベースのスキーマ名。指定しなかった場合はユーザ名と同じスキーマ名を使用すると解釈されます。ただしH2Databaseの場合のみ、PUBLICスキーマと解釈されます。 PostgreSQLの場合は常に小文字に変換して処理されます。|
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
 |optionalDialects | ×    | 使用するダイアレクトクラスのFQCN。|
 
