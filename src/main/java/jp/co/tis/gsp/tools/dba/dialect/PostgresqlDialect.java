@@ -165,7 +165,7 @@ public class PostgresqlDialect extends Dialect {
         Connection conn = null;
         Statement stmt = null;
         String database = getDatabase();
-        String role = StringUtils.lowerCase(user);
+        String role = "\"" + user + "\"";
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
