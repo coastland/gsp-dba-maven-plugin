@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.list.UnmodifiableList;
+import org.apache.commons.lang.StringUtils;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
@@ -34,17 +37,26 @@ import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.expression.ExtractExpression;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.HexValue;
 import net.sf.jsqlparser.expression.IntervalExpression;
-import net.sf.jsqlparser.expression.InverseExpression;
 import net.sf.jsqlparser.expression.JdbcNamedParameter;
 import net.sf.jsqlparser.expression.JdbcParameter;
+import net.sf.jsqlparser.expression.JsonExpression;
+import net.sf.jsqlparser.expression.KeepExpression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.MySQLGroupConcat;
 import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.NumericBind;
+import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
 import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.RowConstructor;
+import net.sf.jsqlparser.expression.SignedExpression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
+import net.sf.jsqlparser.expression.UserVariable;
 import net.sf.jsqlparser.expression.WhenClause;
+import net.sf.jsqlparser.expression.WithinGroupExpression;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
 import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
@@ -68,6 +80,8 @@ import net.sf.jsqlparser.expression.operators.relational.Matches;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
+import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -87,10 +101,6 @@ import net.sf.jsqlparser.statement.select.SubJoin;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.ValuesList;
 import net.sf.jsqlparser.statement.select.WithItem;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.list.UnmodifiableList;
-import org.apache.commons.lang.StringUtils;
 
 public class ViewAnalyzer implements SelectVisitor, SelectItemVisitor,
 		FromItemVisitor {
@@ -174,7 +184,7 @@ public class ViewAnalyzer implements SelectVisitor, SelectItemVisitor,
 		if (columnParser.isSimple()) {
 			String columnName = columnParser.getColumnName();
 			simpleColumnNames.add(columnName);
-			aliases.put(columnName, StringUtils.strip(item.getAlias(), "`").toUpperCase());
+			aliases.put(columnName, StringUtils.strip(item.getAlias().getName(), "`").toUpperCase());
 		}
 	}
 
@@ -229,11 +239,6 @@ public class ViewAnalyzer implements SelectVisitor, SelectItemVisitor,
 
 		@Override
 		public void visit(Function arg0) {
-			isSimple = false;
-		}
-
-		@Override
-		public void visit(InverseExpression arg0) {
 			isSimple = false;
 		}
 
@@ -445,6 +450,78 @@ public class ViewAnalyzer implements SelectVisitor, SelectItemVisitor,
 		@Override
 		public void visit(IntervalExpression arg0) {
 			isSimple = false;
+		}
+
+		@Override
+		public void visit(SignedExpression arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(HexValue arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(WithinGroupExpression arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(OracleHierarchicalExpression arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(RegExpMatchOperator arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(JsonExpression arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(RegExpMySQLOperator arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(UserVariable arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(NumericBind arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(KeepExpression arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(MySQLGroupConcat arg0) {
+			isSimple = false;
+			
+		}
+
+		@Override
+		public void visit(RowConstructor arg0) {
+			isSimple = false;
+			
 		}
 	}
 }
