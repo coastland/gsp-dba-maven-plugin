@@ -189,7 +189,7 @@ public class Db2Dialect extends Dialect {
         while (rs.next()) {
             String tableName = rs.getString("TABNAME");
             // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
+            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO USER " + user;
             conn.createStatement().execute(sql);
         }
     }
@@ -242,7 +242,7 @@ public class Db2Dialect extends Dialect {
      */
     @Override
     public String getViewDefinitionSql() {
-        return "select TEXT as VIEW_DEFINITION from SYSCAT.VIEWS where VIEWNAME=?";
+        return "select TEXT as VIEW_DEFINITION from SYSCAT.VIEWS where VIEWNAME=? AND VIEWSCHEMA =?";
     }
 
     /**
