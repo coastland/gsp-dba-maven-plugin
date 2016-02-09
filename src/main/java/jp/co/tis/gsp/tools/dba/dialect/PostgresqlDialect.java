@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
-    private String url;
-    private String schema;
     private static final String DRIVER = "org.postgresql.Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
@@ -190,15 +188,10 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
+    public void grantAllToAnotherSchema(Connection conn) throws SQLException, UnsupportedOperationException {
         conn.createStatement().execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
         conn.createStatement().execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
         ConnectionUtil.close(conn);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     @Override

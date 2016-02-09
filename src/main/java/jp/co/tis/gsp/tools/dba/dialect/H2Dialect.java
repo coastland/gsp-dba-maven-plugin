@@ -12,7 +12,6 @@ import java.io.File;
 import java.sql.*;
 
 public class H2Dialect extends Dialect {
-    private String url;
     private static final String DRIVER = "org.h2.Driver";
 
     public H2Dialect(){
@@ -95,7 +94,7 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+    public void grantAllToAnotherSchema(Connection conn) throws SQLException {
         PreparedStatement pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
         pstmt.setString(1, StringUtils.upperCase(schema));
         ResultSet rs = pstmt.executeQuery();
@@ -116,16 +115,10 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+    public void createSchemaIfNotExist(Connection conn) throws SQLException {
         Statement stmt = conn.createStatement();
         stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
         StatementUtil.close(stmt);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
-
     }
 
     @Override

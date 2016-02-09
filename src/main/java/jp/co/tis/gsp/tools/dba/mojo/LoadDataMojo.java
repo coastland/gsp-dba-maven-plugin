@@ -32,6 +32,7 @@ import jp.co.tis.gsp.tools.db.EntityDependencyParser;
 import jp.co.tis.gsp.tools.dba.CsvInsertHandler;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -41,6 +42,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
+import org.seasar.framework.beans.util.Beans;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileInputStreamUtil;
 import org.seasar.framework.util.StringUtil;
@@ -92,7 +94,10 @@ public class LoadDataMojo extends AbstractDbaMojo {
 		// 依存関係を考慮し読み込むファイル順をソートする
 		EntityDependencyParser parser = new EntityDependencyParser();
 		Dialect dialect = DialectFactory.getDialect(url);
+		Beans.copy(this, dialect).execute();
 		parser.parse(conn, url, dialect.normalizeSchemaName(schema));
+		DialectUtil.setDialect(dialect);
+		
 		final List<String> tableList = parser.getTableList();
 		Collections.sort(files, new Comparator<File>() {
 			@Override

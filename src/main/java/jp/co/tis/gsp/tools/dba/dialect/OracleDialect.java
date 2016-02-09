@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Properties;
 
 public class OracleDialect extends Dialect {
-	private String url;
 	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
@@ -200,7 +199,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+	public void grantAllToAnotherSchema(Connection conn) throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
 		stmt.setString(1, StringUtils.upperCase(schema));
 		ResultSet rs = stmt.executeQuery();
@@ -217,7 +216,7 @@ public class OracleDialect extends Dialect {
      * @throws SQLException SQLエラー
      */
 	@Override
-	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+	public void createSchemaIfNotExist(Connection conn) throws SQLException {
 		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
 		userStmt.setString(1, StringUtils.upperCase(schema));
 		ResultSet rs = userStmt.executeQuery();
@@ -311,11 +310,6 @@ public class OracleDialect extends Dialect {
 		} finally {
 			StatementUtil.close(stmt);
 		}
-	}
-
-	@Override
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	@Override

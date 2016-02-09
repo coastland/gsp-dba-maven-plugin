@@ -19,9 +19,6 @@ package jp.co.tis.gsp.tools.dba.mojo;
 import java.io.File;
 import java.io.IOException;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -32,6 +29,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.seasar.framework.beans.util.Beans;
+
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 /**
  * @author kawasima
@@ -51,6 +52,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
 		Dialect dialect = DialectFactory.getDialect(url);
+		Beans.copy(this, dialect).execute();
 		if (!outputDirectory.exists()) {
 			try {
 				FileUtils.forceMkdir(outputDirectory);
@@ -61,7 +63,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
 		getLog().info(schema+"スキーマのExportを開始します。:" + exportFile);
 		try {
-			dialect.exportSchema(adminUser, adminPassword, schema, exportFile);
+			dialect.exportSchema(exportFile);
 
 		} catch (Exception e) {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);

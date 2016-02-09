@@ -28,20 +28,88 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class Dialect {
+	
+	protected String user;
+	protected String password;
+	protected String adminUser;
+	protected String adminPassword;
+	protected String schema;
+	protected String url;
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getAdminUser() {
+		return adminUser;
+	}
+
+	public void setAdminUser(String adminUser) {
+		this.adminUser = adminUser;
+	}
+
+	public String getAdminPassword() {
+		return adminPassword;
+	}
+
+	public void setAdminPassword(String adminPassword) {
+		this.adminPassword = adminPassword;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+	
 
 	protected DatabaseMetaData metaData = null;
 	protected static final int UN_USABLE_TYPE = -999;
 
-	public abstract void exportSchema(String user, String password, String schema, File dumpFile)
-			throws MojoExecutionException;
+	@Deprecated
+	public void exportSchema(String user, String password, String schema, File dumpFile)
+			throws MojoExecutionException{};
 
-	public abstract void dropAll(String user, String password, String adminUser,
-			String adminPassword, String schema) throws MojoExecutionException;
+	@Deprecated
+	public void dropAll(String user, String password, String adminUser,
+			String adminPassword, String schema) throws MojoExecutionException{};
 
-	public abstract void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException;
+	@Deprecated
+	public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException{};
 
-	public abstract void createUser(String user, String password, String adminUser,
-			String adminPassword) throws MojoExecutionException;
+	@Deprecated
+	public void createUser(String user, String password, String adminUser,
+			String adminPassword) throws MojoExecutionException{};
+	
+	public void exportSchema(File dumpFile) throws MojoExecutionException{};
+
+	public void dropAll() throws MojoExecutionException{};
+
+	public void importSchema(File dumpFile) throws MojoExecutionException{};
+
+	public void createUser() throws MojoExecutionException{};
 
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
@@ -53,7 +121,7 @@ public abstract class Dialect {
      * @throws SQLException SQL実行時のエラー
      * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
      */
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
+    public void grantAllToAnotherSchema(Connection conn)
             throws SQLException, UnsupportedOperationException {
         // nop
     }
@@ -66,12 +134,10 @@ public abstract class Dialect {
      * @throws SQLException SQL実行時のエラー
      * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
      */
-    public void createSchemaIfNotExist(Connection conn, String schema)
+    public void createSchemaIfNotExist(Connection conn)
             throws SQLException, UnsupportedOperationException {
         // nop
     }
-
-	public abstract void setUrl(String url);
 
 	public abstract TypeMapper getTypeMapper();
 

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Db2Dialect extends Dialect {
-    private String url;
     private static final String DRIVER = "com.ibm.db2.jcc.DB2Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
@@ -181,7 +180,7 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+    public void grantAllToAnotherSchema(Connection conn) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "select TABNAME from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U'");
         stmt.setString(1, StringUtils.upperCase(schema));
@@ -195,7 +194,7 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+    public void createSchemaIfNotExist(Connection conn) throws SQLException {
  		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
 		userStmt.setString(1, StringUtils.upperCase(schema));
 		ResultSet rs = userStmt.executeQuery();
@@ -209,11 +208,6 @@ public class Db2Dialect extends Dialect {
 		Statement createUserStmt = conn.createStatement();
 		createUserStmt.execute("CREATE SCHEMA "+ schema);
 		StatementUtil.close(createUserStmt);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     @Override

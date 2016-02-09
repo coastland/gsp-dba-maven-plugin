@@ -36,6 +36,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
+import org.seasar.framework.beans.util.Beans;
 import org.seasar.framework.util.JarFileUtil;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
@@ -71,8 +72,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
     @Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
 		Dialect dialect = DialectFactory.getDialect(url);
-		dialect.dropAll(user, password, adminUser, adminPassword, schema);
-		dialect.createUser(user, password, adminUser, adminPassword);
+		Beans.copy(this, dialect).execute();
+		dialect.dropAll();
+		dialect.createUser();
 
         Artifact artifact = repositorySystem.createArtifact(groupId, artifactId, version, "jar");
         ArtifactResolutionRequest schemaArtifactRequest = new ArtifactResolutionRequest()

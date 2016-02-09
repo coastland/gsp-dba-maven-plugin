@@ -43,6 +43,7 @@ import org.seasar.extension.jdbc.gen.command.CommandInvoker;
 import org.seasar.extension.jdbc.gen.internal.command.CommandInvokerImpl;
 import org.seasar.extension.jdbc.gen.internal.command.GenerateEntityCommand;
 import org.seasar.extension.jdbc.gen.internal.util.ReflectUtil;
+import org.seasar.framework.beans.util.Beans;
 import org.seasar.framework.util.StringUtil;
 
 import freemarker.cache.ClassTemplateLoader;
@@ -181,6 +182,7 @@ public class GenerateEntity extends AbstractDbaMojo {
      */
     private void executeGenerateEntity() {
         Dialect dialect = DialectFactory.getDialect(url);
+        Beans.copy(this, dialect).execute();
         DialectUtil.setDialect(dialect);
         final GenerateEntityCommand command = new GenerateEntityCommand();
         command.setSchemaName(dialect.normalizeSchemaName(schema));

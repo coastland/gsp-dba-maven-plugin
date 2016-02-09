@@ -18,15 +18,15 @@ package jp.co.tis.gsp.tools.dba.mojo;
 
 import java.util.Map;
 
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+
 public abstract class AbstractDbaMojo extends AbstractMojo {
-    /**
+	/**
      * Database driver class.
      */
     @Parameter(required = true)
@@ -68,12 +68,49 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     @Parameter
 	protected String schema;
 
-
 	/**
 	 * dumpFile
 	 */
     @Parameter
 	protected String dmpFile;
+    
+    
+
+	public String getDriver() {
+		return driver;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public String getAdminUser() {
+		return adminUser;
+	}
+
+	public String getAdminPassword() {
+		return adminPassword;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public String getDmpFile() {
+		return dmpFile;
+	}
+
+	public Map<String, String> getOptionalDialects() {
+		return optionalDialects;
+	}
 
     /**
      * additional Dialect names.<br/>

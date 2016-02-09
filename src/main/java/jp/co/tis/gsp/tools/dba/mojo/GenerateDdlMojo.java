@@ -25,6 +25,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.seasar.framework.beans.util.Beans;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,6 +82,7 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
 		parser.setUser(user);
 
 		Dialect dialect = DialectFactory.getDialect(url);
+		Beans.copy(this, dialect).execute();
 		parser.setTypeMapper(dialect.getTypeMapper());
 
         parser.setPrintTable(dialect.canPrintTable());

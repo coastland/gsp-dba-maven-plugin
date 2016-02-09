@@ -43,6 +43,7 @@ import org.seasar.extension.jdbc.gen.meta.DbColumnMeta;
 import org.seasar.extension.jdbc.gen.meta.DbForeignKeyMeta;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.gen.meta.DbUniqueKeyMeta;
+import org.seasar.framework.beans.util.Beans;
 import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.ArrayMap;
 import org.seasar.framework.util.ResultSetUtil;
@@ -299,7 +300,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     }
 
     protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName) throws SQLException {
-    	Dialect gspDialect = DialectFactory.getDialect(metaData.getURL());
+    	Dialect gspDialect = DialectUtil.getDialect();
     	String sql = gspDialect.getViewDefinitionSql();
     	if (sql == null) {
     		return null;
@@ -325,7 +326,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     
     //SQLにスキーマ名を渡す必要があったため一時的に作成
     protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName, String schemaName) throws SQLException {
-        Dialect gspDialect = DialectFactory.getDialect(metaData.getURL());
+        Dialect gspDialect = DialectUtil.getDialect();;
         String sql = gspDialect.getViewDefinitionSql();
         if (sql == null) {
             return null;
@@ -334,10 +335,15 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         Connection conn = metaData.getConnection();
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        int idx = 1;
+        
         try {
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, viewName);
-            stmt.setString(2, schemaName);
+            stmt.setString(idx++, viewName);
+            if(!StringUtils.isBlank(schemaName)){
+              stmt.setString(idx++, schemaName);	
+            }
+            
             rs = stmt.executeQuery();
             while(rs.next()) {
                 return rs.getString("VIEW_DEFINITION");

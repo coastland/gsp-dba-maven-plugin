@@ -30,17 +30,11 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import jp.co.tis.gsp.tools.db.AbstractDbObjectParser;
-import jp.co.tis.gsp.tools.db.AlternativeGenerator;
-import jp.co.tis.gsp.tools.db.TypeMapper;
-import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.beans.util.BeanMap;
 import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
@@ -48,8 +42,13 @@ import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.CollectionsUtil;
 import org.seasar.framework.util.tiger.Maps;
 
+import jp.co.tis.gsp.tools.db.AbstractDbObjectParser;
+import jp.co.tis.gsp.tools.db.AlternativeGenerator;
+import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
+
 public class MysqlDialect extends Dialect {
-	private String url;
+
 	private final static String DRIVER = "com.mysql.jdbc.Driver";
 
 	private Map<Integer, String> typeToNameMap = Maps
@@ -68,12 +67,8 @@ public class MysqlDialect extends Dialect {
 		.$();
 
 
-	public void setUrl(String url) {
-		this.url = url;
-
-	}
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public void exportSchema(File dumpFile) throws MojoExecutionException {
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
 		try {
@@ -102,9 +97,7 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public void dropAll(String user, String password,
-			String adminUser, String adminPassword,
-			String schema) throws MojoExecutionException {
+	public void dropAll() throws MojoExecutionException {
 		if(adminPassword == null)
 			adminPassword = "";
 		try {
@@ -129,7 +122,7 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException{
+	public void createUser() throws MojoExecutionException{
 		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		Statement stmt = null;
@@ -155,12 +148,12 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
+	public void grantAllToAnotherSchema(Connection conn) throws SQLException, UnsupportedOperationException {
 		throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
  	}
 
 	@Override
-	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
+	public void createSchemaIfNotExist(Connection conn) throws SQLException, UnsupportedOperationException {
 		throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
 	}
 
@@ -179,8 +172,7 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public void importSchema(String user, String password, String schema,
-			File dumpFile) throws MojoExecutionException {
+	public void importSchema(File dumpFile) throws MojoExecutionException {
 		try {
 			ProcessUtil.execWithInput(dumpFile,
 					"mysql",
@@ -197,11 +189,6 @@ public class MysqlDialect extends Dialect {
 	@Override
 	public TypeMapper getTypeMapper() {
 		return new TypeMapper(typeToNameMap);
-	}
-
-	@Override
-	public String normalizeSchemaName(String schemaName) {
-		return "'" + schemaName + "'";
 	}
 
 	@Override
@@ -232,6 +219,6 @@ public class MysqlDialect extends Dialect {
      */
 	@Override
 	public String getViewDefinitionSql() {
-		return "SELECT view_definition FROM information_schema.views WHERE table_name=?";
+		return String.format("SELECT view_definition FROM information_schema.views WHERE table_name=? AND TABLE_SCHEMA='%s'", schema);
 	}
 }
