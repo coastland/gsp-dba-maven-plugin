@@ -39,6 +39,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.beans.util.BeanMap;
 import org.seasar.framework.exception.IORuntimeException;
@@ -200,11 +201,6 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public String normalizeSchemaName(String schemaName) {
-		return "'" + schemaName + "'";
-	}
-
-	@Override
 	public List<AlternativeGenerator> getAlternativeGenerators() {
 		List<AlternativeGenerator> generators = CollectionsUtil.newArrayList(10);
 		generators.add(new AlternativeGenerator() {
@@ -232,6 +228,6 @@ public class MysqlDialect extends Dialect {
      */
 	@Override
 	public String getViewDefinitionSql() {
-		return "SELECT view_definition FROM information_schema.views WHERE table_name=?";
+		return "SELECT VIEW_DEFINITION FROM information_schema.views WHERE table_name=? AND TABLE_SCHEMA=?";
 	}
 }
