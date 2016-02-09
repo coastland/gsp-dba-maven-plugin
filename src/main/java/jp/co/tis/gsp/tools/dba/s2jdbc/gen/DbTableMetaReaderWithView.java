@@ -117,11 +117,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     @Override
     protected List<DbUniqueKeyMeta> getDbUniqueKeyMetaList(
             DatabaseMetaData metaData, DbTableMeta tableMeta) {
+    	
+    	String schema = getSchemaName(tableMeta);
 
-        if (!dialect.supportsGetIndexInfo(tableMeta.getCatalogName(), tableMeta
-                .getSchemaName(), tableMeta.getName())) {
+        if (!dialect.supportsGetIndexInfo(tableMeta.getCatalogName(), schema, tableMeta.getName())) {
             logger.log("WS2JDBCGen0002", new Object[] {
-                    tableMeta.getCatalogName(), tableMeta.getSchemaName(),
+                    tableMeta.getCatalogName(), schema,
                     tableMeta.getName() });
             return Collections.emptyList();
         }
@@ -138,8 +139,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         	}
 
             ResultSet rs = metaData
-                    .getIndexInfo(tableMeta.getCatalogName(), tableMeta
-                            .getSchemaName(), tableName, true, false);
+                    .getIndexInfo(tableMeta.getCatalogName(), schema, tableName, true, false);
             try {
                 while (rs.next()) {
                     String name = rs.getString("INDEX_NAME");
@@ -168,12 +168,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             DbTableMeta tableMeta) {
     	Set<String> result = new HashSet<String>();
         try {
-            String schemaName = tableMeta.getSchemaName();
+            String schema = getSchemaName(tableMeta);
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableName, schemaName);
+	        	String sql = getViewDefinitionSql(metaData, tableName, schema);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -183,7 +183,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	        	}
 	        }
 	        ResultSet rs = metaData.getPrimaryKeys(tableMeta.getCatalogName(),
-	        		tableMeta.getSchemaName(), tableName);
+	        		schema, tableName);
 
             try {
                 while (rs.next()) {
@@ -219,12 +219,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         @SuppressWarnings("unchecked")
         Map<String, DbForeignKeyMeta> map = new ArrayMap();
         try {
-            String schemaName = tableMeta.getSchemaName();
+            String schema = getSchemaName(tableMeta);
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName(), schemaName);
+	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName(), schema);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -234,7 +234,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	        	}
 	        }
             ResultSet rs = metaData.getImportedKeys(tableMeta.getCatalogName(),
-                    tableMeta.getSchemaName(), tableMeta.getName());
+            		schema, tableMeta.getName());
             try {
                 while (rs.next()) {
                     String name = rs.getString("FK_NAME");
@@ -278,7 +278,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     }
 
     protected String getObjectTypeName(DatabaseMetaData metaData, DbTableMeta tableMeta) throws SQLException {
-    	ResultSet rs = metaData.getTables(tableMeta.getCatalogName(), tableMeta.getSchemaName(), tableMeta.getName(), null);
+    	ResultSet rs = metaData.getTables(tableMeta.getCatalogName(), getSchemaName(tableMeta), tableMeta.getName(), null);
     	try {
     		rs.next();
     		String typeName = rs.getString("TABLE_TYPE");
@@ -348,5 +348,25 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         }
         return null;
 
+    }
+    
+    /**
+     * メタ情報からスキーマ名を取得する.
+     * 
+     * スキーマ名が取得出来ない場合はカタログ名をセットする。
+     * 
+     * @param tableMeta
+     * @return スキーマ名
+     */
+    private String getSchemaName(DbTableMeta tableMeta){
+    	
+    	String schema = tableMeta.getSchemaName();
+    	
+    	if(StringUtils.isBlank(schema)){
+    		schema = tableMeta.getCatalogName();
+    	}
+    	
+    	return schema;
+    	
     }
 }
