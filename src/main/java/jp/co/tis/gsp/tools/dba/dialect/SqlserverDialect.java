@@ -32,8 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SqlserverDialect extends Dialect {
-    private String url;
-    private String schema;
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 
@@ -83,14 +81,12 @@ public class SqlserverDialect extends Dialect {
      * SqlServer2008ではdmpファイルのエクスポートがサポートされていないため実装しない。
      */
     @Override
-    public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+    public File exportSchema() throws MojoExecutionException {
         throw new UnsupportedOperationException("Sqlserverを用いたexport-schemaはサポートしていません。");
     }
 
     @Override
-    public void dropAll(String user, String password, String adminUser,
-            String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
+    public void dropAll() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -133,13 +129,12 @@ public class SqlserverDialect extends Dialect {
      * SqlServer2008ではdmpファイルのインポートがサポートされていないため実装しない。
      */
     @Override
-    public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+    public void importSchema(File dumpFile) throws MojoExecutionException {
         throw new UnsupportedOperationException("Sqlserverを用いたimport-schemaはサポートしていません。");
     }
 
     @Override
-    public void createUser(String user, String password, String adminUser,
-            String adminPassword) throws MojoExecutionException {
+    public void createUser() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -166,11 +161,6 @@ public class SqlserverDialect extends Dialect {
             StatementUtil.close(stmt);
             ConnectionUtil.close(conn);
         }
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     @Override
@@ -245,8 +235,7 @@ public class SqlserverDialect extends Dialect {
      * @throws SQLException SQL実行時のエラー
      */
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
-            throws SQLException {
+    public void grantAllToAnotherSchema(Connection conn) throws SQLException {
         PreparedStatement stmt =
                 conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
         stmt.setString(1, schema);
