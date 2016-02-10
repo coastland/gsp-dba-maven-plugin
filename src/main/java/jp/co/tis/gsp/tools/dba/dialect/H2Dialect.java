@@ -126,4 +126,9 @@ public class H2Dialect extends Dialect {
         return new TypeMapper();
     }
 
+	@Override
+	public String getViewDefinitionSql() {
+		return null;
+	}
+
 }

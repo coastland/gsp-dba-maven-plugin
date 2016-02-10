@@ -37,12 +37,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.seasar.framework.beans.util.Beans;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 import jp.co.tis.gsp.tools.dba.util.SqlSplitter;
 
 /**
@@ -68,9 +66,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-        DriverManagerUtil.registerDriver(driver);
-		Dialect dialect = DialectFactory.getDialect(url);
-		Beans.copy(this, dialect).execute();
+		Dialect dialect = DialectUtil.getDialect();
 		dialect.dropAll();
 		dialect.createUser();
         if (!schema.equals(user)) {

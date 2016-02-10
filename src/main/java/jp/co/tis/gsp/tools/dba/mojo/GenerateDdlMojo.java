@@ -16,19 +16,19 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
-import jp.co.tis.gsp.tools.db.LengthSemantics;
-import jp.co.tis.gsp.tools.db.ObjectBrowserErParser;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.seasar.framework.beans.util.Beans;
 
-import java.io.File;
-import java.io.IOException;
+import jp.co.tis.gsp.tools.db.LengthSemantics;
+import jp.co.tis.gsp.tools.db.ObjectBrowserErParser;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  * Generate DDL.
@@ -81,8 +81,7 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
 		parser.setUrl(url);
 		parser.setUser(user);
 
-		Dialect dialect = DialectFactory.getDialect(url);
-		Beans.copy(this, dialect).execute();
+		Dialect dialect = DialectUtil.getDialect();
 		parser.setTypeMapper(dialect.getTypeMapper());
 
         parser.setPrintTable(dialect.canPrintTable());

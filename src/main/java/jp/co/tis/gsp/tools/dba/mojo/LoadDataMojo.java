@@ -28,12 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import jp.co.tis.gsp.tools.db.EntityDependencyParser;
-import jp.co.tis.gsp.tools.dba.CsvInsertHandler;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,13 +36,17 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.beans.util.Beans;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileInputStreamUtil;
 import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.tiger.CollectionsUtil;
 
 import com.csvreader.CsvReader;
+
+import jp.co.tis.gsp.tools.db.EntityDependencyParser;
+import jp.co.tis.gsp.tools.dba.CsvInsertHandler;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  * @author kawasima
@@ -93,8 +91,7 @@ public class LoadDataMojo extends AbstractDbaMojo {
 
 		// 依存関係を考慮し読み込むファイル順をソートする
 		EntityDependencyParser parser = new EntityDependencyParser();
-		Dialect dialect = DialectFactory.getDialect(url);
-		Beans.copy(this, dialect).execute();
+		Dialect dialect = DialectUtil.getDialect();
 		parser.parse(conn, url, dialect.normalizeSchemaName(schema));
 		DialectUtil.setDialect(dialect);
 		

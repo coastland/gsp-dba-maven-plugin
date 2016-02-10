@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -29,10 +28,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-import org.seasar.framework.beans.util.Beans;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  * @author kawasima
@@ -59,8 +57,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-		Dialect dialect = DialectFactory.getDialect(url);
-		Beans.copy(this, dialect).execute();
+		Dialect dialect = DialectUtil.getDialect();
 		if (!outputDirectory.exists()) {
 			try {
 				FileUtils.forceMkdir(outputDirectory);

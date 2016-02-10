@@ -36,11 +36,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.seasar.framework.beans.util.Beans;
 import org.seasar.framework.util.JarFileUtil;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  *
@@ -71,8 +70,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
     @Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-		Dialect dialect = DialectFactory.getDialect(url);
-		Beans.copy(this, dialect).execute();
+    	Dialect dialect = DialectUtil.getDialect();
 		dialect.dropAll();
 		dialect.createUser();
 

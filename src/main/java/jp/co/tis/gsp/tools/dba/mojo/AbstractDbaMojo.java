@@ -22,8 +22,12 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.seasar.framework.beans.util.Beans;
+import org.seasar.framework.util.DriverManagerUtil;
 
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 public abstract class AbstractDbaMojo extends AbstractMojo {
 	/**
@@ -158,6 +162,12 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
                 schema = user;
             }
         }
+        
+        DriverManagerUtil.registerDriver(driver);
+		Dialect dialect = DialectFactory.getDialect(url);
+		Beans.copy(this, dialect).execute();
+		DialectUtil.setDialect(dialect);
+        
         executeMojoSpec();
     }
 
