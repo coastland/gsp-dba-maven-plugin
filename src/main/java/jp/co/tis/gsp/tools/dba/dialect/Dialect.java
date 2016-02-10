@@ -16,16 +16,24 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.AlternativeGenerator;
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Collections;
+import java.util.List;
+
+import javax.persistence.GenerationType;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.framework.util.StringUtil;
 
-import javax.persistence.GenerationType;
-import java.io.File;
-import java.sql.*;
-import java.util.Collections;
-import java.util.List;
+import jp.co.tis.gsp.tools.db.AlternativeGenerator;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public abstract class Dialect {
 	
@@ -35,7 +43,10 @@ public abstract class Dialect {
 	protected String adminPassword;
 	protected String schema;
 	protected String url;
-	
+	protected String dmpFile;
+	protected File outputDirectory;
+	protected File inputDirectory;
+
 	public String getUrl() {
 		return url;
 	}
@@ -84,32 +95,40 @@ public abstract class Dialect {
 		this.schema = schema;
 	}
 	
+	public String getDmpFile() {
+		return dmpFile;
+	}
+
+	public void setDmpFile(String dmpFile) {
+		this.dmpFile = dmpFile;
+	}
+	
+	public File getOutputDirectory() {
+		return outputDirectory;
+	}
+
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
+	public File getInputDirectory() {
+		return inputDirectory;
+	}
+
+	public void setInputDirectory(File inputDirectory) {
+		this.inputDirectory = inputDirectory;
+	}
 
 	protected DatabaseMetaData metaData = null;
 	protected static final int UN_USABLE_TYPE = -999;
-
-	@Deprecated
-	public void exportSchema(String user, String password, String schema, File dumpFile)
-			throws MojoExecutionException{};
-
-	@Deprecated
-	public void dropAll(String user, String password, String adminUser,
-			String adminPassword, String schema) throws MojoExecutionException{};
-
-	@Deprecated
-	public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException{};
-
-	@Deprecated
-	public void createUser(String user, String password, String adminUser,
-			String adminPassword) throws MojoExecutionException{};
 	
-	public void exportSchema(File dumpFile) throws MojoExecutionException{};
+	public abstract File exportSchema() throws MojoExecutionException;
 
-	public void dropAll() throws MojoExecutionException{};
+	public abstract void dropAll() throws MojoExecutionException;
 
-	public void importSchema(File dumpFile) throws MojoExecutionException{};
+	public abstract void importSchema(File dumpFile) throws MojoExecutionException;
 
-	public void createUser() throws MojoExecutionException{};
+	public abstract void createUser() throws MojoExecutionException;
 
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
@@ -240,5 +259,15 @@ public abstract class Dialect {
         } else {
             stmt.setObject(parameterIndex, value, sqlType);
         }
+    }
+    
+    /**
+     * Exportで利用するファイルを作成します.
+     * 
+     * @return　ファイル
+     */
+    protected File createExportFile(){
+		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
+		return exportFile;
     }
 }

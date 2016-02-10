@@ -81,14 +81,12 @@ public class SqlserverDialect extends Dialect {
      * SqlServer2008ではdmpファイルのエクスポートがサポートされていないため実装しない。
      */
     @Override
-    public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+    public File exportSchema() throws MojoExecutionException {
         throw new UnsupportedOperationException("Sqlserverを用いたexport-schemaはサポートしていません。");
     }
 
     @Override
-    public void dropAll(String user, String password, String adminUser,
-            String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
+    public void dropAll() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -131,13 +129,12 @@ public class SqlserverDialect extends Dialect {
      * SqlServer2008ではdmpファイルのインポートがサポートされていないため実装しない。
      */
     @Override
-    public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+    public void importSchema(File dumpFile) throws MojoExecutionException {
         throw new UnsupportedOperationException("Sqlserverを用いたimport-schemaはサポートしていません。");
     }
 
     @Override
-    public void createUser(String user, String password, String adminUser,
-            String adminPassword) throws MojoExecutionException {
+    public void createUser() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;

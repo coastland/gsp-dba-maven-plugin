@@ -68,7 +68,9 @@ public class MysqlDialect extends Dialect {
 
 
 	@Override
-	public void exportSchema(File dumpFile) throws MojoExecutionException {
+	public File exportSchema() throws MojoExecutionException {
+		File dumpFile = createExportFile();
+		
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
 		try {
@@ -94,6 +96,8 @@ public class MysqlDialect extends Dialect {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
+		
+		return dumpFile;
 	}
 
 	@Override

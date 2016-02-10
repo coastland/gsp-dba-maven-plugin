@@ -16,7 +16,24 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.persistence.GenerationType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -26,16 +43,7 @@ import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
-import javax.persistence.GenerationType;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class OracleDialect extends Dialect {
 	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
@@ -90,7 +98,8 @@ public class OracleDialect extends Dialect {
     }
 
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public File exportSchema() throws MojoExecutionException {
+		File dumpFile = createExportFile();
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
@@ -126,11 +135,12 @@ public class OracleDialect extends Dialect {
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}
+		
+		return dumpFile;
 	}
 
 	@Override
-	public void importSchema(String user, String password, String schema,
-			File dumpFile) throws MojoExecutionException{
+	public void importSchema(File dumpFile) throws MojoExecutionException{
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
@@ -169,7 +179,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException {
+	public void createUser() throws MojoExecutionException {
 		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		Statement stmt = null;
@@ -253,8 +263,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void dropAll(String user, String password, String adminUser,
-			String adminPassword, String schema) throws MojoExecutionException {
+	public void dropAll() throws MojoExecutionException {
 		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		try {

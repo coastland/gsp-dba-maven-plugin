@@ -68,13 +68,12 @@ public class Db2Dialect extends Dialect {
      * DB2ではスキーマ構造をエクスポートできないため、export-schemaをサポートしない。
      */
     @Override
-    public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+    public File exportSchema() throws MojoExecutionException {
         throw new UnsupportedOperationException("db2を用いたexport-schemaはサポートしていません。");
     }
 
     @Override
-    public void dropAll(String user, String password, String adminUser,
-            String adminPassword, String schema) throws MojoExecutionException {
+    public void dropAll() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -147,7 +146,7 @@ public class Db2Dialect extends Dialect {
      * DB2ではスキーマ構造をエクスポートできないため、import-schemaをサポートしない。
      */
     @Override
-    public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+    public void importSchema(File dumpFile) throws MojoExecutionException {
         throw new UnsupportedOperationException("db2を用いたimport-schemaはサポートしていません。");
     }
 
@@ -156,8 +155,7 @@ public class Db2Dialect extends Dialect {
      * 本処理では、DBへのアクセス権限を付与するだけ。
      */
     @Override
-    public void createUser(String user, String password, String adminUser,
-            String adminPassword) throws MojoExecutionException {
+    public void createUser() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;

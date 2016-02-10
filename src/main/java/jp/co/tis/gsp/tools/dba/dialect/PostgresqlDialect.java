@@ -70,8 +70,9 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void exportSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+    public File exportSchema() throws MojoExecutionException {
+    	File dumpFile = createExportFile();
+    	
         BufferedInputStream in = null;
         FileOutputStream out = null;
         try {
@@ -107,12 +108,12 @@ public class PostgresqlDialect extends Dialect {
             IOUtils.closeQuietly(in);
             IOUtils.closeQuietly(out);
         }
+        
+        return dumpFile;
     }
 
     @Override
-    public void dropAll(String user, String password, String adminUser,
-            String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
+    public void dropAll() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -135,8 +136,7 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void importSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+    public void importSchema(File dumpFile) throws MojoExecutionException {
 
         Map<String, String> environment = new HashMap<String, String>();
         if (StringUtils.isNotEmpty(password)) {
@@ -157,8 +157,7 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void createUser(String user, String password, String adminUser,
-            String adminPassword) throws MojoExecutionException {
+    public void createUser() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
