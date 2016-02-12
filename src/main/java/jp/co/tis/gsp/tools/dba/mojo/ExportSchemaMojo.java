@@ -19,11 +19,7 @@ package jp.co.tis.gsp.tools.dba.mojo;
 import java.io.File;
 import java.io.IOException;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -33,6 +29,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
+
 /**
  * @author kawasima
  */
@@ -41,8 +40,16 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
     @Parameter(defaultValue = "target/dump")
 	protected File outputDirectory;
+    
+    public File getOutputDirectory() {
+		return outputDirectory;
+	}
 
-    @Component( role = Archiver.class, hint = "jar" )
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
+	@Component( role = Archiver.class, hint = "jar" )
     protected JarArchiver jarArchiver;
 
     @Component
@@ -50,7 +57,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-		Dialect dialect = DialectFactory.getDialect(url);
+		Dialect dialect = DialectUtil.getDialect();
 		if (!outputDirectory.exists()) {
 			try {
 				FileUtils.forceMkdir(outputDirectory);
@@ -58,11 +65,11 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 				throw new MojoExecutionException("Can't create dump output directory." + outputDirectory, e);
 			}
 		}
-		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
-		getLog().info(schema+"スキーマのExportを開始します。:" + exportFile);
+		getLog().info(schema+"スキーマのExportを開始します。:" + outputDirectory + System.getProperty("line.separator") + dmpFile);
+		
+		File exportFile;
 		try {
-			dialect.exportSchema(adminUser, adminPassword, schema, exportFile);
-
+			exportFile = dialect.exportSchema();
 		} catch (Exception e) {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);
 		}

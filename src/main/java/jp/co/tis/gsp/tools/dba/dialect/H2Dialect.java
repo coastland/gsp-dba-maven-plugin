@@ -12,7 +12,6 @@ import java.io.File;
 import java.sql.*;
 
 public class H2Dialect extends Dialect {
-    private String url;
     private static final String DRIVER = "org.h2.Driver";
 
     public H2Dialect(){
@@ -26,8 +25,9 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void exportSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+    public File exportSchema() throws MojoExecutionException {
+    	File dumpFile = createExportFile();
+    	
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         try {
@@ -40,11 +40,12 @@ public class H2Dialect extends Dialect {
         } finally {
             ConnectionUtil.close(conn);
         }
+        
+        return dumpFile;
     }
 
     @Override
-    public void dropAll(String user, String password, String adminUser,
-            String adminPassword, String schema) throws MojoExecutionException {
+    public void dropAll() throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -61,8 +62,7 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void importSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+    public void importSchema(File dumpFile) throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         try {
@@ -78,8 +78,7 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void createUser(String user, String password, String adminUser,
-            String adminPassword) throws MojoExecutionException {
+    public void createUser() throws MojoExecutionException {
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -95,7 +94,7 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+    public void grantAllToAnotherSchema(Connection conn) throws SQLException {
         PreparedStatement pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
         pstmt.setString(1, StringUtils.upperCase(schema));
         ResultSet rs = pstmt.executeQuery();
@@ -116,21 +115,20 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+    public void createSchemaIfNotExist(Connection conn) throws SQLException {
         Statement stmt = conn.createStatement();
         stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
         StatementUtil.close(stmt);
     }
 
     @Override
-    public void setUrl(String url) {
-        this.url = url;
-
-    }
-
-    @Override
     public TypeMapper getTypeMapper() {
         return new TypeMapper();
     }
+
+	@Override
+	public String getViewDefinitionSql() {
+		return null;
+	}
 
 }
