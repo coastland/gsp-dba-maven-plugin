@@ -16,7 +16,24 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.persistence.GenerationType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -26,19 +43,9 @@ import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
-import javax.persistence.GenerationType;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class OracleDialect extends Dialect {
-	private String url;
 	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
@@ -91,7 +98,8 @@ public class OracleDialect extends Dialect {
     }
 
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public File exportSchema() throws MojoExecutionException {
+		File dumpFile = createExportFile();
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
@@ -127,11 +135,12 @@ public class OracleDialect extends Dialect {
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}
+		
+		return dumpFile;
 	}
 
 	@Override
-	public void importSchema(String user, String password, String schema,
-			File dumpFile) throws MojoExecutionException{
+	public void importSchema(File dumpFile) throws MojoExecutionException{
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
@@ -170,7 +179,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException {
+	public void createUser() throws MojoExecutionException {
 		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		Statement stmt = null;
@@ -200,7 +209,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
+	public void grantAllToAnotherSchema(Connection conn) throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
 		stmt.setString(1, StringUtils.upperCase(schema));
 		ResultSet rs = stmt.executeQuery();
@@ -217,7 +226,7 @@ public class OracleDialect extends Dialect {
      * @throws SQLException SQLエラー
      */
 	@Override
-	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
+	public void createSchemaIfNotExist(Connection conn) throws SQLException {
 		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
 		userStmt.setString(1, StringUtils.upperCase(schema));
 		ResultSet rs = userStmt.executeQuery();
@@ -254,8 +263,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void dropAll(String user, String password, String adminUser,
-			String adminPassword, String schema) throws MojoExecutionException {
+	public void dropAll() throws MojoExecutionException {
 		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		try {
@@ -311,11 +319,6 @@ public class OracleDialect extends Dialect {
 		} finally {
 			StatementUtil.close(stmt);
 		}
-	}
-
-	@Override
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	@Override

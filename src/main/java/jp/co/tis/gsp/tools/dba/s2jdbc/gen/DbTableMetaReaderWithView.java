@@ -32,10 +32,6 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
-
 import org.apache.commons.lang.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
 import org.seasar.extension.jdbc.gen.internal.meta.DbTableMetaReaderImpl;
@@ -47,6 +43,9 @@ import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.ArrayMap;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
+
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	public DbTableMetaReaderWithView(DataSource dataSource, GenDialect dialect,
@@ -168,12 +167,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             DbTableMeta tableMeta) {
     	Set<String> result = new HashSet<String>();
         try {
-            String schemaName = tableMeta.getSchemaName();
+        	Dialect dialect = DialectUtil.getDialect();
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableName, schemaName);
+	        	String sql = dialect.getViewDefinition(metaData.getConnection(), tableName, tableMeta);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -219,12 +218,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         @SuppressWarnings("unchecked")
         Map<String, DbForeignKeyMeta> map = new ArrayMap();
         try {
-            String schemaName = tableMeta.getSchemaName();
+        	Dialect dialect = DialectUtil.getDialect();
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName(), schemaName);
+	        	String sql = dialect.getViewDefinition(metaData.getConnection(), tableName, tableMeta);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -286,67 +285,5 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     	} finally {
     		ResultSetUtil.close(rs);
     	}
-    }
-    protected void parseViewForUniqueKey(Map<String, DbUniqueKeyMeta> map, DatabaseMetaData metaData, String viewName) throws SQLException {
-    	String sql = getViewDefinitionSql(metaData, viewName);
-    	ViewAnalyzer viewAnalyzer = new ViewAnalyzer();
-    	viewAnalyzer.parse(sql);
-    	if (viewAnalyzer.isSimple()) {
-    		String tableName = viewAnalyzer.getTableName();
-    		tableName = dialect.unquote(tableName);
-
-    	}
-    }
-
-    protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName) throws SQLException {
-    	Dialect gspDialect = DialectFactory.getDialect(metaData.getURL());
-    	String sql = gspDialect.getViewDefinitionSql();
-    	if (sql == null) {
-    		return null;
-    	}
-
-    	Connection conn = metaData.getConnection();
-    	PreparedStatement stmt = null;
-    	ResultSet rs = null;
-    	try {
-    		stmt = conn.prepareStatement(sql);
-    		stmt.setString(1, viewName);
-    		rs = stmt.executeQuery();
-    		while(rs.next()) {
-    			return rs.getString("VIEW_DEFINITION");
-    		}
-    	} finally {
-    		ResultSetUtil.close(rs);
-    		StatementUtil.close(stmt);
-    	}
-    	return null;
-
-    }
-    
-    //SQLにスキーマ名を渡す必要があったため一時的に作成
-    protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName, String schemaName) throws SQLException {
-        Dialect gspDialect = DialectFactory.getDialect(metaData.getURL());
-        String sql = gspDialect.getViewDefinitionSql();
-        if (sql == null) {
-            return null;
-        }
-
-        Connection conn = metaData.getConnection();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, viewName);
-            stmt.setString(2, schemaName);
-            rs = stmt.executeQuery();
-            while(rs.next()) {
-                return rs.getString("VIEW_DEFINITION");
-            }
-        } finally {
-            ResultSetUtil.close(rs);
-            StatementUtil.close(stmt);
-        }
-        return null;
-
     }
 }

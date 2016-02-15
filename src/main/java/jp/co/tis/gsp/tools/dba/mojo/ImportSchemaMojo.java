@@ -39,7 +39,7 @@ import org.apache.maven.repository.RepositorySystem;
 import org.seasar.framework.util.JarFileUtil;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  *
@@ -70,9 +70,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
     @Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-		Dialect dialect = DialectFactory.getDialect(url);
-		dialect.dropAll(user, password, adminUser, adminPassword, schema);
-		dialect.createUser(user, password, adminUser, adminPassword);
+    	Dialect dialect = DialectUtil.getDialect();
+		dialect.dropAll();
+		dialect.createUser();
 
         Artifact artifact = repositorySystem.createArtifact(groupId, artifactId, version, "jar");
         ArtifactResolutionRequest schemaArtifactRequest = new ArtifactResolutionRequest()
@@ -103,7 +103,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
         }
 
 		getLog().info("スキーマのインポートを開始します。:" + importFile);
-		dialect.importSchema(user, password, schema, importFile);
+		dialect.importSchema(importFile);
 		getLog().info("スキーマのインポートを終了しました");
 	}
 

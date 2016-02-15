@@ -16,32 +16,123 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.AlternativeGenerator;
-import jp.co.tis.gsp.tools.db.TypeMapper;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.seasar.framework.util.StringUtil;
-
-import javax.persistence.GenerationType;
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.GenerationType;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
+import org.seasar.framework.util.ResultSetUtil;
+import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
+
+import jp.co.tis.gsp.tools.db.AlternativeGenerator;
+import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
+
 public abstract class Dialect {
+	
+	protected String user;
+	protected String password;
+	protected String adminUser;
+	protected String adminPassword;
+	protected String schema;
+	protected String url;
+	protected String dmpFile;
+	protected File outputDirectory;
+	protected File inputDirectory;
+
+	public String getUrl() {
+		return url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getAdminUser() {
+		return adminUser;
+	}
+
+	public void setAdminUser(String adminUser) {
+		this.adminUser = adminUser;
+	}
+
+	public String getAdminPassword() {
+		return adminPassword;
+	}
+
+	public void setAdminPassword(String adminPassword) {
+		this.adminPassword = adminPassword;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+	
+	public String getDmpFile() {
+		return dmpFile;
+	}
+
+	public void setDmpFile(String dmpFile) {
+		this.dmpFile = dmpFile;
+	}
+	
+	public File getOutputDirectory() {
+		return outputDirectory;
+	}
+
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
+	public File getInputDirectory() {
+		return inputDirectory;
+	}
+
+	public void setInputDirectory(File inputDirectory) {
+		this.inputDirectory = inputDirectory;
+	}
 
 	protected DatabaseMetaData metaData = null;
 	protected static final int UN_USABLE_TYPE = -999;
+	
+	public abstract File exportSchema() throws MojoExecutionException;
 
-	public abstract void exportSchema(String user, String password, String schema, File dumpFile)
-			throws MojoExecutionException;
+	public abstract void dropAll() throws MojoExecutionException;
 
-	public abstract void dropAll(String user, String password, String adminUser,
-			String adminPassword, String schema) throws MojoExecutionException;
+	public abstract void importSchema(File dumpFile) throws MojoExecutionException;
 
-	public abstract void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException;
-
-	public abstract void createUser(String user, String password, String adminUser,
-			String adminPassword) throws MojoExecutionException;
+	public abstract void createUser() throws MojoExecutionException;
 
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
@@ -53,7 +144,7 @@ public abstract class Dialect {
      * @throws SQLException SQL実行時のエラー
      * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
      */
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
+    public void grantAllToAnotherSchema(Connection conn)
             throws SQLException, UnsupportedOperationException {
         // nop
     }
@@ -66,12 +157,10 @@ public abstract class Dialect {
      * @throws SQLException SQL実行時のエラー
      * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
      */
-    public void createSchemaIfNotExist(Connection conn, String schema)
+    public void createSchemaIfNotExist(Connection conn)
             throws SQLException, UnsupportedOperationException {
         // nop
     }
-
-	public abstract void setUrl(String url);
 
 	public abstract TypeMapper getTypeMapper();
 
@@ -174,5 +263,51 @@ public abstract class Dialect {
         } else {
             stmt.setObject(parameterIndex, value, sqlType);
         }
+    }
+    
+    /**
+     * Exportで利用するファイルを作成します.
+     * 
+     * @return　ファイル
+     */
+    protected File createExportFile(){
+		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
+		return exportFile;
+    }
+    
+    /**
+     * ViewのDDL定義を取得する。
+     * 
+     * @param conn コネクション 
+     * @param viewName　ビュー名
+     * @param tableMeta ビュー定義のメタデータ
+     * @return ViewのDDL
+     * @throws SQLException SQL例外 
+     */
+    public String getViewDefinition(Connection conn, String viewName, DbTableMeta tableMeta) throws SQLException {
+        Dialect gspDialect = DialectUtil.getDialect();;
+        String sql = gspDialect.getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int idx = 1;
+        
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(idx++, viewName);
+            stmt.setString(idx++, tableMeta.getSchemaName());	
+            
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString("VIEW_DEFINITION");
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
     }
 }

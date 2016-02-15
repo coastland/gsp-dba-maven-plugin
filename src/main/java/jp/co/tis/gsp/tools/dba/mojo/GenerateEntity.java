@@ -27,12 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jp.co.tis.gsp.tools.db.beans.Erd;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.s2jdbc.gen.GspFactoryImpl;
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -49,6 +43,10 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import jp.co.tis.gsp.tools.db.beans.Erd;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.s2jdbc.gen.GspFactoryImpl;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  * @author kawasima
@@ -180,8 +178,7 @@ public class GenerateEntity extends AbstractDbaMojo {
      * エンティティ生成を実行する。
      */
     private void executeGenerateEntity() {
-        Dialect dialect = DialectFactory.getDialect(url);
-        DialectUtil.setDialect(dialect);
+    	Dialect dialect = DialectUtil.getDialect();
         final GenerateEntityCommand command = new GenerateEntityCommand();
         command.setSchemaName(dialect.normalizeSchemaName(schema));
         command.setOverwrite(true);
