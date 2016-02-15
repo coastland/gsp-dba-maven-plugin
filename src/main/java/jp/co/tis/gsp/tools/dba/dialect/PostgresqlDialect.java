@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
+    private String url;
+    private String schema;
     private static final String DRIVER = "org.postgresql.Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
@@ -70,9 +72,8 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public File exportSchema() throws MojoExecutionException {
-    	File dumpFile = createExportFile();
-    	
+    public void exportSchema(String user, String password, String schema,
+            File dumpFile) throws MojoExecutionException {
         BufferedInputStream in = null;
         FileOutputStream out = null;
         try {
@@ -108,12 +109,12 @@ public class PostgresqlDialect extends Dialect {
             IOUtils.closeQuietly(in);
             IOUtils.closeQuietly(out);
         }
-        
-        return dumpFile;
     }
 
     @Override
-    public void dropAll() throws MojoExecutionException {
+    public void dropAll(String user, String password, String adminUser,
+            String adminPassword, String schema) throws MojoExecutionException {
+        this.schema = schema;
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -136,7 +137,8 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void importSchema(File dumpFile) throws MojoExecutionException {
+    public void importSchema(String user, String password, String schema,
+            File dumpFile) throws MojoExecutionException {
 
         Map<String, String> environment = new HashMap<String, String>();
         if (StringUtils.isNotEmpty(password)) {
@@ -157,7 +159,8 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void createUser() throws MojoExecutionException {
+    public void createUser(String user, String password, String adminUser,
+            String adminPassword) throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -187,10 +190,15 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn) throws SQLException, UnsupportedOperationException {
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
         conn.createStatement().execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
         conn.createStatement().execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
         ConnectionUtil.close(conn);
+    }
+
+    @Override
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override

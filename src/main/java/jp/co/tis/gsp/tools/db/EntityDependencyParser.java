@@ -27,11 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import jp.co.tis.gsp.tools.GspToolsException;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+
+import org.apache.commons.lang.StringUtils;
+import org.seasar.framework.util.ResultSetUtil;
 
 
 public class EntityDependencyParser {
@@ -40,7 +41,7 @@ public class EntityDependencyParser {
     public void parse(Connection conn, String url, String schema) {
         try {
             DatabaseMetaData metaData = conn.getMetaData();
-            Dialect dialect = DialectUtil.getDialect();
+            Dialect dialect = DialectFactory.getDialect(url);
             String normalizedSchemaName = dialect.normalizeSchemaName(schema);
             List<String> tableNames = getAllTableNames(metaData, normalizedSchemaName);
             for (String tableName : tableNames) {

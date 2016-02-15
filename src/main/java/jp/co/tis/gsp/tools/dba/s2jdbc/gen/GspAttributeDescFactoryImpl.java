@@ -16,8 +16,6 @@
 
 package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
-import javax.persistence.GenerationType;
-
 import org.seasar.extension.jdbc.gen.desc.AttributeDesc;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
 import org.seasar.extension.jdbc.gen.internal.desc.AttributeDescFactoryImpl;
@@ -25,6 +23,9 @@ import org.seasar.extension.jdbc.gen.meta.DbColumnMeta;
 import org.seasar.extension.jdbc.gen.meta.DbForeignKeyMeta;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.framework.convention.PersistenceConvention;
+import org.seasar.framework.util.ClassUtil;
+
+import javax.persistence.GenerationType;
 
 /**
  * @author kawasima

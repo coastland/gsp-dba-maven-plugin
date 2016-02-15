@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Db2Dialect extends Dialect {
+    private String url;
     private static final String DRIVER = "com.ibm.db2.jcc.DB2Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
@@ -68,12 +69,13 @@ public class Db2Dialect extends Dialect {
      * DB2ではスキーマ構造をエクスポートできないため、export-schemaをサポートしない。
      */
     @Override
-    public File exportSchema() throws MojoExecutionException {
+    public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
         throw new UnsupportedOperationException("db2を用いたexport-schemaはサポートしていません。");
     }
 
     @Override
-    public void dropAll() throws MojoExecutionException {
+    public void dropAll(String user, String password, String adminUser,
+            String adminPassword, String schema) throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -146,7 +148,7 @@ public class Db2Dialect extends Dialect {
      * DB2ではスキーマ構造をエクスポートできないため、import-schemaをサポートしない。
      */
     @Override
-    public void importSchema(File dumpFile) throws MojoExecutionException {
+    public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
         throw new UnsupportedOperationException("db2を用いたimport-schemaはサポートしていません。");
     }
 
@@ -155,7 +157,8 @@ public class Db2Dialect extends Dialect {
      * 本処理では、DBへのアクセス権限を付与するだけ。
      */
     @Override
-    public void createUser() throws MojoExecutionException {
+    public void createUser(String user, String password, String adminUser,
+            String adminPassword) throws MojoExecutionException {
         DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
@@ -178,7 +181,7 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn) throws SQLException {
+    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "select TABNAME from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U'");
         stmt.setString(1, StringUtils.upperCase(schema));
@@ -192,7 +195,7 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void createSchemaIfNotExist(Connection conn) throws SQLException {
+    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
  		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
 		userStmt.setString(1, StringUtils.upperCase(schema));
 		ResultSet rs = userStmt.executeQuery();
@@ -206,6 +209,11 @@ public class Db2Dialect extends Dialect {
 		Statement createUserStmt = conn.createStatement();
 		createUserStmt.execute("CREATE SCHEMA "+ schema);
 		StatementUtil.close(createUserStmt);
+    }
+
+    @Override
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override

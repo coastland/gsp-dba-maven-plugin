@@ -16,8 +16,6 @@
 
 package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
-import java.io.File;
-
 import javax.persistence.GenerationType;
 import javax.sql.DataSource;
 
@@ -27,12 +25,15 @@ import org.seasar.extension.jdbc.gen.desc.CompositeUniqueConstraintDescFactory;
 import org.seasar.extension.jdbc.gen.desc.EntityDescFactory;
 import org.seasar.extension.jdbc.gen.desc.EntitySetDescFactory;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
+import org.seasar.extension.jdbc.gen.internal.desc.AttributeDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.desc.CompositeUniqueConstraintDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.desc.EntityDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.desc.EntitySetDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.factory.FactoryImpl;
 import org.seasar.extension.jdbc.gen.meta.DbTableMetaReader;
 import org.seasar.framework.convention.PersistenceConvention;
+
+import java.io.File;
 
 public class GspFactoryImpl extends FactoryImpl {
 	@Override
