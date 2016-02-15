@@ -28,6 +28,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import jp.co.tis.gsp.tools.db.EntityDependencyParser;
+import jp.co.tis.gsp.tools.dba.CsvInsertHandler;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,11 +47,6 @@ import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.tiger.CollectionsUtil;
 
 import com.csvreader.CsvReader;
-
-import jp.co.tis.gsp.tools.db.EntityDependencyParser;
-import jp.co.tis.gsp.tools.dba.CsvInsertHandler;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  * @author kawasima
@@ -91,10 +91,8 @@ public class LoadDataMojo extends AbstractDbaMojo {
 
 		// 依存関係を考慮し読み込むファイル順をソートする
 		EntityDependencyParser parser = new EntityDependencyParser();
-		Dialect dialect = DialectUtil.getDialect();
+		Dialect dialect = DialectFactory.getDialect(url);
 		parser.parse(conn, url, dialect.normalizeSchemaName(schema));
-		DialectUtil.setDialect(dialect);
-		
 		final List<String> tableList = parser.getTableList();
 		Collections.sort(files, new Comparator<File>() {
 			@Override
