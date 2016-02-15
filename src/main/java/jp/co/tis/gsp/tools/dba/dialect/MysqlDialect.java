@@ -34,10 +34,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
+import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.CollectionsUtil;
 import org.seasar.framework.util.tiger.Maps;
@@ -45,6 +47,7 @@ import org.seasar.framework.util.tiger.Maps;
 import jp.co.tis.gsp.tools.db.AbstractDbObjectParser;
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class MysqlDialect extends Dialect {
@@ -225,4 +228,45 @@ public class MysqlDialect extends Dialect {
 	public String getViewDefinitionSql() {
 		return "SELECT view_definition FROM information_schema.views WHERE table_name=? AND TABLE_SCHEMA=?";
 	}
+	
+
+	/**
+	 * ViewのDDL定義を取得する（MySQL用）.
+	 * 
+	 * <p>
+	 *   MySQLのJDBC実装ではDbTableMetaよりスキーマ名が取得出来ないためカタログ名を用いる。
+	 * </p>
+	 * 
+	 * @param conn {@inheritDoc} 
+	 * @param viewName {@inheritDoc}
+	 * @param tableMeta {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws SQLException {@inheritDoc}
+	 */
+    public String getViewDefinition(Connection conn, String viewName, DbTableMeta tableMeta) throws SQLException {
+        Dialect gspDialect = DialectUtil.getDialect();;
+        String sql = gspDialect.getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int idx = 1;
+        
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(idx++, viewName);
+            stmt.setString(idx++, tableMeta.getCatalogName());	
+            
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString("VIEW_DEFINITION");
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
+    }
 }

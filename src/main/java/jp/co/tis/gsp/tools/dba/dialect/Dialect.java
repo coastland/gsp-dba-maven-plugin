@@ -30,10 +30,14 @@ import javax.persistence.GenerationType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
+import org.seasar.framework.util.ResultSetUtil;
+import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.StringUtil;
 
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 public abstract class Dialect {
 	
@@ -269,5 +273,41 @@ public abstract class Dialect {
     protected File createExportFile(){
 		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
 		return exportFile;
+    }
+    
+    /**
+     * ViewのDDL定義を取得する。
+     * 
+     * @param conn コネクション 
+     * @param viewName　ビュー名
+     * @param tableMeta ビュー定義のメタデータ
+     * @return ViewのDDL
+     * @throws SQLException SQL例外 
+     */
+    public String getViewDefinition(Connection conn, String viewName, DbTableMeta tableMeta) throws SQLException {
+        Dialect gspDialect = DialectUtil.getDialect();;
+        String sql = gspDialect.getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int idx = 1;
+        
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(idx++, viewName);
+            stmt.setString(idx++, tableMeta.getSchemaName());	
+            
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString("VIEW_DEFINITION");
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
     }
 }

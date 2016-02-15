@@ -167,11 +167,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             DbTableMeta tableMeta) {
     	Set<String> result = new HashSet<String>();
         try {
+        	Dialect dialect = DialectUtil.getDialect();
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableName, schemaName);
+	        	String sql = dialect.getViewDefinition(metaData.getConnection(), tableName, tableMeta);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -217,11 +218,12 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         @SuppressWarnings("unchecked")
         Map<String, DbForeignKeyMeta> map = new ArrayMap();
         try {
+        	Dialect dialect = DialectUtil.getDialect();
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName(), schemaName);
+	        	String sql = dialect.getViewDefinition(metaData.getConnection(), tableName, tableMeta);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -283,34 +285,5 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     	} finally {
     		ResultSetUtil.close(rs);
     	}
-    }
-    
-    protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName, String schemaName) throws SQLException {
-        Dialect gspDialect = DialectUtil.getDialect();;
-        String sql = gspDialect.getViewDefinitionSql();
-        if (sql == null) {
-            return null;
-        }
-
-        Connection conn = metaData.getConnection();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        int idx = 1;
-        
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(idx++, viewName);
-            stmt.setString(idx++, schemaName);	
-            
-            rs = stmt.executeQuery();
-            while(rs.next()) {
-                return rs.getString("VIEW_DEFINITION");
-            }
-        } finally {
-            ResultSetUtil.close(rs);
-            StatementUtil.close(stmt);
-        }
-        return null;
-
     }
 }
