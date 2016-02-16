@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SqlserverDialect extends Dialect {
-    private String url;
     private String schema;
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -169,11 +168,6 @@ public class SqlserverDialect extends Dialect {
     }
 
     @Override
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @Override
     public TypeMapper getTypeMapper() {
         return null;
     }
@@ -245,19 +239,29 @@ public class SqlserverDialect extends Dialect {
      * @throws SQLException SQL実行時のエラー
      */
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
-            throws SQLException {
-        PreparedStatement stmt =
-                conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
-        stmt.setString(1, schema);
-        ResultSet rs = stmt.executeQuery();
-        StringBuilder sb = new StringBuilder();
-        Statement grantStmt = conn.createStatement();
-        while (rs.next()) {
-            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
-            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("TABLE_NAME") + " TO " + user);
+    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    	
+        Connection conn = null;
+    	PreparedStatement pstmt = null;
+    	
+    	try{    	
+	    	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+	    	pstmt =conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
+	        pstmt.setString(1, schema);
+	        ResultSet rs = pstmt.executeQuery();
+	        StringBuilder sb = new StringBuilder();
+	        Statement grantStmt = conn.createStatement();
+	        while (rs.next()) {
+	            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
+	            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("TABLE_NAME") + " TO " + user);
+	        }
+        
+        } catch (SQLException e) {
+            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
+        } finally {
+        	StatementUtil.close(pstmt);
+            ConnectionUtil.close(conn);
         }
-        StatementUtil.close(stmt);
     }
 
     private String getUrlReplaceDatabaseName(String newDatabaseName) {

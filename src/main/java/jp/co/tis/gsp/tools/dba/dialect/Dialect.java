@@ -16,16 +16,28 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.AlternativeGenerator;
-import jp.co.tis.gsp.tools.db.TypeMapper;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.seasar.framework.util.StringUtil;
-
-import javax.persistence.GenerationType;
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.GenerationType;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
+import org.seasar.framework.util.DriverManagerUtil;
+import org.seasar.framework.util.ResultSetUtil;
+import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
+
+import jp.co.tis.gsp.tools.db.AlternativeGenerator;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public abstract class Dialect {
 
@@ -42,6 +54,17 @@ public abstract class Dialect {
 
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
+	
+	
+    protected String url;
+
+    public String getUrl() {
+        return this.url;
+    }
+    
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
@@ -50,28 +73,27 @@ public abstract class Dialect {
      * @param conn DBコネクション
      * @param schema スキーマ名
      * @param user ユーザ名
-     * @throws SQLException SQL実行時のエラー
-     * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
+     * @throws MojoExecutionException エラー
      */
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user)
-            throws SQLException, UnsupportedOperationException {
+    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
         // nop
     }
 
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマがもし存在しなければ作成する。
      * デフォルトでは何もしない。
-     * @param conn DBコネクション
      * @param schema スキーマ名
+     * @param user TODO
+     * @param password TODO
+     * @param admin TODO
+     * @param adminPassword TODO
+     * @param conn DBコネクション
      * @throws SQLException SQL実行時のエラー
      * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
      */
-    public void createSchemaIfNotExist(Connection conn, String schema)
-            throws SQLException, UnsupportedOperationException {
+    public void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
         // nop
     }
-
-	public abstract void setUrl(String url);
 
 	public abstract TypeMapper getTypeMapper();
 
@@ -174,5 +196,45 @@ public abstract class Dialect {
         } else {
             stmt.setObject(parameterIndex, value, sqlType);
         }
+    }
+    
+    /**
+     * ViewのDDL定義を取得する。
+     * 
+     * @param conn コネクション 
+     * @param viewName　ビュー名
+     * @param tableMeta ビュー定義のメタデータ
+     * @return ViewのDDL
+     * @throws SQLException SQL例外 
+     */
+    public String getViewDefinition(Connection conn, String viewName, DbTableMeta tableMeta) throws SQLException {
+        String sql = getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int idx = 1;
+        
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(idx++, viewName);
+            stmt.setString(idx++, tableMeta.getSchemaName());	
+            
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString("VIEW_DEFINITION");
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
+    }
+    
+    protected Connection getJDBCConnection(String driver, String user, String password) throws SQLException{
+    	DriverManagerUtil.registerDriver(driver);
+    	return DriverManager.getConnection(url, user, password);
     }
 }

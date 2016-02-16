@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
-    private String url;
     private String schema;
     private static final String DRIVER = "org.postgresql.Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -190,15 +189,23 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
-        conn.createStatement().execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
-        conn.createStatement().execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
-        ConnectionUtil.close(conn);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
+    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    	
+        Connection conn = null;
+        Statement stmt = null;
+        
+        try{
+        	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+        	stmt = conn.createStatement();
+        	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
+        	stmt.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
+        
+        } catch (SQLException e) {
+            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
+        } finally {
+        	StatementUtil.close(stmt);
+            ConnectionUtil.close(conn);
+        }
     }
 
     @Override
