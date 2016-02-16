@@ -16,7 +16,7 @@ OracleデータベースのNumber型をJavaのクラスに変換する際の対�
 作成、条件を記述し、pomにて作成したクラスを読み込むように設定してください。  
 以下はカスタマイズの例です。例では、10桁未満の数字をIntegerに、19桁以上の数字をBigDecimalに対応付けるように変更しています。
 
-```
+```java
 public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
 
     public CustomOracleGenDialect() {
@@ -44,7 +44,7 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
 カスタマイズしたら、適用するプロジェクトのpomのGSPプラグインに、作成したクラスを読み込ませるよう設定を追加してください。
 以下、設定例です。
 
-```
+```xml
 <plugins>
   <plugin>
     <groupId>jp.co.tis.gsp</groupId>

@@ -6,7 +6,7 @@ README.mdのload-dataにあるように、全角空白もしくは半角空白�
 この設定を変更する際には、使用するDBのダイアレクトクラスを継承したクラスを作成、条件を記述し、pomにて作成したダイアレクトクラスを使用するように設定してください。  
 以下は、全角空白のみのデータをnullとしてOracleDBに登録する際の設定例です。
 
-```
+```java
 public class CustomOracleDialect extends OracleDialect{
     
     public void setObjectInStmt(PreparedStatement stmt, int parameterIndex, String value, int sqlType) throws SQLException {
@@ -28,7 +28,7 @@ public class CustomOracleDialect extends OracleDialect{
 カスタマイズしたら、適用するプロジェクトのpomのGSPプラグインに、作成したクラスを読み込ませるよう設定を追加してください。  
 以下、設定例です。
 
-```
+```xml
 <plugins>
   <plugin>
     <groupId>jp.co.tis.gsp</groupId>

@@ -70,7 +70,7 @@ public class ${shortClassName}<#if shortSuperclassName??> extends ${shortSupercl
 
 このテンプレートの場合、次のようなエンティティが出力されます。
 
-```
+```java
 package com.example.entity;
 
 import java.io.Serializable;
@@ -111,7 +111,7 @@ public class SystemAccount implements Serializable {
         this.userId = userId;
     }
     
-    ～以下省略～
+    // ～以下省略～
 ```
 
 使用できる変数は[デフォルトのテンプレート](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)を参考にしてください。
@@ -119,7 +119,7 @@ public class SystemAccount implements Serializable {
 カスタマイズしたら、適用するプロジェクトのpomのgsp-dba-maven-pluginに、作成したテンプレートを読み込ませるよう設定を追加してください。
 以下、src/main/resource/gsp/template/gsp_entity_custom.ftlに配置した場合の設定例です。
 
-```
+```xml
 <plugins>
   <plugin>
     <groupId>jp.co.tis.gsp</groupId>
