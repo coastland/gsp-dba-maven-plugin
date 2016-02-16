@@ -34,7 +34,7 @@ public class AbstractDbObjectParser {
 	protected String schema;
 	protected String url;
 	protected String user;
-	protected String projectSpecificTemplateDir;
+	protected String ddlTemplateFileDir;
 	private final Configuration fmConfig = new Configuration();
 	protected final LinkedList<TemplateLoader> templateLoaderList = new LinkedList<TemplateLoader>();
 	protected TypeMapper typeMapper;
@@ -46,9 +46,9 @@ public class AbstractDbObjectParser {
 	}
 
 	protected void setupTemplateLoader() {
-		if (projectSpecificTemplateDir != null) {
+		if (ddlTemplateFileDir != null) {
 			try {
-				FileTemplateLoader templateLoader = new FileTemplateLoader(new File("./" + projectSpecificTemplateDir));
+				FileTemplateLoader templateLoader = new FileTemplateLoader(new File("./" + ddlTemplateFileDir));
 				templateLoaderList.add(templateLoader);
 			} catch (IOException e) {
 				// configurationが設定されているにも関わらず到達できない
@@ -118,7 +118,7 @@ public class AbstractDbObjectParser {
         this.user = user;
     }
 
-	public void setProjectSpecificTemplateDir(String projectSpecificTemplateDir) {
-		this.projectSpecificTemplateDir = projectSpecificTemplateDir;
+	public void setDdlTemplateFileDir(String ddlTemplateFileDir) {
+		this.ddlTemplateFileDir = ddlTemplateFileDir;
 	}
 }

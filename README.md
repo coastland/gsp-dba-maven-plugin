@@ -133,7 +133,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | erdFile                    | ○     | erdファイルのパス。ワークディレクトリからの相対パスで指定する。 |
 | outputDirectory            | ×     | DDLの出力ディレクトリ。デフォルトは、"target/ddl"。             |
 | lengthSemantics            | ×     | 長さセマンティクス。デフォルトはバイト。                        |
-| projectSpecificTemplateDir | ×     | プロジェクト固有のDDLテンプレートの配置ディレクトリをワークディレクトリからの相対パスで指定する。 |
+| ddlTemplateFileDir         | ×     | プロジェクト固有のDDLテンプレートの配置ディレクトリをワークディレクトリからの相対パスで指定する。 |
 テンプレートをカスタマイズする際は、[generate-ddlで使用するテンプレートのカスタマイズ例](./recipe/custom-DdlTemplate.md)を参照してください。
 
 
