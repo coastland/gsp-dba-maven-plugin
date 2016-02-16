@@ -17,7 +17,6 @@
 package jp.co.tis.gsp.tools.db.beans;
 
 import org.apache.commons.lang.StringUtils;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -121,7 +120,7 @@ public class Column {
 		return required != 1;
 	}
 
-	private ForeignKeyColumn foreignKeyColumn;
+	private List<ForeignKeyColumn> foreignKeyColumnList;
 
 	@XmlAttribute(name="ID")
 	public Integer getId() {
@@ -217,16 +216,16 @@ public class Column {
 	}
 
 	@XmlElementRef(name="FK")
-	public ForeignKeyColumn getForeignKeyColumn() {
-		return foreignKeyColumn;
+	public List<ForeignKeyColumn> getForeignKeyColumnList() {
+		return foreignKeyColumnList;
 	}
 
-	public void setForeignKeyColumn(ForeignKeyColumn foreignKeyColumn) {
-		this.foreignKeyColumn = foreignKeyColumn;
+	public void setForeignKeyColumnList(List<ForeignKeyColumn> foreignKeyColumnList) {
+		this.foreignKeyColumnList = foreignKeyColumnList;
 	}
 
 	public boolean hasForeignKeyColumn() {
-		return foreignKeyColumn != null;
+		return foreignKeyColumnList != null && foreignKeyColumnList.size() > 0;
 	}
 
     @XmlTransient

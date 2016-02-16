@@ -140,24 +140,27 @@ public class Entity {
 			}
 			if (!column.hasForeignKeyColumn())
 				continue;
-			ForeignKeyColumn fkColumn = column.getForeignKeyColumn();
-			Relation relation = erd.getRelation(fkColumn.getRelationId());
-			if (relation.getShowType() != 0) {
-				continue;
-			}
+			
+			List<ForeignKeyColumn> fkColumnList = column.getForeignKeyColumnList();
+			for(ForeignKeyColumn fkColumn : fkColumnList){
+				Relation relation = erd.getRelation(fkColumn.getRelationId());
+				if (relation.getShowType() != 0) {
+					continue;
+				}
 
-			Entity parentEntity = erd.getEntity(relation.getParentEntityId());
+				Entity parentEntity = erd.getEntity(relation.getParentEntityId());
 
-			ForeignKey foreignKey;
-			if (foreignKeyMap.containsKey(relation.getId())) {
-				foreignKey = foreignKeyMap.get(relation.getId());
-			} else {
-				foreignKey = new ForeignKey();
-				foreignKey.setReferenceEntity(parentEntity);
-				foreignKeyMap.put(relation.getId(), foreignKey);
+				ForeignKey foreignKey;
+				if (foreignKeyMap.containsKey(relation.getId())) {
+					foreignKey = foreignKeyMap.get(relation.getId());
+				} else {
+					foreignKey = new ForeignKey();
+					foreignKey.setReferenceEntity(parentEntity);
+					foreignKeyMap.put(relation.getId(), foreignKey);
+				}
+				foreignKey.getColumnList().add(column);
+				foreignKey.getReferenceColumnList().add(parentEntity.getColumn(fkColumn.getColumnId()));
 			}
-			foreignKey.getColumnList().add(column);
-			foreignKey.getReferenceColumnList().add(parentEntity.getColumn(fkColumn.getColumnId()));
 		}
 
 		foreignKeyList.addAll(foreignKeyMap.values());
