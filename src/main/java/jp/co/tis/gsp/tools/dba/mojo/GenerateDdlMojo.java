@@ -52,6 +52,9 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
     @Parameter(defaultValue = "BYTE")
     protected LengthSemantics lengthSemantics;
 
+    @Parameter
+    protected String ddlTemplateFileDir;
+
     /**
      * Generate DDL.
      *
@@ -79,7 +82,7 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
 		parser.setSchema(schema);
 		parser.setUrl(url);
 		parser.setUser(user);
-
+		parser.setDdlTemplateFileDir(ddlTemplateFileDir);
 		Dialect dialect = DialectFactory.getDialect(url);
 		parser.setTypeMapper(dialect.getTypeMapper());
 

@@ -34,27 +34,27 @@ gsp-dba-maven-pluginは、DBAのルーチンワークを自動化し、本来の
 
 pom.xmlに以下の設定を追加することでプラグインが使用できるようになります。
 
-    <pluginManagement>
-        <plugins>
-         ・・・
-            <plugin>
-                <groupId>jp.co.tis.gsp</groupId>
-                <artifactId>gsp-dba-maven-plugin</artifactId>
-                <version>
-                    使用するgsp-dba-maven-pluginのバージョン
-                </version>
-                <dependencies>
-                    <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
-                    <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc6</artifactId>
-                        <version>11.2.0.2.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        ・・・
-        </plugins>
-    </pluginManagement>
+```xml
+<pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>jp.co.tis.gsp</groupId>
+      <artifactId>gsp-dba-maven-plugin</artifactId>
+      <version>
+        使用するgsp-dba-maven-pluginのバージョン
+      </version>
+      <dependencies>
+        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
+        <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <version>11.2.0.2.0</version>
+        </dependency>
+      </dependencies>
+    </plugin>
+  </plugins>
+</pluginManagement>
+```
 
 ### ゴール共通のパラメータ
 
@@ -76,7 +76,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
  * optionalDialectsの指定方法  
  使用するダイアレクトクラスを変更する場合、以下の形式でデータベースと対応するダイアレクトクラスを定義します。
 
-```
+```xml
 <configuration>
   <optionalDialects>
     <oracle>jp.co.tis.gsp.tools.dba.dialect.CustomOracleDialect</oracle>
@@ -104,35 +104,39 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 
 使用する場合、pom.xmlに以下を追加してください。
 
-    <plugins>
-      <plugin>
-        <groupId>jp.co.tis.gsp</groupId>
-        <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>
-            使用するgsp-dba-maven-pluginのバージョン
-        </version>
-        <executions>
-          <execution>
-            <id>generate-ddl</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>generate-ddl</goal>
-            </goals>
-            <configuration>
-              <!-- 設定を追加 -->
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>generate-ddl</id>
+        <phase>generate-sources</phase>
+        <goals>
+          <goal>generate-ddl</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
 
 #### 使用可能なパラメータ
 
-| 設定値               | 必須  | 説明                                                            |
-|:---------------------|:-----:|:----------------------------------------------------------------|
-| erdFile              | ○     | erdファイルのパス。ワークディレクトリからの相対パスで指定する。 |
-| outputDirectory      | ×     | DDLの出力ディレクトリ。デフォルトは、"target/ddl"。             |
-| lengthSemantics      | ×     | 長さセマンティクス。デフォルトはバイト。                        |
+| 設定値                      | 必須  | 説明                                                            |
+|:---------------------------|:-----:|:----------------------------------------------------------------|
+| erdFile                    | ○     | erdファイルのパス。ワークディレクトリからの相対パスで指定する。 |
+| outputDirectory            | ×     | DDLの出力ディレクトリ。デフォルトは、"target/ddl"。             |
+| lengthSemantics            | ×     | 長さセマンティクス。デフォルトはバイト。                        |
+| ddlTemplateFileDir         | ×     | プロジェクト固有のDDLテンプレートの配置ディレクトリをワークディレクトリからの相対パスで指定する。 |
+テンプレートをカスタマイズする際は、[generate-ddlで使用するテンプレートのカスタマイズ例](./recipe/custom-DdlTemplate.md)を参照してください。
 
 
 ### execute-ddl
@@ -142,27 +146,29 @@ DDLを実行します。
 
 使用する場合、pom.xmlに以下を追加してください。
 
-    <plugins>
-      <plugin>
-        <groupId>jp.co.tis.gsp</groupId>
-        <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>
-            使用するgsp-dba-maven-pluginのバージョン
-        </version>
-        <executions>
-          <execution>
-            <id>execute-ddl</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>execute-ddl</goal>
-            </goals>
-            <configuration>
-              <!-- 設定を追加 -->
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>execute-ddl</id>
+        <phase>generate-sources</phase>
+        <goals>
+          <goal>execute-ddl</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
 
 #### 使用可能なパラメータ
 
@@ -177,27 +183,29 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 使用する場合、pom.xmlに以下を追加してください。
 
-    <plugins>
-      <plugin>
-        <groupId>jp.co.tis.gsp</groupId>
-        <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>
-            使用するgsp-dba-maven-pluginのバージョン
-        </version>
-        <executions>
-          <execution>
-            <id>load-data</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>load-data</goal>
-            </goals>
-            <configuration>
-              <!-- 設定を追加 -->
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>load-data</id>
+        <phase>pre-integration-test</phase>
+        <goals>
+          <goal>load-data</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
 
 
 #### 使用可能なパラメータ
@@ -212,18 +220,20 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 データファイルの文字コードを指定する場合、以下の形式でファイル名と対応する文字コードを定義します。
 
-    <configuration>
-      <specifiedEncodingFiles>
-        <aa.csv>UTF-8</aa.csv>
-        <bb.csv>UTF-8</bb.csv>
-      </specifiedEncodingFiles>
-    </configuration>
+```xml
+<configuration>
+  <specifiedEncodingFiles>
+    <aa.csv>UTF-8</aa.csv>
+    <bb.csv>UTF-8</bb.csv>
+  </specifiedEncodingFiles>
+</configuration>
+```
 
 
 #### データの形式
 データおよびデータファイルは以下の形式で作成してください。
 
-* ファイル名は、[テーブルの物理名].csv。
+* ファイル名は、 *テーブルの物理名*.csv。
 * 先頭行は、カラムの物理名(:カラムの型名)。DBによっては型名を指定しなくても自動で推定し、設定される。
 * 二行目以降にテストデータを記載。
 * 全角空白、半角空白のみの項目はnullとして扱われる。変更する際は[Dialectクラスのカスタマイズ例](./recipe/custom-Dialect.md)を参照すること。
@@ -238,7 +248,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 #### 登録可能なデータ型
 
 登録可能なデータ型はデータベースごとに異なります。
-詳細は、 **load-dataの対応状況** を参照してください。
+詳細は、 [load-dataの対応状況](#load-dataの対応状況) を参照してください。
 
 ### generate-entity
 
@@ -247,27 +257,29 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 使用する場合、pom.xmlに以下を追加してください。
 
-    <plugins>
-      <plugin>
-        <groupId>jp.co.tis.gsp</groupId>
-        <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>
-            使用するgsp-dba-maven-pluginのバージョン
-        </version>
-        <executions>
-          <execution>
-            <id>generate-entity</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>generate-entity</goal>
-            </goals>
-            <configuration>
-              <!-- 設定を追加 -->
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>generate-entity</id>
+        <phase>generate-sources</phase>
+        <goals>
+          <goal>generate-entity</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
 
 
 #### 使用可能なパラメータ
@@ -299,27 +311,29 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 使用する場合、pom.xmlに以下を追加してください。
 
-    <plugins>
-      <plugin>
-        <groupId>jp.co.tis.gsp</groupId>
-        <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>
-            使用するgsp-dba-maven-pluginのバージョン
-        </version>
-        <executions>
-          <execution>
-            <id>export-schema</id>
-            <phase>install</phase>
-            <goals>
-              <goal>export-schema</goal>
-            </goals>
-            <configuration>
-              <!-- 設定を追加 -->
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>export-schema</id>
+        <phase>install</phase>
+        <goals>
+          <goal>export-schema</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
 
 
 #### 使用可能なパラメータ
@@ -337,18 +351,20 @@ export-schemaはDB2とSQLServerには対応しておりません。
 
 使用する場合、pom.xmlに以下を追加してください。
 
-    <plugins>
-      <plugin>
-        <groupId>jp.co.tis.gsp</groupId>
-        <artifactId>gsp-dba-maven-plugin</artifactId>
-        <version>
-            使用するgsp-dba-maven-pluginのバージョン
-        </version>
-        <configuration>
-        <!-- 設定を追加 -->
-        </configuration>
-      </plugin>
-    </plugins>
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <configuration>
+    <!-- 設定を追加 -->
+    </configuration>
+  </plugin>
+</plugins>
+```
 
 #### 使用可能なパラメータ
 

@@ -16,21 +16,17 @@
 
 package jp.co.tis.gsp.tools.db;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-
-import jp.co.tis.gsp.tools.db.beans.Erd;
-
-import org.apache.commons.lang.StringUtils;
-
 import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import jp.co.tis.gsp.tools.db.beans.Erd;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.*;
+import java.util.LinkedList;
+import java.util.Locale;
 
 public class AbstractDbObjectParser {
 
@@ -38,8 +34,9 @@ public class AbstractDbObjectParser {
 	protected String schema;
 	protected String url;
 	protected String user;
+	protected String ddlTemplateFileDir;
 	private final Configuration fmConfig = new Configuration();
-	protected final LinkedList<ClassTemplateLoader> templateLoaderList = new LinkedList<ClassTemplateLoader>();
+	protected final LinkedList<TemplateLoader> templateLoaderList = new LinkedList<TemplateLoader>();
 	protected TypeMapper typeMapper;
 
 	public AbstractDbObjectParser() {
@@ -49,18 +46,29 @@ public class AbstractDbObjectParser {
 	}
 
 	protected void setupTemplateLoader() {
-		templateLoaderList.add(new ClassTemplateLoader(AbstractDbObjectParser.class, "/jp/co/tis/gsp/tools/db/template/"));
+		if (ddlTemplateFileDir != null) {
+			try {
+				FileTemplateLoader templateLoader = new FileTemplateLoader(new File("./" + ddlTemplateFileDir));
+				templateLoaderList.add(templateLoader);
+			} catch (IOException e) {
+				// configurationが設定されているにも関わらず到達できない
+				throw new IllegalArgumentException("failed to reach project resource", e);
+			}
+		}
+
 		if (url != null) {
 			String[] urlTokens = StringUtils.split(url, ':');
 			if(urlTokens.length < 3) {
 				throw new IllegalArgumentException("url isn't jdbc url format.");
 			}
-			templateLoaderList.addFirst(
+			templateLoaderList.add(
 					new ClassTemplateLoader(Erd.class, "/jp/co/tis/gsp/tools/db/template/"
 							+urlTokens[1]+"/")
-					);
+			);
 		}
 
+		templateLoaderList.add(
+				new ClassTemplateLoader(AbstractDbObjectParser.class, "/jp/co/tis/gsp/tools/db/template/"));
 	}
 
 	public void setSchema(String schema) {
@@ -83,7 +91,7 @@ public class AbstractDbObjectParser {
 	protected Template getTemplate(String templateName) throws IOException {
 		Template template = null;
 
-		for(ClassTemplateLoader templateLoader :templateLoaderList) {
+		for(TemplateLoader templateLoader :templateLoaderList) {
 			fmConfig.setTemplateLoader(templateLoader);
 			try {
 				template = fmConfig.getTemplate(templateName);
@@ -109,4 +117,8 @@ public class AbstractDbObjectParser {
     public void setUser(String user) {
         this.user = user;
     }
+
+	public void setDdlTemplateFileDir(String ddlTemplateFileDir) {
+		this.ddlTemplateFileDir = ddlTemplateFileDir;
+	}
 }
