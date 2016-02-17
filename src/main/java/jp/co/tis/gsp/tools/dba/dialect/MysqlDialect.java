@@ -231,7 +231,7 @@ public class MysqlDialect extends Dialect {
      */
 	@Override
 	public String getViewDefinitionSql() {
-		return "SELECT view_definition FROM information_schema.views WHERE table_name=? AND TABLE_SCHEMA=?";
+		return "SELECT view_definition FROM information_schema.views WHERE table_name=? AND table_schema=?";
 	}
 	
 
@@ -265,7 +265,7 @@ public class MysqlDialect extends Dialect {
             
             rs = stmt.executeQuery();
             while(rs.next()) {
-                return rs.getString("VIEW_DEFINITION");
+                return rs.getString(1);
             }
         } finally {
             ResultSetUtil.close(rs);

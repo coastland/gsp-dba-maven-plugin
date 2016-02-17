@@ -224,7 +224,7 @@ public abstract class Dialect {
             
             rs = stmt.executeQuery();
             while(rs.next()) {
-                return rs.getString("VIEW_DEFINITION");
+                return rs.getString(1);
             }
         } finally {
             ResultSetUtil.close(rs);
