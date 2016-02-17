@@ -16,12 +16,14 @@
 
 package jp.co.tis.gsp.tools.db.beans;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.Arrays;
+import java.util.List;
 
 @XmlRootElement(name="ATTR")
 public class Column {
@@ -72,9 +74,35 @@ public class Column {
 
     public Boolean isAutoIncrement() {
         return StringUtils.equalsIgnoreCase(defaultValue, "AUTO_INCREMENT")
-                || isSingularPrimaryKey();
-
+                || (isSingularPrimaryKey() && isNumericDataType());
     }
+
+	private Boolean isNumericDataType() {
+		// 重複は削除してもたいしたパフォーマンス向上にならないうえ、
+		// 後々のメンテナンス性が著しく下がると思われるため放置する。
+		List<String> numericDataTypeList = Arrays.asList(
+				// Oracle
+				"INTEGER", "SHORTINTEGER", "LONGINTEGER", "DECIMAL", "SHORTDECIMAL", "NUMBER",
+				// Postgres
+				"smallint", "integer", "bigint", "decimal", "numeric", "real",
+				"double precision", "smallserial", "serial", "bigserial",
+				// DB2
+				"BIGINT", "SMALLINT", "INTEGER", "DOUBLE", "NUMERIC", "REAL",
+				// H2Database
+				"INT", "INTEGER", "MEDIUMINT", "INT4", "SIGNED",
+				"TINYINT", "SMALLINT", "INT2", "YEAR", "BIGINT",
+				"INT8", "IDENTITY", "DECIMAL", "NUMBER", "DEC",
+				"NUMERIC", "DOUBLE", "DOUBLE PRECISION", "FLOAT",
+				"FLOAT8", "REAL", "FLOAT4",
+				// SQL Server
+				"bigint", "bit", "decimal", "int", "money", "numeric",
+				"smallint", "smallmoney", "tinyint", "float", "real",
+				// MySQL
+				"INTEGER", "SMALLINT", "DECIMAL", "NUMERIC", "FLOAT", "REAL",
+				"DOUBLE PRECISION", "INT", "DEC", "FIXED", "DOUBLE", "BIT"
+		);
+		return numericDataTypeList.contains(dataType);
+	}
 
     public String getGeneratorKeyName() {
         if (isSingularPrimaryKey()) {
