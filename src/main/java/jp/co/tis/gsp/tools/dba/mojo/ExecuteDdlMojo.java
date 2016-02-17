@@ -59,14 +59,8 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 		Dialect dialect = DialectFactory.getDialect(url);
 		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		dialect.createUser(user, password, adminUser, adminPassword);
-        if (!schema.equals(user)) {
-            try {
-                setConnection();
-                dialect.createSchemaIfNotExist(conn, schema);
-            } catch (SQLException e) {
-                getLog().warn(e);
-            }
-        }
+        dialect.createSchema(schema, user, password, adminUser, adminPassword);
+
 
         FilenameFilter sqlFileFilter = new FilenameFilter() {
             @Override
@@ -93,13 +87,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 			getLog().warn(e);
 		}
 
-        if (!schema.equals(user)) {
-            try {
-                dialect.grantAllToAnotherSchema(conn, schema, user);
-            } catch (SQLException e) {
-                getLog().warn(e);
-            }
-        }
+        dialect.grantAllToAnotherSchema(schema, user, password, adminUser, adminPassword);
 	}
 
     private void executeSql(String sql) throws SQLException {

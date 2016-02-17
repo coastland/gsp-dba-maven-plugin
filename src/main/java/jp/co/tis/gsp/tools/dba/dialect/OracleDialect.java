@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Properties;
 
 public class OracleDialect extends Dialect {
-	private String url;
 	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
@@ -200,16 +199,29 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
-		PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
-		stmt.setString(1, StringUtils.upperCase(schema));
-		ResultSet rs = stmt.executeQuery();
-		while (rs.next()) {
-			String tableName = rs.getString("TABLE_NAME");
-			// PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-			String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
-			conn.createStatement().execute(sql);
-		}
+	public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+		
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try{
+        	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+			PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
+			stmt.setString(1, StringUtils.upperCase(schema));
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				String tableName = rs.getString("TABLE_NAME");
+				// PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
+				String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
+				conn.createStatement().execute(sql);
+			}
+		
+        } catch (SQLException e) {
+            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
+        } finally {
+        	StatementUtil.close(pstmt);
+            ConnectionUtil.close(conn);
+        }
 	}
 
     /**
@@ -217,26 +229,39 @@ public class OracleDialect extends Dialect {
      * @throws SQLException SQLエラー
      */
 	@Override
-	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
-		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
-		userStmt.setString(1, StringUtils.upperCase(schema));
-		ResultSet rs = userStmt.executeQuery();
-		rs.next();
-		if (rs.getInt("num") > 0) {
-			// すでにデータ流し込み対象のスキーマが存在していれば何もしない
-			return;
+	public void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
+		
+		Statement createUserStmt = null;
+		Connection conn = null;
+		
+		try{
+			conn = getJDBCConnection(DRIVER, admin, adminPassword);
+			
+			PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
+			userStmt.setString(1, StringUtils.upperCase(schema));
+			ResultSet rs = userStmt.executeQuery();
+			rs.next();
+			if (rs.getInt("num") > 0) {
+				// すでにデータ流し込み対象のスキーマが存在していれば何もしない
+				return;
+			}
+			StatementUtil.close(userStmt);
+	
+			createUserStmt= conn.createStatement();
+			createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
+			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
+					"CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
+					"CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
+			createUserStmt.execute(grantSql);
+			System.out.println("GRANT文を実行しました:\n" + grantSql);
+		
+		} catch (SQLException e) {
+			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
+		} finally {
+			StatementUtil.close(createUserStmt);
+			ConnectionUtil.close(conn);
 		}
-		StatementUtil.close(userStmt);
 
-		Statement createUserStmt = conn.createStatement();
-		createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
-		String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
-				"CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
-				"CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
-		createUserStmt.execute(grantSql);
-		System.out.println("GRANT文を実行しました:\n" + grantSql);
-
-		StatementUtil.close(createUserStmt);
 	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
@@ -311,11 +336,6 @@ public class OracleDialect extends Dialect {
 		} finally {
 			StatementUtil.close(stmt);
 		}
-	}
-
-	@Override
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	@Override

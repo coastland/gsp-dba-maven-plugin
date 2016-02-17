@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Db2Dialect extends Dialect {
-    private String url;
     private static final String DRIVER = "com.ibm.db2.jcc.DB2Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
@@ -181,39 +180,61 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                "select TABNAME from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U'");
-        stmt.setString(1, StringUtils.upperCase(schema));
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            String tableName = rs.getString("TABNAME");
-            // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO USER " + user;
-            conn.createStatement().execute(sql);
+    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    	
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try{
+        	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+        	pstmt = conn.prepareStatement(
+	                "select TABNAME from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U'");
+        	pstmt.setString(1, StringUtils.upperCase(schema));
+	        ResultSet rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            String tableName = rs.getString("TABNAME");
+	            // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
+	            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO USER " + user;
+	            conn.createStatement().execute(sql);
+	        }
+        
+        } catch (SQLException e) {
+            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
+        } finally {
+        	StatementUtil.close(pstmt);
+            ConnectionUtil.close(conn);
         }
     }
 
     @Override
-    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
- 		PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
-		userStmt.setString(1, StringUtils.upperCase(schema));
-		ResultSet rs = userStmt.executeQuery();
-		rs.next();
-		if (rs.getInt("num") > 0) {
-			// すでにデータ流し込み対象のスキーマが存在していれば何もしない
-			return;
+    public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    	
+    	PreparedStatement  userStmt = null;
+        Statement createUserStmt = null;
+        Connection conn = null;
+    	
+        try{
+			conn = getJDBCConnection(DRIVER, admin, adminPassword);
+	        
+	 		userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
+			userStmt.setString(1, StringUtils.upperCase(schema));
+			ResultSet rs = userStmt.executeQuery();
+			rs.next();
+			if (rs.getInt("num") > 0) {
+				// すでにデータ流し込み対象のスキーマが存在していれば何もしない
+				return;
+			}
+	
+			createUserStmt = conn.createStatement();
+			createUserStmt.execute("CREATE SCHEMA "+ schema);
+		
+		} catch (SQLException e) {
+			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
+		} finally {
+			StatementUtil.close(userStmt);
+			StatementUtil.close(createUserStmt);
+			ConnectionUtil.close(conn);
 		}
-		StatementUtil.close(userStmt);
-
-		Statement createUserStmt = conn.createStatement();
-		createUserStmt.execute("CREATE SCHEMA "+ schema);
-		StatementUtil.close(createUserStmt);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     @Override

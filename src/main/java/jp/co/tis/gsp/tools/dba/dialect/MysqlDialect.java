@@ -30,23 +30,24 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import jp.co.tis.gsp.tools.db.AbstractDbObjectParser;
-import jp.co.tis.gsp.tools.db.AlternativeGenerator;
-import jp.co.tis.gsp.tools.db.TypeMapper;
-import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.beans.util.BeanMap;
 import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
+import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.CollectionsUtil;
 import org.seasar.framework.util.tiger.Maps;
+
+import jp.co.tis.gsp.tools.db.AbstractDbObjectParser;
+import jp.co.tis.gsp.tools.db.AlternativeGenerator;
+import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class MysqlDialect extends Dialect {
 	private String url;
@@ -155,13 +156,16 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException, UnsupportedOperationException {
-		throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+	public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+		if(!schema.equals(user))
+			throw new MojoExecutionException("MySQLスキーマ例外", new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。"));
+		 
  	}
 
 	@Override
-	public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException, UnsupportedOperationException {
-		throw new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。");
+	public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+		if(!schema.equals(user))
+			throw new MojoExecutionException("MySQLスキーマ例外", new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。"));
 	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
@@ -200,11 +204,6 @@ public class MysqlDialect extends Dialect {
 	}
 
 	@Override
-	public String normalizeSchemaName(String schemaName) {
-		return "'" + schemaName + "'";
-	}
-
-	@Override
 	public List<AlternativeGenerator> getAlternativeGenerators() {
 		List<AlternativeGenerator> generators = CollectionsUtil.newArrayList(10);
 		generators.add(new AlternativeGenerator() {
@@ -232,6 +231,46 @@ public class MysqlDialect extends Dialect {
      */
 	@Override
 	public String getViewDefinitionSql() {
-		return "SELECT view_definition FROM information_schema.views WHERE table_name=?";
+		return "SELECT view_definition FROM information_schema.views WHERE table_name=? AND table_schema=?";
 	}
+	
+
+	/**
+	 * ViewのDDL定義を取得する（MySQL用）.
+	 * 
+	 * <p>
+	 *   MySQLのJDBC実装ではDbTableMetaよりスキーマ名が取得出来ないためカタログ名を用いる。
+	 * </p>
+	 * 
+	 * @param conn {@inheritDoc} 
+	 * @param viewName {@inheritDoc}
+	 * @param tableMeta {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws SQLException {@inheritDoc}
+	 */
+    public String getViewDefinition(Connection conn, String viewName, DbTableMeta tableMeta) throws SQLException {
+        String sql = getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int idx = 1;
+        
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(idx++, viewName);
+            stmt.setString(idx++, tableMeta.getCatalogName());	
+            
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString(1);
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
+    }
 }

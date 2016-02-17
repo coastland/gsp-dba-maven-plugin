@@ -12,7 +12,7 @@ import java.io.File;
 import java.sql.*;
 
 public class H2Dialect extends Dialect {
-    private String url;
+    
     private static final String DRIVER = "org.h2.Driver";
 
     public H2Dialect(){
@@ -95,37 +95,55 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(Connection conn, String schema, String user) throws SQLException {
-        PreparedStatement pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
-        pstmt.setString(1, StringUtils.upperCase(schema));
-        ResultSet rs = pstmt.executeQuery();
-        StringBuilder sb = new StringBuilder();
-        while (rs.next()) {
-            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
+    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    	
+        Connection conn = null;
+        Statement stmt = null;
+        PreparedStatement pstmt = null;
+    	
+    	try{
+    		conn = getJDBCConnection(DRIVER, admin, adminPassword);
+	        pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
+	        pstmt.setString(1, StringUtils.upperCase(schema));
+	        ResultSet rs = pstmt.executeQuery();
+	        StringBuilder sb = new StringBuilder();
+	        while (rs.next()) {
+	            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
+	        }
+	        int stringLength = sb.length();
+	        // 最後尾にもカンマがついてしまうので手動で消す
+	        String tables = sb.toString().substring(0, stringLength - 1);
+	
+	        // PUBLICスキーマはデフォルトスキーマなので何もする必要がない
+	        if ("PUBLIC".equals(schema)) return;
+	        stmt = conn.createStatement();
+	
+	        stmt.execute("GRANT ALL ON " + tables + " TO " + user);
+        
+        } catch (SQLException e) {
+            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
+        } finally {
+        	StatementUtil.close(pstmt);
+            StatementUtil.close(stmt);
+            ConnectionUtil.close(conn);
         }
-        int stringLength = sb.length();
-        // 最後尾にもカンマがついてしまうので手動で消す
-        String tables = sb.toString().substring(0, stringLength - 1);
-
-        // PUBLICスキーマはデフォルトスキーマなので何もする必要がない
-        if ("PUBLIC".equals(schema)) return;
-        Statement stmt = conn.createStatement();
-
-        stmt.execute("GRANT ALL ON " + tables + " TO " + user);
-        StatementUtil.close(stmt);
     }
 
     @Override
-    public void createSchemaIfNotExist(Connection conn, String schema) throws SQLException {
-        Statement stmt = conn.createStatement();
-        stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
-        StatementUtil.close(stmt);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
-
+    public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+        Statement stmt = null;
+        Connection conn = null;
+        
+		try {
+			conn = getJDBCConnection(DRIVER, admin, adminPassword);
+			stmt = conn.createStatement();
+			stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
+		} catch (SQLException e) {
+			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
+		} finally {
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
     }
 
     @Override
