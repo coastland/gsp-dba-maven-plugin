@@ -16,7 +16,8 @@
 
 `extraDdlDirectory`で指定されたSQLファイルは`generate-ddl`で生成されたSQLファイルがすべて実行された後に呼び出されます。
 
-以下、PostgreSQLで`project`テーブルの`project_id`列からシーケンスを削除するスクリプト例です。
+以下、PostgreSQLで`project`テーブルの`project_id`列に`SERIAL`で定義されていた自動採番を解除して、
+自動採番用に内部的に使用されていたシーケンスを削除するスクリプト例です。
 
 ```sql
 -- http://www.postgresql.org/message-id/a55915760705110936j1ee5bb67oe366c9161c92fc33@mail.gmail.com
