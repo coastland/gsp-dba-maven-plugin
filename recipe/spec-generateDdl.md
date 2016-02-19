@@ -15,3 +15,12 @@
 指定方法は[execute-ddlゴール](README.md#execute-ddl)を参照してください。
 
 `extraDdlDirectory`で指定されたSQLファイルは`generate-ddl`で生成されたSQLファイルがすべて実行された後に呼び出されます。
+
+以下、PostgreSQLで`project`テーブルの`project_id`列からシーケンスを削除するスクリプト例です。
+
+```sql
+-- http://www.postgresql.org/message-id/a55915760705110936j1ee5bb67oe366c9161c92fc33@mail.gmail.com
+ALTER TABLE project ALTER COLUMN project_id DROP DEFAULT;
+ALTER SEQUENCE project_project_id_seq OWNED BY NONE;
+DROP SEQUENCE project_project_id_seq;
+```
