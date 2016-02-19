@@ -13,8 +13,6 @@ import java.sql.*;
 
 public class H2Dialect extends Dialect {
     
-    private static final String DRIVER = "org.h2.Driver";
-
     public H2Dialect(){
         GenDialectRegistry.deregister(
                 org.seasar.extension.jdbc.dialect.H2Dialect.class
@@ -28,7 +26,7 @@ public class H2Dialect extends Dialect {
     @Override
     public void exportSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -45,7 +43,7 @@ public class H2Dialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -63,7 +61,7 @@ public class H2Dialect extends Dialect {
     @Override
     public void importSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -102,7 +100,7 @@ public class H2Dialect extends Dialect {
         PreparedStatement pstmt = null;
     	
     	try{
-    		conn = getJDBCConnection(DRIVER, admin, adminPassword);
+    		conn = getJDBCConnection(driver, admin, adminPassword);
 	        pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
 	        pstmt.setString(1, StringUtils.upperCase(schema));
 	        ResultSet rs = pstmt.executeQuery();
@@ -135,7 +133,7 @@ public class H2Dialect extends Dialect {
         Connection conn = null;
         
 		try {
-			conn = getJDBCConnection(DRIVER, admin, adminPassword);
+			conn = getJDBCConnection(driver, admin, adminPassword);
 			stmt = conn.createStatement();
 			stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
 		} catch (SQLException e) {

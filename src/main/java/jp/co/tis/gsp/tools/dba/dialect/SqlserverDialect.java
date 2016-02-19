@@ -33,7 +33,6 @@ import java.util.List;
 
 public class SqlserverDialect extends Dialect {
     private String schema;
-    private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 
     static {
@@ -90,7 +89,7 @@ public class SqlserverDialect extends Dialect {
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
         this.schema = schema;
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         PreparedStatement dropStmt;
@@ -103,7 +102,7 @@ public class SqlserverDialect extends Dialect {
             
             // 依存関係を考慮し削除するテーブルをソートする
             EntityDependencyParser parser = new EntityDependencyParser();
-            parser.parse(conn, url, schema);
+            parser.parse(conn, url, normalizeSchemaName(schema));
             final List<String> tableList = parser.getTableList();
             Collections.reverse(tableList);
             for (String table : tableList) {
@@ -139,7 +138,7 @@ public class SqlserverDialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -187,7 +186,7 @@ public class SqlserverDialect extends Dialect {
     }
 
     private boolean existsUser(String adminUser, String adminPassword, String user) throws SQLException {
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         PreparedStatement stmt = null;
         boolean existLogin = false;
@@ -245,7 +244,7 @@ public class SqlserverDialect extends Dialect {
     	PreparedStatement pstmt = null;
     	
     	try{    	
-	    	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+	    	conn = getJDBCConnection(driver, admin, adminPassword);
 	    	pstmt =conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
 	        pstmt.setString(1, schema);
 	        ResultSet rs = pstmt.executeQuery();

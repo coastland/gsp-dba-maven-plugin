@@ -180,7 +180,7 @@ public class GenerateEntity extends AbstractDbaMojo {
      * エンティティ生成を実行する。
      */
     private void executeGenerateEntity() {
-        Dialect dialect = DialectFactory.getDialect(url);
+        Dialect dialect = DialectFactory.getDialect(url, driver);
         DialectUtil.setDialect(dialect);
         final GenerateEntityCommand command = new GenerateEntityCommand();
         command.setSchemaName(dialect.normalizeSchemaName(schema));

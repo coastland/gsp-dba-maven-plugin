@@ -40,7 +40,6 @@ import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
     private String schema;
-    private static final String DRIVER = "org.postgresql.Driver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
     static {
@@ -114,7 +113,7 @@ public class PostgresqlDialect extends Dialect {
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
         this.schema = schema;
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -160,7 +159,7 @@ public class PostgresqlDialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
+        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         String database = getDatabase();
@@ -195,7 +194,7 @@ public class PostgresqlDialect extends Dialect {
         Statement stmt = null;
         
         try{
-        	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+        	conn = getJDBCConnection(driver, admin, adminPassword);
         	stmt = conn.createStatement();
         	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
         	stmt.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);

@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Properties;
 
 public class OracleDialect extends Dialect {
-	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
 	static {
@@ -170,7 +169,7 @@ public class OracleDialect extends Dialect {
 
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException {
-		DriverManagerUtil.registerDriver(DRIVER);
+		DriverManagerUtil.registerDriver(driver);
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -205,7 +204,7 @@ public class OracleDialect extends Dialect {
         PreparedStatement pstmt = null;
         
         try{
-        	conn = getJDBCConnection(DRIVER, admin, adminPassword);
+        	conn = getJDBCConnection(driver, admin, adminPassword);
 			PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
 			stmt.setString(1, StringUtils.upperCase(schema));
 			ResultSet rs = stmt.executeQuery();
@@ -235,7 +234,7 @@ public class OracleDialect extends Dialect {
 		Connection conn = null;
 		
 		try{
-			conn = getJDBCConnection(DRIVER, admin, adminPassword);
+			conn = getJDBCConnection(driver, admin, adminPassword);
 			
 			PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
 			userStmt.setString(1, StringUtils.upperCase(schema));
@@ -281,7 +280,7 @@ public class OracleDialect extends Dialect {
 	@Override
 	public void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException {
-		DriverManagerUtil.registerDriver(DRIVER);
+		DriverManagerUtil.registerDriver(driver);
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
