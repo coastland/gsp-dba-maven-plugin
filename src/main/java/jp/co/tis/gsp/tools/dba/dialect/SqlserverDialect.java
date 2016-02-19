@@ -102,7 +102,7 @@ public class SqlserverDialect extends Dialect {
             
             // 依存関係を考慮し削除するテーブルをソートする
             EntityDependencyParser parser = new EntityDependencyParser();
-            parser.parse(conn, url, normalizeSchemaName(schema));
+            parser.parse(conn, url, schema, driver);
             final List<String> tableList = parser.getTableList();
             Collections.reverse(tableList);
             for (String table : tableList) {
