@@ -57,6 +57,7 @@ public abstract class Dialect {
 	
 	
     protected String url;
+    protected String driver;
 
     public String getUrl() {
         return this.url;
@@ -65,6 +66,10 @@ public abstract class Dialect {
     public void setUrl(String url) {
         this.url = url;
     }
+    
+	public void setDriver(String driver) {
+		this.driver = driver;
+	}
 
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して

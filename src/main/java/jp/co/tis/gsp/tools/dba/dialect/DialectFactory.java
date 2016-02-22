@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DialectFactory {
-	public static Dialect getDialect(String url) {
+	public static Dialect getDialect(String url, String driver) {
 		String[] urlTokens = StringUtils.split(url, ':');
 		if(urlTokens.length < 3) {
 			throw new IllegalArgumentException("url isn't jdbc url format.");
@@ -41,6 +41,7 @@ public class DialectFactory {
             }
 			dialect = (Dialect)dialectClass.newInstance();
 			dialect.setUrl(url);
+			dialect.setDriver(driver);
 		} catch(Exception e) {
 			throw new IllegalArgumentException("Unsupported Database product:" + urlTokens[1], e);
 		}

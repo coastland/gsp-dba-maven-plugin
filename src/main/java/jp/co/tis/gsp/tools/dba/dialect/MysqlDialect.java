@@ -49,9 +49,7 @@ import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
-public class MysqlDialect extends Dialect {
-	private String url;
-	private final static String DRIVER = "com.mysql.jdbc.Driver";
+public class MysqlDialect extends Dialect {	
 
 	private Map<Integer, String> typeToNameMap = Maps
 		.map(Types.BIGINT, "BIGINT")
@@ -69,10 +67,7 @@ public class MysqlDialect extends Dialect {
 		.$();
 
 
-	public void setUrl(String url) {
-		this.url = url;
 
-	}
 	@Override
 	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
 		BufferedInputStream in = null;
@@ -131,7 +126,7 @@ public class MysqlDialect extends Dialect {
 
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException{
-		DriverManagerUtil.registerDriver(DRIVER);
+		DriverManagerUtil.registerDriver(driver);
 		Connection conn = null;
 		Statement stmt = null;
 		try {

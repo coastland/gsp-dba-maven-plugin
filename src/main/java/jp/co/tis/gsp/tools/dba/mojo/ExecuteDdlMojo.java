@@ -56,7 +56,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
         DriverManagerUtil.registerDriver(driver);
-		Dialect dialect = DialectFactory.getDialect(url);
+		Dialect dialect = DialectFactory.getDialect(url, driver);
 		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		dialect.createUser(user, password, adminUser, adminPassword);
         dialect.createSchema(schema, user, password, adminUser, adminPassword);
