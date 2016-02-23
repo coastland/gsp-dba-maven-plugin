@@ -30,18 +30,14 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import jp.co.tis.gsp.tools.GspToolsException;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 
 public class EntityDependencyParser {
     private Map<String, Table> tableMap = new HashMap<String, Table>();
 
-    public void parse(Connection conn, String url, String schema, String driver) {
+    public void parse(Connection conn, String url, String normalizedSchemaName) {
         try {
             DatabaseMetaData metaData = conn.getMetaData();
-            Dialect dialect = DialectFactory.getDialect(url, driver);
-            String normalizedSchemaName = dialect.normalizeSchemaName(schema);
             List<String> tableNames = getAllTableNames(metaData, normalizedSchemaName);
             for (String tableName : tableNames) {
                 parseReference(metaData, normalizedSchemaName, tableName);
