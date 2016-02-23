@@ -5,8 +5,6 @@
     @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
       <#if attr.generationType == "SEQUENCE">
     @SequenceGenerator(name = "generator", sequenceName = "${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
-      <#elseif attr.generationType == "TABLE">
-    @TableGenerator(name = "generator", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
       </#if>
     </#if>
   </#if>
