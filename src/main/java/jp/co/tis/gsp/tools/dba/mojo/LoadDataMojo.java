@@ -92,7 +92,7 @@ public class LoadDataMojo extends AbstractDbaMojo {
 		// 依存関係を考慮し読み込むファイル順をソートする
 		EntityDependencyParser parser = new EntityDependencyParser();
 		Dialect dialect = DialectFactory.getDialect(url, driver);
-		parser.parse(conn, url, dialect.normalizeSchemaName(schema), driver);
+		parser.parse(conn, url, dialect.normalizeSchemaName(schema));
 		final List<String> tableList = parser.getTableList();
 		Collections.sort(files, new Comparator<File>() {
 			@Override
