@@ -20,7 +20,6 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 |@Id | 主キーであることを表します。|
 |@GeneratedValue|DBによって自動採番されることを表します。<br/>属性は以下の通り<br/>・generator:使用するジェネレータ。<br/>・strategy:主キーの値を生成する方法|
 | @SequenceGenerator|主キーを作成するシーケンスジェネレータの設定を表します。<br/>@GeneratedValueと同時に使用する必要があります。<br/>属性は以下の通り<br/>・name:このジェネレータを識別するための名前。@GeneratedValueのgeneratorに指定する。<br/>・sequenceName:使用するデータベースシーケンスオブジェクトの名前<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|
-|@TableGenerator|主キーを作成するジェネレータの設定を表します。<br/>@GeneratedValueと同時に使用する必要があります。<br/>属性は以下の通り<br/>・name:このジェネレータを識別するための名前。@GeneratedValueのgeneratorに指定する。<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|
 |@Lob|largeオブジェクト型の永続化フィールドまたは永続化プロパティであることを表します。|
 |@Temporal|時刻を表します型（java.util.Dateおよびjava.util.Calendar）を持つ永続化プロパティまたは永続化フィールドを表します。|
 |@Version|楽観的ロック機能を使用するために用いるversionフィールドまたはversionプロパティを表します。<br/>カラム名が、正規表現で「VERSION([_]?NO)?」にマッチする場合に付与されます。|
