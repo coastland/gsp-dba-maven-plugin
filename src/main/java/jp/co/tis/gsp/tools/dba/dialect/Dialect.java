@@ -47,11 +47,34 @@ public abstract class Dialect {
 	public abstract void exportSchema(String user, String password, String schema, File dumpFile)
 			throws MojoExecutionException;
 
+	/**
+	 * 指定したスキーマ内のオブジェクトを削除し、空のスキーマを用意します。
+	 * 
+	 * 指定したスキーマが存在しない場合はスキーマを作成します。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @param schema
+	 * @throws MojoExecutionException
+	 */
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
 
 	public abstract void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException;
 
+	/**
+	 * ユーザを作成します。
+	 * 
+	 * 既にユーザが存在する場合はそのユーザを削除します。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @throws MojoExecutionException
+	 */
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
 	
@@ -70,7 +93,7 @@ public abstract class Dialect {
 	public void setDriver(String driver) {
 		this.driver = driver;
 	}
-
+	
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
      * アプリユーザが操作を行えるよう権限を付与する。
@@ -80,23 +103,7 @@ public abstract class Dialect {
      * @param user ユーザ名
      * @throws MojoExecutionException エラー
      */
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-        // nop
-    }
-
-    /**
-     * ユーザ名とスキーマ名が不一致の場合、別名のスキーマがもし存在しなければ作成する。
-     * デフォルトでは何もしない。
-     * @param schema スキーマ名
-     * @param user TODO
-     * @param password TODO
-     * @param admin TODO
-     * @param adminPassword TODO
-     * @param conn DBコネクション
-     * @throws SQLException SQL実行時のエラー
-     * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
-     */
-    public void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
         // nop
     }
 

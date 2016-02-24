@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SqlserverDialect extends Dialect {
-    private String schema;
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 
     static {
@@ -88,7 +87,6 @@ public class SqlserverDialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
         DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
@@ -97,6 +95,8 @@ public class SqlserverDialect extends Dialect {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
             if (!existsSchema(conn, schema)) {
+            	stmt.execute("CREATE SCHEMA " + schema);
+            	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
                 return;
             }
             
@@ -106,7 +106,7 @@ public class SqlserverDialect extends Dialect {
             final List<String> tableList = parser.getTableList();
             Collections.reverse(tableList);
             for (String table : tableList) {
-                dropObject(conn, "TABLE", table);
+                dropObject(conn, schema, "TABLE", table);
             }
             // ↑で削除したテーブル以外のオブジェクトを削除する
             dropStmt = conn.prepareStatement("SELECT name, type_desc FROM sys.objects WHERE schema_id = SCHEMA_ID('" + schema + "')");
@@ -115,7 +115,7 @@ public class SqlserverDialect extends Dialect {
                 if (!tableList.contains(rs.getString("name"))) {
                     String objectType = getObjectType(rs.getString("type_desc"));
                     if (objectType != null) {  
-                        dropObject(conn, objectType, rs.getString("name"));
+                        dropObject(conn, schema, objectType, rs.getString("name"));
                     }
                 }
             }
@@ -144,20 +144,12 @@ public class SqlserverDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            if (!existsSchema(conn, schema)) {
-                stmt.execute("CREATE SCHEMA " + schema);
-            }
             if(!existsUser(adminUser, adminPassword, user)) {
                 stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
-                stmt.execute("CREATE USER " + user + " FOR LOGIN " + user + " WITH DEFAULT_SCHEMA = " + schema);
+                stmt.execute("CREATE USER " + user + " FOR LOGIN " + user);
                 stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
             }
-            // dbo, sys, INFORMATION_SCHEMAのスキーマ権限は変更できないためここでスキーマごと権限移譲はしない。
-            if (!StringUtils.equalsIgnoreCase(schema, "dbo")
-                    && !StringUtils.equalsIgnoreCase(schema, "sys")
-                    && !StringUtils.equalsIgnoreCase(schema, "INFORMATION_SCHEMA")) {
-                stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
-            }
+
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
@@ -238,7 +230,7 @@ public class SqlserverDialect extends Dialect {
      * @throws SQLException SQL実行時のエラー
      */
     @Override
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
     	PreparedStatement pstmt = null;
@@ -282,7 +274,7 @@ public class SqlserverDialect extends Dialect {
         return newUrl + ";";
     }
 
-    private void dropObject(Connection conn, String objectType, String objectName) throws SQLException {
+    private void dropObject(Connection conn, String schema, String objectType, String objectName) throws SQLException {
         Statement stmt = null;
         try {
             stmt =  conn.createStatement();

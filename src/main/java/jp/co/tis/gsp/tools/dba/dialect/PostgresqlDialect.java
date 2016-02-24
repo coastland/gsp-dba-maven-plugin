@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
-    private String schema;
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
     static {
@@ -112,7 +111,6 @@ public class PostgresqlDialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
         DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
@@ -125,6 +123,9 @@ public class PostgresqlDialect extends Dialect {
                 // DROP SCHEMAに失敗しても気にしない
             }
             stmt.execute("CREATE SCHEMA " + schema);
+            
+            stmt.execute("ALTER SCHEMA " + schema + " OWNER TO " + user);
+            stmt.execute("ALTER USER " + user + " Set search_path TO " + schema);
             
         } catch (SQLException e) {
             throw new MojoExecutionException("データ削除中にエラー", e);
@@ -167,18 +168,16 @@ public class PostgresqlDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            if (!existsUser(conn, role)) {
-                try {
-                    stmt.execute("DROP OWNED BY " + role + " CASCADE");
-                    stmt.execute("DROP ROLE " + role);
-                } catch(SQLException ignore) {
-                    // DROP USERに失敗しても気にしない
-                }
-                stmt.execute("CREATE ROLE " + role + " LOGIN PASSWORD \'" + password + "\'");
-                stmt.execute("GRANT CREATE, CONNECT ON DATABASE " + database + " TO " + role);
+            try {
+                stmt.execute("DROP OWNED BY " + role + " CASCADE");
+                stmt.execute("DROP ROLE " + role);
+            } catch(SQLException ignore) {
+                // DROP USERに失敗しても気にしない
             }
-            stmt.execute("ALTER SCHEMA " + schema + " OWNER TO " + role);
-            stmt.execute("ALTER USER " + role + " Set search_path TO " + schema);
+            
+            stmt.execute("CREATE ROLE " + role + " LOGIN PASSWORD \'" + password + "\'");
+            stmt.execute("GRANT CREATE, CONNECT ON DATABASE " + database + " TO " + role);
+
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
@@ -188,7 +187,7 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
         Statement stmt = null;

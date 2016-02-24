@@ -16,11 +16,23 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.util.SqlSplitter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -28,9 +40,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
-import java.io.*;
-import java.sql.*;
-import java.util.*;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.util.SqlSplitter;
 
 /**
  *
@@ -57,11 +69,9 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
         DriverManagerUtil.registerDriver(driver);
 		Dialect dialect = DialectFactory.getDialect(url, driver);
-		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		dialect.createUser(user, password, adminUser, adminPassword);
-        dialect.createSchema(schema, user, password, adminUser, adminPassword);
-
-
+		dialect.dropAll(user, password, adminUser, adminPassword, schema);
+		
         FilenameFilter sqlFileFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -87,7 +97,8 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 			getLog().warn(e);
 		}
 
-        dialect.grantAllToAnotherSchema(schema, user, password, adminUser, adminPassword);
+		// DBユーザにスキーマオブジェクトの権限を付与する
+        dialect.grantAllToUser(schema, user, password, adminUser, adminPassword);
 	}
 
     private void executeSql(String sql) throws SQLException {

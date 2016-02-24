@@ -101,26 +101,22 @@ public class MysqlDialect extends Dialect {
 	public void dropAll(String user, String password,
 			String adminUser, String adminPassword,
 			String schema) throws MojoExecutionException {
-		if(adminPassword == null)
-			adminPassword = "";
+		
+		Connection conn = null;
+		Statement stmt = null;
+		
 		try {
-			ProcessUtil.exec(
-					"mysqladmin",
-					"-f", // force
-					"-u", adminUser,
-					"--password=" + adminPassword,
-					"drop",
-					schema
-					);
-			ProcessUtil.exec(
-					"mysqladmin",
-					"-u", adminUser,
-					"--password=" + adminPassword,
-					"create",
-					schema
-					);
-		} catch (IOException e) {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			stmt = conn.createStatement();
+			
+			stmt.execute("DROP DATABASE IF EXISTS "+ schema);
+			stmt.execute("CREATE DATABASE "+ schema);
+
+		} catch (SQLException e) {
 			throw new MojoExecutionException("mysqldump", e);
+		} finally {
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
 		}
 	}
 
@@ -141,7 +137,6 @@ public class MysqlDialect extends Dialect {
 				// DROP USERに失敗しても気にしない
 			}
 			stmt.execute("CREATE USER '"+ user + "' IDENTIFIED BY '"+ password +"'");
-			stmt.execute("GRANT ALL ON *.* TO '" + user + "'");
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
@@ -149,19 +144,23 @@ public class MysqlDialect extends Dialect {
 			ConnectionUtil.close(conn);
 		}
 	}
-
+	
 	@Override
-	public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		if(!schema.equals(user))
-			throw new MojoExecutionException("MySQLスキーマ例外", new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。"));
+	public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+		Statement stmt = null;
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, admin, adminPassword);
+			stmt = conn.createStatement();
+		    stmt.execute("GRANT ALL ON " + schema + ".* TO '" + user + "'");
+		} catch (SQLException e) {
+			throw new MojoExecutionException("スキーマ権限付与実行エラー", e);
+		} finally {
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
 		 
  	}
-
-	@Override
-	public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		if(!schema.equals(user))
-			throw new MojoExecutionException("MySQLスキーマ例外", new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。"));
-	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
 		PreparedStatement stmt = null;

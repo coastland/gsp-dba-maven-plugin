@@ -50,6 +50,9 @@ public class H2Dialect extends Dialect {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
             stmt.execute("DROP ALL OBJECTS");
+            
+            createSchema(schema, user, password, adminUser, adminPassword);
+            
         } catch (SQLException e) {
             throw new MojoExecutionException("DROP ALL OBJECTS 実行中にエラー", e);
         } finally {
@@ -93,7 +96,7 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
         Statement stmt = null;
@@ -127,8 +130,7 @@ public class H2Dialect extends Dialect {
         }
     }
 
-    @Override
-    public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    private void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
         Statement stmt = null;
         Connection conn = null;
         

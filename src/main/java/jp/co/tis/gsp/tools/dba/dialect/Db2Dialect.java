@@ -79,8 +79,9 @@ public class Db2Dialect extends Dialect {
         PreparedStatement stmt = null;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
-            // 目的のスキーマがなければ何もしない
+			// 指定スキーマがいなければ作成する。
             if(!existsSchema(conn, schema)) {
+            	createSchema(schema, user, password, adminUser, adminPassword);
                 return;
             }
             // テーブル・ビューの削除
@@ -179,7 +180,7 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -205,25 +206,13 @@ public class Db2Dialect extends Dialect {
         }
     }
 
-    @Override
-    public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
+    private void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	PreparedStatement  userStmt = null;
         Statement createUserStmt = null;
         Connection conn = null;
     	
         try{
 			conn = getJDBCConnection(driver, admin, adminPassword);
-	        
-	 		userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
-			userStmt.setString(1, StringUtils.upperCase(schema));
-			ResultSet rs = userStmt.executeQuery();
-			rs.next();
-			if (rs.getInt("num") > 0) {
-				// すでにデータ流し込み対象のスキーマが存在していれば何もしない
-				return;
-			}
-	
 			createUserStmt = conn.createStatement();
 			createUserStmt.execute("CREATE SCHEMA "+ schema);
 		
