@@ -16,20 +16,25 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.EntityDependencyParser;
-import jp.co.tis.gsp.tools.db.TypeMapper;
-import org.apache.commons.lang.StringUtils;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
-import java.io.File;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import jp.co.tis.gsp.tools.db.EntityDependencyParser;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class SqlserverDialect extends Dialect {
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -98,6 +103,8 @@ public class SqlserverDialect extends Dialect {
             	stmt.execute("CREATE SCHEMA " + schema);
             	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
                 return;
+            }else{
+            	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
             }
             
             // 依存関係を考慮し削除するテーブルをソートする
@@ -108,8 +115,9 @@ public class SqlserverDialect extends Dialect {
             for (String table : tableList) {
                 dropObject(conn, schema, "TABLE", table);
             }
-            // ↑で削除したテーブル以外のオブジェクトを削除する
-            dropStmt = conn.prepareStatement("SELECT name, type_desc FROM sys.objects WHERE schema_id = SCHEMA_ID('" + schema + "')");
+            
+            // ビューの削除を行う。
+            dropStmt = conn.prepareStatement("SELECT name, type_desc FROM sys.objects WHERE schema_id = SCHEMA_ID('" + schema + "') AND type IN ('U','V')");
             ResultSet rs = dropStmt.executeQuery();
             while (rs.next()) {
                 if (!tableList.contains(rs.getString("name"))) {

@@ -69,7 +69,11 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
         DriverManagerUtil.registerDriver(driver);
 		Dialect dialect = DialectFactory.getDialect(url, driver);
+		
+		// ユーザの作成を行います
 		dialect.createUser(user, password, adminUser, adminPassword);
+		
+		// 指定スキーマ内のテーブル、ビュー、シーケンスを全て削除します。
 		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		
         FilenameFilter sqlFileFilter = new FilenameFilter() {

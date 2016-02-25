@@ -97,7 +97,18 @@ public class MysqlDialect extends Dialect {
 		}
 	}
 
-	@Override
+	/**
+	 * 指定スキーマ内のテーブル、ビュー、シーケンスを全て削除します。
+	 * 
+	 * MySQLでは予めスキーマ（＝ＤＢ）が存在している前提のため、スキーマ存在確認・生成処理は行いません。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @param schema
+	 * @throws MojoExecutionException
+	 */
 	public void dropAll(String user, String password,
 			String adminUser, String adminPassword,
 			String schema) throws MojoExecutionException {
@@ -108,17 +119,60 @@ public class MysqlDialect extends Dialect {
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
 			stmt = conn.createStatement();
+
+			// スキーマ内のテーブル、ビュー削除
+			String nmzschema = normalizeSchemaName(schema);
+			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
 			
-			stmt.execute("DROP DATABASE IF EXISTS "+ schema);
-			stmt.execute("CREATE DATABASE "+ schema);
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
 
 		} catch (SQLException e) {
-			throw new MojoExecutionException("mysqldump", e);
+			throw new MojoExecutionException("データ削除中にエラー", e);
 		} finally {
 			StatementUtil.close(stmt);
 			ConnectionUtil.close(conn);
 		}
 	}
+	
+	@Override
+    protected void dropObjectsInSchema(Connection conn, String dropListSql, String schema, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(dropListSql);
+    	  String dropSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+		        case FK:
+  		        	dropSql = "ALTER TABLE " + schema + "." + rs.getString(1) + " DROP FOREIGN KEY " + rs.getString(2);
+          		  break;
+  		        case TABLE:
+  		        	dropSql = "DROP TABLE "  + schema + "." + rs.getString(1);
+    		      break;
+  		        case VIEW:
+  		        	dropSql = "DROP VIEW "  + schema + "." + rs.getString(1);
+  			      break;
+         		default: // シーケンスは未サポート
+  			      break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(dropSql);
+      	    stmt.execute(dropSql);
+    	  }
+        } finally {
+        	rs.close();
+            StatementUtil.close(stmt);
+        }
+    }
 
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException{
@@ -170,7 +224,7 @@ public class MysqlDialect extends Dialect {
 			StatementUtil.close(stmt);
 		}
 	}
-
+	
 	@Override
 	public void importSchema(String user, String password, String schema,
 			File dumpFile) throws MojoExecutionException {

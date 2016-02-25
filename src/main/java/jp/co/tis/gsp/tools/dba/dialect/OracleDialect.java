@@ -284,7 +284,7 @@ public class OracleDialect extends Dialect {
 		PreparedStatement stmtMeta = null;
 		Statement stmt = null;
 		try {
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE') and owner = ?");
 			stmtMeta.setString(1, schema);
 			
 			ResultSet rsMeta = stmtMeta.executeQuery();

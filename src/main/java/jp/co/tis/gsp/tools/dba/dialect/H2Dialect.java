@@ -1,6 +1,13 @@
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
@@ -8,8 +15,7 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
-import java.io.File;
-import java.sql.*;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class H2Dialect extends Dialect {
     
@@ -45,21 +51,56 @@ public class H2Dialect extends Dialect {
             String adminPassword, String schema) throws MojoExecutionException {
         DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement pstmt = null;
+        
         try {
-            conn = DriverManager.getConnection(url, adminUser, adminPassword);
-            stmt = conn.createStatement();
-            stmt.execute("DROP ALL OBJECTS");
-            
-            createSchema(schema, user, password, adminUser, adminPassword);
+        	conn = DriverManager.getConnection(url, adminUser, adminPassword);
+        	
+			if(!existsSchema(conn, normalizeSchemaName(schema))) {
+				createSchema(schema, user, password, adminUser, adminPassword);
+		        // スキーマ生成
+				return;
+			}
+
+			// スキーマ内のテーブル、ビュー、シーケンス削除
+			String nmzschema = normalizeSchemaName(schema);
+			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE CONSTRAINT_SCHEMA'" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
+			
+			dropListSql = "SELECT SEQUENCE_NAME FROM INFORMATION_SCHEMA.SEQUENCES WHERE IS_GENERATED=FALSE AND SEQUENCE_SCHEMA='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);
             
         } catch (SQLException e) {
-            throw new MojoExecutionException("DROP ALL OBJECTS 実行中にエラー", e);
+            throw new MojoExecutionException("DROP ALL実行中にエラー", e);
         } finally {
-            StatementUtil.close(stmt);
+            StatementUtil.close(pstmt);
             ConnectionUtil.close(conn);
         }
     }
+    
+    private boolean existsSchema(Connection conn, String schema) throws SQLException {
+        PreparedStatement pstmt = null;
+        
+        try{
+          pstmt = conn.prepareStatement("SELECT COUNT(SCHEMA_NAME) AS num FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?");
+          pstmt.setString(1, StringUtils.upperCase(schema));
+          ResultSet rs = pstmt.executeQuery();
+          rs.next();
+          return (rs.getInt("num") > 0);
+        }finally{
+       	  StatementUtil.close(pstmt);
+        }
+    }   
+        
+	public String normalizeSchemaName(String schemaName) {
+		return StringUtils.upperCase(schemaName);
+	}
 
     @Override
     public void importSchema(String user, String password, String schema,
