@@ -181,10 +181,9 @@ public class OracleDialect extends Dialect {
             props.put("password", adminPassword);
             conn = DriverManager.getConnection(url, props);
 			stmt = conn.createStatement();
-			try {
-				stmt.execute("DROP USER "+ user);
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
+			
+			if(existsUser(conn, user)) {
+				return;
 			}
 
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");

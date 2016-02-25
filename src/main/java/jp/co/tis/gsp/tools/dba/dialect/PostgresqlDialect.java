@@ -168,16 +168,12 @@ public class PostgresqlDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            try {
-                stmt.execute("DROP OWNED BY " + role + " CASCADE");
-                stmt.execute("DROP ROLE " + role);
-            } catch(SQLException ignore) {
-                // DROP USERに失敗しても気にしない
+            if (existsUser(conn, role)) {
+            	return;
             }
             
             stmt.execute("CREATE ROLE " + role + " LOGIN PASSWORD \'" + password + "\'");
             stmt.execute("GRANT CREATE, CONNECT ON DATABASE " + database + " TO " + role);
-
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {

@@ -131,11 +131,6 @@ public class MysqlDialect extends Dialect {
 			if(existsUser(conn, user)) {
 				return;
 			}
-			try {
-				stmt.execute("DROP USER '"+ user + "'");
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
 			stmt.execute("CREATE USER '"+ user + "' IDENTIFIED BY '"+ password +"'");
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);

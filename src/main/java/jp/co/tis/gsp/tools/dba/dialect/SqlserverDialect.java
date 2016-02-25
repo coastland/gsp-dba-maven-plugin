@@ -144,11 +144,12 @@ public class SqlserverDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            if(!existsUser(adminUser, adminPassword, user)) {
-                stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
-                stmt.execute("CREATE USER " + user + " FOR LOGIN " + user);
-                stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
+            if(existsUser(adminUser, adminPassword, user)) {
+                return;
             }
+            stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
+            stmt.execute("CREATE USER " + user + " FOR LOGIN " + user);
+            stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
 
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
