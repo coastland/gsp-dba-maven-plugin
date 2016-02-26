@@ -17,6 +17,7 @@
 package jp.co.tis.gsp.tools.dba.dialect;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect.OBJECT_TYPE;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PostgresqlDialect extends Dialect {
-    private String schema;
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
     
     static {
@@ -112,24 +112,58 @@ public class PostgresqlDialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
         DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            try {
-                stmt.execute("DROP SCHEMA " + schema + " CASCADE");
-            } catch(SQLException ignore) {
-                // DROP SCHEMAに失敗しても気にしない
+          	
+            if(!existsSchema(conn, normalizeSchemaName(schema))){
+           		stmt.execute("CREATE SCHEMA " + schema);
+                stmt.execute("ALTER SCHEMA " + schema + " OWNER TO " + user);
+                stmt.execute("ALTER USER " + user + " Set search_path TO " + schema);
+            	return;
+            }else{
+                stmt.execute("ALTER SCHEMA " + schema + " OWNER TO " + user);
+                stmt.execute("ALTER USER " + user + " Set search_path TO " + schema);
             }
-            stmt.execute("CREATE SCHEMA " + schema);
+
+			// スキーマ内のテーブル、ビュー、シーケンス削除
+            String nmzschema = normalizeSchemaName(schema);
+            String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA='" + nmzschema +
+					               "' AND CONSTRAINT_TYPE='FOREIGN KEY'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
+			
+			dropListSql = "SELECT RELNAME FROM PG_STATIO_ALL_SEQUENCES WHERE SCHEMANAME='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);            
             
         } catch (SQLException e) {
             throw new MojoExecutionException("データ削除中にエラー", e);
         } finally {
             ConnectionUtil.close(conn);
+            StatementUtil.close(stmt);
+        }
+    }
+    
+    private boolean existsSchema(Connection conn, String schema) throws SQLException {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt =
+                conn.prepareStatement("SELECT COUNT(SCHEMA_NAME) as num FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?");
+            stmt.setString(1, schema);
+            rs = stmt.executeQuery();
+            rs.next();
+            return (rs.getInt("num") > 0);
+        } finally {
+            ResultSetUtil.close(rs);
             StatementUtil.close(stmt);
         }
     }
@@ -167,18 +201,12 @@ public class PostgresqlDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            if (!existsUser(conn, role)) {
-                try {
-                    stmt.execute("DROP OWNED BY " + role + " CASCADE");
-                    stmt.execute("DROP ROLE " + role);
-                } catch(SQLException ignore) {
-                    // DROP USERに失敗しても気にしない
-                }
-                stmt.execute("CREATE ROLE " + role + " LOGIN PASSWORD \'" + password + "\'");
-                stmt.execute("GRANT CREATE, CONNECT ON DATABASE " + database + " TO " + role);
+            if (existsUser(conn, role)) {
+            	return;
             }
-            stmt.execute("ALTER SCHEMA " + schema + " OWNER TO " + role);
-            stmt.execute("ALTER USER " + role + " Set search_path TO " + schema);
+            
+            stmt.execute("CREATE ROLE " + role + " LOGIN PASSWORD \'" + password + "\'");
+            stmt.execute("GRANT CREATE, CONNECT ON DATABASE " + database + " TO " + role);
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
@@ -188,7 +216,7 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
         Statement stmt = null;

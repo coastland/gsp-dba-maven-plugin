@@ -23,6 +23,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +39,13 @@ import org.seasar.framework.util.StringUtil;
 
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect.OBJECT_TYPE;
 
 public abstract class Dialect {
+	
+	protected enum OBJECT_TYPE {
+		FK, TABLE, VIEW, SEQUENCE;
+	}
 
 	protected DatabaseMetaData metaData = null;
 	protected static final int UN_USABLE_TYPE = -999;
@@ -47,11 +53,34 @@ public abstract class Dialect {
 	public abstract void exportSchema(String user, String password, String schema, File dumpFile)
 			throws MojoExecutionException;
 
+	/**
+	 * 指定したスキーマ内の全テーブル・ビュー・シーケンスを削除します。
+	 * 
+	 * 指定したスキーマが存在しない場合はスキーマを作成します。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @param schema
+	 * @throws MojoExecutionException
+	 */
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
 
 	public abstract void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException;
 
+	/**
+	 * ユーザを作成します。
+	 * 
+	 * 既にユーザが存在する場合はそのユーザを削除します。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @throws MojoExecutionException
+	 */
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
 	
@@ -70,7 +99,7 @@ public abstract class Dialect {
 	public void setDriver(String driver) {
 		this.driver = driver;
 	}
-
+	
     /**
      * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
      * アプリユーザが操作を行えるよう権限を付与する。
@@ -80,23 +109,7 @@ public abstract class Dialect {
      * @param user ユーザ名
      * @throws MojoExecutionException エラー
      */
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-        // nop
-    }
-
-    /**
-     * ユーザ名とスキーマ名が不一致の場合、別名のスキーマがもし存在しなければ作成する。
-     * デフォルトでは何もしない。
-     * @param schema スキーマ名
-     * @param user TODO
-     * @param password TODO
-     * @param admin TODO
-     * @param adminPassword TODO
-     * @param conn DBコネクション
-     * @throws SQLException SQL実行時のエラー
-     * @throws UnsupportedOperationException サポートされていない操作を行った時に出るエラー
-     */
-    public void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
         // nop
     }
 
@@ -241,5 +254,39 @@ public abstract class Dialect {
     protected Connection getJDBCConnection(String driver, String user, String password) throws SQLException{
     	DriverManagerUtil.registerDriver(driver);
     	return DriverManager.getConnection(url, user, password);
+    }
+    
+    protected void dropObjectsInSchema(Connection conn, String dropListSql, String schema, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(dropListSql);
+    	  String dropSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+		        case FK: // 外部キー
+  		        	dropSql = "ALTER TABLE " + schema + "." + rs.getString(1) + " DROP CONSTRAINT " + rs.getString(2);
+          		  break;
+  		        case TABLE: // テーブル
+  		        	dropSql = "DROP TABLE "  + schema + "." + rs.getString(1);
+    		      break;
+  		        case VIEW: // ビュー
+  		        	dropSql = "DROP VIEW "  + schema + "." + rs.getString(1);
+  			      break;
+  		        case SEQUENCE: // シーケンス
+  		        	dropSql = "DROP SEQUENCE "  + schema + "." + rs.getString(1);
+          		  break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(dropSql);
+      	    stmt.execute(dropSql);
+    	  }
+        } finally {
+            StatementUtil.close(stmt);
+        }
     }
 }

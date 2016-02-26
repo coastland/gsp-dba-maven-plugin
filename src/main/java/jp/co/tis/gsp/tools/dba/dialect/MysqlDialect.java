@@ -97,32 +97,82 @@ public class MysqlDialect extends Dialect {
 		}
 	}
 
-	@Override
+	/**
+	 * 指定スキーマ内のテーブル、ビュー、シーケンスを全て削除します。
+	 * 
+	 * MySQLでは予めスキーマ（＝ＤＢ）が存在している前提のため、スキーマ存在確認・生成処理は行いません。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @param schema
+	 * @throws MojoExecutionException
+	 */
 	public void dropAll(String user, String password,
 			String adminUser, String adminPassword,
 			String schema) throws MojoExecutionException {
-		if(adminPassword == null)
-			adminPassword = "";
+		
+		Connection conn = null;
+		Statement stmt = null;
+		
 		try {
-			ProcessUtil.exec(
-					"mysqladmin",
-					"-f", // force
-					"-u", adminUser,
-					"--password=" + adminPassword,
-					"drop",
-					schema
-					);
-			ProcessUtil.exec(
-					"mysqladmin",
-					"-u", adminUser,
-					"--password=" + adminPassword,
-					"create",
-					schema
-					);
-		} catch (IOException e) {
-			throw new MojoExecutionException("mysqldump", e);
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			stmt = conn.createStatement();
+
+			// スキーマ内のテーブル、ビュー削除
+			String nmzschema = normalizeSchemaName(schema);
+			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
+
+		} catch (SQLException e) {
+			throw new MojoExecutionException("データ削除中にエラー", e);
+		} finally {
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
 		}
 	}
+	
+	@Override
+    protected void dropObjectsInSchema(Connection conn, String dropListSql, String schema, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(dropListSql);
+    	  String dropSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+		        case FK:
+  		        	dropSql = "ALTER TABLE " + schema + "." + rs.getString(1) + " DROP FOREIGN KEY " + rs.getString(2);
+          		  break;
+  		        case TABLE:
+  		        	dropSql = "DROP TABLE "  + schema + "." + rs.getString(1);
+    		      break;
+  		        case VIEW:
+  		        	dropSql = "DROP VIEW "  + schema + "." + rs.getString(1);
+  			      break;
+         		default: // シーケンスは未サポート
+  			      break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(dropSql);
+      	    stmt.execute(dropSql);
+    	  }
+        } finally {
+        	rs.close();
+            StatementUtil.close(stmt);
+        }
+    }
 
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException{
@@ -135,13 +185,7 @@ public class MysqlDialect extends Dialect {
 			if(existsUser(conn, user)) {
 				return;
 			}
-			try {
-				stmt.execute("DROP USER '"+ user + "'");
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
 			stmt.execute("CREATE USER '"+ user + "' IDENTIFIED BY '"+ password +"'");
-			stmt.execute("GRANT ALL ON *.* TO '" + user + "'");
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
@@ -149,19 +193,23 @@ public class MysqlDialect extends Dialect {
 			ConnectionUtil.close(conn);
 		}
 	}
-
+	
 	@Override
-	public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		if(!schema.equals(user))
-			throw new MojoExecutionException("MySQLスキーマ例外", new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。"));
+	public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+		Statement stmt = null;
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, admin, adminPassword);
+			stmt = conn.createStatement();
+		    stmt.execute("GRANT ALL ON " + schema + ".* TO '" + user + "'");
+		} catch (SQLException e) {
+			throw new MojoExecutionException("スキーマ権限付与実行エラー", e);
+		} finally {
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
 		 
  	}
-
-	@Override
-	public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		if(!schema.equals(user))
-			throw new MojoExecutionException("MySQLスキーマ例外", new UnsupportedOperationException("このデータベースで実行する時は、別スキーマは指定できません。"));
-	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
 		PreparedStatement stmt = null;
@@ -176,7 +224,7 @@ public class MysqlDialect extends Dialect {
 			StatementUtil.close(stmt);
 		}
 	}
-
+	
 	@Override
 	public void importSchema(String user, String password, String schema,
 			File dumpFile) throws MojoExecutionException {

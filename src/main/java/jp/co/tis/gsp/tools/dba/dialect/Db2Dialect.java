@@ -16,7 +16,16 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
@@ -24,10 +33,7 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
-import java.io.File;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class Db2Dialect extends Dialect {
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -79,24 +85,26 @@ public class Db2Dialect extends Dialect {
         PreparedStatement stmt = null;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
-            // 目的のスキーマがなければ何もしない
+			// 指定スキーマがいなければ作成する。
             if(!existsSchema(conn, schema)) {
+            	createSchema(schema, user, password, adminUser, adminPassword);
                 return;
             }
-            // テーブル・ビューの削除
-            stmt = conn.prepareStatement("select TABNAME, TYPE from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U' and TYPE in('T', 'V')");
-            stmt.setString(1, normalizeSchemaName(schema));
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                dropObject(conn, normalizeSchemaName(schema), getObjectType(rs.getString("TYPE")), rs.getString("TABNAME"));
-            }
-            // シーケンスの削除
-            stmt = conn.prepareStatement("select SEQNAME from SYSCAT.SEQUENCES where SEQSCHEMA=? and OWNERTYPE='U' and SEQTYPE in('I', 'S')");
-            stmt.setString(1, normalizeSchemaName(schema));
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                dropObject(conn, normalizeSchemaName(schema), "SEQUENCE", rs.getString("SEQNAME"));
-            }
+            
+			// スキーマ内のテーブル、ビュー、シーケンス削除
+			String nmzschema = normalizeSchemaName(schema);
+			String dropListSql = "SELECT TABNAME, CONSTNAME FROM SYSCAT.TABCONST WHERE TYPE='F' AND TABSCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
+			
+			dropListSql = "SELECT TABNAME　FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('V') AND TABSCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
+			
+			dropListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('T') AND TABSCHEMA='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
+			
+			dropListSql = "SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE OWNERTYPE='U' AND SEQTYPE IN('I', 'S') AND SEQSCHEMA='" + nmzschema + "'";
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);
+            
         } catch (SQLException e) {
             throw new MojoExecutionException("データ削除中にエラー", e);
         } finally {
@@ -116,30 +124,6 @@ public class Db2Dialect extends Dialect {
         } finally {
             StatementUtil.close(stmt);
         }
-    }
-    
-    private void dropObject(Connection conn, String schema, String objectType, String objectName) throws SQLException {
-        Statement stmt = null;
-        try {
-            stmt =  conn.createStatement();
-            String sql = "DROP " + objectType + " " + schema + "." + objectName;
-            System.err.println(sql);
-            stmt.execute(sql);
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            StatementUtil.close(stmt);
-        }
-    }
-    
-    private String getObjectType(String type) {
-        if ("T".equals(type)) {
-            return "TABLE";
-        } else if ("V".equals(type)) {
-            return "VIEW";
-        }
-        
-        return type;
     }
 
     /**
@@ -179,7 +163,7 @@ public class Db2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -205,25 +189,13 @@ public class Db2Dialect extends Dialect {
         }
     }
 
-    @Override
-    public void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
+    private void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	PreparedStatement  userStmt = null;
         Statement createUserStmt = null;
         Connection conn = null;
     	
         try{
 			conn = getJDBCConnection(driver, admin, adminPassword);
-	        
-	 		userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM SYSCAT.SCHEMATA WHERE SCHEMANAME=?");
-			userStmt.setString(1, StringUtils.upperCase(schema));
-			ResultSet rs = userStmt.executeQuery();
-			rs.next();
-			if (rs.getInt("num") > 0) {
-				// すでにデータ流し込み対象のスキーマが存在していれば何もしない
-				return;
-			}
-	
 			createUserStmt = conn.createStatement();
 			createUserStmt.execute("CREATE SCHEMA "+ schema);
 		

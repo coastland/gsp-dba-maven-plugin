@@ -167,6 +167,9 @@ public class OracleDialect extends Dialect {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException {
 		DriverManagerUtil.registerDriver(driver);
@@ -178,6 +181,7 @@ public class OracleDialect extends Dialect {
             props.put("password", adminPassword);
             conn = DriverManager.getConnection(url, props);
 			stmt = conn.createStatement();
+			
 			if(existsUser(conn, user)) {
 				return;
 			}
@@ -198,7 +202,7 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void grantAllToAnotherSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
+	public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
 		
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -223,29 +227,13 @@ public class OracleDialect extends Dialect {
         }
 	}
 
-    /**
-     * 流し込み先のスキーマがなければ作る。
-     * @throws SQLException SQLエラー
-     */
-	@Override
-	public void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
+	private void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
 		
 		Statement createUserStmt = null;
 		Connection conn = null;
 		
 		try{
 			conn = getJDBCConnection(driver, admin, adminPassword);
-			
-			PreparedStatement userStmt = conn.prepareStatement("SELECT COUNT(*) AS NUM FROM DBA_USERS WHERE USERNAME=?");
-			userStmt.setString(1, StringUtils.upperCase(schema));
-			ResultSet rs = userStmt.executeQuery();
-			rs.next();
-			if (rs.getInt("num") > 0) {
-				// すでにデータ流し込み対象のスキーマが存在していれば何もしない
-				return;
-			}
-			StatementUtil.close(userStmt);
-	
 			createUserStmt= conn.createStatement();
 			createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
 			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
@@ -284,22 +272,19 @@ public class OracleDialect extends Dialect {
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
-			// 目的のスキーマがなければ何もしない
+			// 指定スキーマがいなければ作成する。
 			if(!existsUser(conn, schema)) {
+				createSchema(schema, user, password, adminUser, adminPassword);
 				return;
 			}
 		} catch (SQLException e) {
 			throw new MojoExecutionException("データ削除中にエラー", e);
-		} finally {
-			ConnectionUtil.close(conn);
 		}
 
 		PreparedStatement stmtMeta = null;
 		Statement stmt = null;
 		try {
-			conn = DriverManager.getConnection(url, adminUser, adminPassword);
-			
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM') and owner = ?");
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE') and owner = ?");
 			stmtMeta.setString(1, schema);
 			
 			ResultSet rsMeta = stmtMeta.executeQuery();
