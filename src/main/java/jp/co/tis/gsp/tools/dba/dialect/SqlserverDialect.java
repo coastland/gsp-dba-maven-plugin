@@ -249,10 +249,8 @@ public class SqlserverDialect extends Dialect {
 	    	pstmt =conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
 	        pstmt.setString(1, schema);
 	        ResultSet rs = pstmt.executeQuery();
-	        StringBuilder sb = new StringBuilder();
 	        Statement grantStmt = conn.createStatement();
 	        while (rs.next()) {
-	            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
 	            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("TABLE_NAME") + " TO " + user);
 	        }
         
