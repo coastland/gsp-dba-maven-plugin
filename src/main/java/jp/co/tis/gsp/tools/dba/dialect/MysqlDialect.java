@@ -34,6 +34,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.exception.IORuntimeException;
@@ -50,6 +51,16 @@ import jp.co.tis.gsp.tools.db.TypeMapper;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class MysqlDialect extends Dialect {	
+	
+    public MysqlDialect() {
+        GenDialectRegistry.deregister(
+                org.seasar.extension.jdbc.dialect.MysqlDialect.class
+        );
+        GenDialectRegistry.register(
+                org.seasar.extension.jdbc.dialect.MysqlDialect.class,
+                new ExtendedMysqlGenDialect()
+        );
+    }
 
 	private Map<Integer, String> typeToNameMap = Maps
 		.map(Types.BIGINT, "BIGINT")
