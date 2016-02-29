@@ -99,6 +99,8 @@ public class SqlserverDialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
+            
+            // 指定スキーマが存在しない場合は作成
             if (!existsSchema(conn, schema)) {
             	stmt.execute("CREATE SCHEMA " + schema);
             	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
@@ -242,24 +244,22 @@ public class SqlserverDialect extends Dialect {
     public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
-    	PreparedStatement pstmt = null;
+    	Statement stmt = null;
     	
     	try{    	
 	    	conn = getJDBCConnection(driver, admin, adminPassword);
-	    	pstmt =conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
-	        pstmt.setString(1, schema);
-	        ResultSet rs = pstmt.executeQuery();
+	    	stmt = conn.createStatement();
+	        ResultSet rs = stmt.executeQuery("SELECT NAME FROM SYS.OBJECTS WHERE SCHEMA_ID = SCHEMA_ID('" + schema + "') AND TYPE IN ('U','V')");
 	        StringBuilder sb = new StringBuilder();
 	        Statement grantStmt = conn.createStatement();
 	        while (rs.next()) {
-	            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
-	            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("TABLE_NAME") + " TO " + user);
+	            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("NAME") + " TO " + user);
 	        }
         
         } catch (SQLException e) {
             throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
         } finally {
-        	StatementUtil.close(pstmt);
+        	StatementUtil.close(stmt);
             ConnectionUtil.close(conn);
         }
     }

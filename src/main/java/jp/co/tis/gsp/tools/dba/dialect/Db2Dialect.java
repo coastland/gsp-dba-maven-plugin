@@ -82,13 +82,18 @@ public class Db2Dialect extends Dialect {
             String adminPassword, String schema) throws MojoExecutionException {
         DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
-        PreparedStatement stmt = null;
+        Statement stmt = null;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
+            stmt = conn.createStatement();
+            
 			// 指定スキーマがいなければ作成する。
             if(!existsSchema(conn, schema)) {
             	createSchema(schema, user, password, adminUser, adminPassword);
                 return;
+            } else {
+            	// 指定スキーマが存在する場合はスキーマ操作権限を念のため与えておく
+            	stmt.execute("GRANT CREATEIN,ALTERIN,DROPIN ON SCHEMA " + schema + " TO USER " + user);
             }
             
 			// スキーマ内のテーブル、ビュー、シーケンス削除
@@ -96,13 +101,13 @@ public class Db2Dialect extends Dialect {
 			String dropListSql = "SELECT TABNAME, CONSTNAME FROM SYSCAT.TABCONST WHERE TYPE='F' AND TABSCHEMA='" + nmzschema + "'";
 			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
 			
-			dropListSql = "SELECT TABNAME　FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('V') AND TABSCHEMA='" + nmzschema + "'";
+			dropListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('V') AND TABSCHEMA='" + nmzschema + "'";
 			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
 			
 			dropListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('T') AND TABSCHEMA='" + nmzschema + "'";
 	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
 			
-			dropListSql = "SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE OWNERTYPE='U' AND SEQTYPE IN('I', 'S') AND SEQSCHEMA='" + nmzschema + "'";
+			dropListSql = "SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE OWNERTYPE='U' AND ORIGIN='U' AND SEQSCHEMA='" + nmzschema + "'";
 	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);
             
         } catch (SQLException e) {
@@ -169,23 +174,59 @@ public class Db2Dialect extends Dialect {
         PreparedStatement pstmt = null;
         
         try{
+        	// テーブルとビュー
         	conn = getJDBCConnection(driver, admin, adminPassword);
-        	pstmt = conn.prepareStatement(
-	                "select TABNAME from SYSCAT.TABLES where TABSCHEMA=? and OWNERTYPE='U'");
-        	pstmt.setString(1, StringUtils.upperCase(schema));
-	        ResultSet rs = pstmt.executeQuery();
-	        while (rs.next()) {
-	            String tableName = rs.getString("TABNAME");
-	            // PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-	            String sql = "GRANT ALL ON " + schema + "." + tableName + " TO USER " + user;
-	            conn.createStatement().execute(sql);
-	        }
+        	
+			String nmzschema = normalizeSchemaName(schema);
+			
+			String grantListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('V') AND TABSCHEMA='" + nmzschema + "'";
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
+			
+			grantListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('T') AND TABSCHEMA='" + nmzschema + "'";
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
+			
+			grantListSql = "SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE OWNERTYPE='U' AND ORIGIN='U' AND SEQSCHEMA='" + nmzschema + "'";
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.SEQUENCE);
         
         } catch (SQLException e) {
             throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
         } finally {
         	StatementUtil.close(pstmt);
             ConnectionUtil.close(conn);
+        }
+    }
+	
+	@Override
+    protected void grantSchemaObjToUser(Connection conn, String grantListSql, String schema, String user, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(grantListSql);
+    	  String grantSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+  		        case TABLE: // テーブル
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO USER " + user;
+    		      break;
+  		        case VIEW: // ビュー
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO USER " + user;
+  			      break;
+  		        case SEQUENCE: // シーケンス
+  		        	grantSql = "GRANT ALTER ON SEQUENCE "  + schema + "." + rs.getString(1) + " TO USER " + user;
+          		  break;
+         		default:
+          		  break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(grantSql);
+      	    stmt.execute(grantSql);
+    	  }
+        } finally {
+            StatementUtil.close(stmt);
         }
     }
 
@@ -197,7 +238,7 @@ public class Db2Dialect extends Dialect {
         try{
 			conn = getJDBCConnection(driver, admin, adminPassword);
 			createUserStmt = conn.createStatement();
-			createUserStmt.execute("CREATE SCHEMA "+ schema);
+			createUserStmt.execute("CREATE SCHEMA " + schema + " AUTHORIZATION " + user);
 		
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
