@@ -200,8 +200,15 @@ public class MysqlDialect extends Dialect {
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, admin, adminPassword);
-			stmt = conn.createStatement();
-		    stmt.execute("GRANT ALL ON " + schema + ".* TO '" + user + "'");
+			
+			String nmzschema = normalizeSchemaName(schema);
+			
+			String grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'";
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
+			
+			grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'";
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
+			
 		} catch (SQLException e) {
 			throw new MojoExecutionException("スキーマ権限付与実行エラー", e);
 		} finally {

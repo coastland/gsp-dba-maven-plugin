@@ -289,4 +289,37 @@ public abstract class Dialect {
             StatementUtil.close(stmt);
         }
     }
+    
+    protected void grantSchemaObjToUser(Connection conn, String grantListSql, String schema, String user, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(grantListSql);
+    	  String grantSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+  		        case TABLE: // テーブル
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO " + user;
+    		      break;
+  		        case VIEW: // ビュー
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO " + user;
+  			      break;
+  		        case SEQUENCE: // シーケンス
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO " + user;
+          		  break;
+         		default:
+          		  break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(grantSql);
+      	    stmt.execute(grantSql);
+    	  }
+        } finally {
+            StatementUtil.close(stmt);
+        }
+    }
 }

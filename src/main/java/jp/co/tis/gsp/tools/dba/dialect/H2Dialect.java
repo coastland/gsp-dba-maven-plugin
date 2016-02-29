@@ -56,6 +56,7 @@ public class H2Dialect extends Dialect {
         try {
         	conn = DriverManager.getConnection(url, adminUser, adminPassword);
         	
+        	// 指定スキーマが存在しない場合は作成
 			if(!existsSchema(conn, normalizeSchemaName(schema))) {
 				createSchema(schema, user, password, adminUser, adminPassword);
 		        // スキーマ生成
@@ -64,7 +65,7 @@ public class H2Dialect extends Dialect {
 
 			// スキーマ内のテーブル、ビュー、シーケンス削除
 			String nmzschema = normalizeSchemaName(schema);
-			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE CONSTRAINT_SCHEMA'" + nmzschema + "'";
+			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE CONSTRAINT_SCHEMA='" + nmzschema + "'";
 			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
 			
 			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
@@ -140,33 +141,23 @@ public class H2Dialect extends Dialect {
     public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
     	
         Connection conn = null;
-        Statement stmt = null;
         PreparedStatement pstmt = null;
     	
     	try{
     		conn = getJDBCConnection(driver, admin, adminPassword);
-	        pstmt = conn.prepareStatement("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
-	        pstmt.setString(1, StringUtils.upperCase(schema));
-	        ResultSet rs = pstmt.executeQuery();
-	        StringBuilder sb = new StringBuilder();
-	        while (rs.next()) {
-	            sb.append(schema).append(".").append(rs.getString("TABLE_NAME")).append(",");
-	        }
-	        int stringLength = sb.length();
-	        // 最後尾にもカンマがついてしまうので手動で消す
-	        String tables = sb.toString().substring(0, stringLength - 1);
-	
-	        // PUBLICスキーマはデフォルトスキーマなので何もする必要がない
-	        if ("PUBLIC".equals(schema)) return;
-	        stmt = conn.createStatement();
-	
-	        stmt.execute("GRANT ALL ON " + tables + " TO " + user);
+
+			String nmzschema = normalizeSchemaName(schema);
+			
+			String grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
+			
+			grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
+			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
         
         } catch (SQLException e) {
             throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
         } finally {
         	StatementUtil.close(pstmt);
-            StatementUtil.close(stmt);
             ConnectionUtil.close(conn);
         }
     }

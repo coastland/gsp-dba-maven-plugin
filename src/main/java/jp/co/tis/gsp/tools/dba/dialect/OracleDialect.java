@@ -209,11 +209,11 @@ public class OracleDialect extends Dialect {
         
         try{
         	conn = getJDBCConnection(driver, admin, adminPassword);
-			PreparedStatement stmt = conn.prepareStatement("SELECT TABLE_NAME FROM DBA_TABLES WHERE OWNER = ?");
+			PreparedStatement stmt = conn.prepareStatement("SELECT OBJECT_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW', 'SEQUENCE') AND OWNER = ?");
 			stmt.setString(1, StringUtils.upperCase(schema));
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-				String tableName = rs.getString("TABLE_NAME");
+				String tableName = rs.getString("OBJECT_NAME");
 				// PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
 				String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
 				conn.createStatement().execute(sql);

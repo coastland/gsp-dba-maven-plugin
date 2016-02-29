@@ -74,6 +74,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 		dialect.createUser(user, password, adminUser, adminPassword);
 		
 		// 指定スキーマ内のテーブル、ビュー、シーケンスを全て削除します。
+		// 指定スキーマが存在しない場合は作成します。
 		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		
         FilenameFilter sqlFileFilter = new FilenameFilter() {

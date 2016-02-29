@@ -125,6 +125,7 @@ public class PostgresqlDialect extends Dialect {
                 stmt.execute("ALTER USER " + user + " Set search_path TO " + schema);
             	return;
             }else{
+            	// 指定スキーマが存在する場合はスキーマ操作権限を念のため与えておく
                 stmt.execute("ALTER SCHEMA " + schema + " OWNER TO " + user);
                 stmt.execute("ALTER USER " + user + " Set search_path TO " + schema);
             }
@@ -224,8 +225,9 @@ public class PostgresqlDialect extends Dialect {
         try{
         	conn = getJDBCConnection(driver, admin, adminPassword);
         	stmt = conn.createStatement();
-        	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user);
-        	stmt.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user);
+        	stmt.execute("GRANT ALL ON SCHEMA " + schema + " TO " + user); // スキーマ自体への権限
+        	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user); // テーブルとビュー
+        	stmt.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user); // シーケンス
         
         } catch (SQLException e) {
             throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
