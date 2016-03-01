@@ -112,7 +112,6 @@ public class PostgresqlDialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -194,7 +193,6 @@ public class PostgresqlDialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         String database = getDatabase();
@@ -223,7 +221,7 @@ public class PostgresqlDialect extends Dialect {
         Statement stmt = null;
         
         try{
-        	conn = getJDBCConnection(driver, admin, adminPassword);
+        	conn = DriverManager.getConnection(url, admin, adminPassword);
         	stmt = conn.createStatement();
         	stmt.execute("GRANT ALL ON SCHEMA " + schema + " TO " + user); // スキーマ自体への権限
         	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user); // テーブルとビュー

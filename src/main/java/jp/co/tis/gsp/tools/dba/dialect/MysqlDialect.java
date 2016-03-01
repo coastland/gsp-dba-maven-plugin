@@ -187,7 +187,6 @@ public class MysqlDialect extends Dialect {
 
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException{
-		DriverManagerUtil.registerDriver(driver);
 		Connection conn = null;
 		Statement stmt = null;
 		try {

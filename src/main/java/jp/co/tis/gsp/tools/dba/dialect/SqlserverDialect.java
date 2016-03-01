@@ -92,7 +92,6 @@ public class SqlserverDialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         PreparedStatement dropStmt;
@@ -148,7 +147,6 @@ public class SqlserverDialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -189,7 +187,6 @@ public class SqlserverDialect extends Dialect {
     }
 
     private boolean existsUser(String adminUser, String adminPassword, String user) throws SQLException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         PreparedStatement stmt = null;
         boolean existLogin = false;
@@ -247,7 +244,7 @@ public class SqlserverDialect extends Dialect {
     	Statement stmt = null;
     	
     	try{    	
-	    	conn = getJDBCConnection(driver, admin, adminPassword);
+	    	conn = DriverManager.getConnection(url, admin, adminPassword);
 	    	stmt = conn.createStatement();
 	        ResultSet rs = stmt.executeQuery("SELECT NAME FROM SYS.OBJECTS WHERE SCHEMA_ID = SCHEMA_ID('" + schema + "') AND TYPE IN ('U','V')");
 	        StringBuilder sb = new StringBuilder();

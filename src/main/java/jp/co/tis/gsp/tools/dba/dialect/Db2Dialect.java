@@ -80,7 +80,6 @@ public class Db2Dialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -146,7 +145,6 @@ public class Db2Dialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -175,7 +173,7 @@ public class Db2Dialect extends Dialect {
         
         try{
         	// テーブルとビュー
-        	conn = getJDBCConnection(driver, admin, adminPassword);
+        	conn = DriverManager.getConnection(url, admin, adminPassword);
         	
 			String nmzschema = normalizeSchemaName(schema);
 			
@@ -236,7 +234,7 @@ public class Db2Dialect extends Dialect {
         Connection conn = null;
     	
         try{
-			conn = getJDBCConnection(driver, admin, adminPassword);
+			conn = DriverManager.getConnection(url, admin, adminPassword);
 			createUserStmt = conn.createStatement();
 			createUserStmt.execute("CREATE SCHEMA " + schema + " AUTHORIZATION " + user);
 		
