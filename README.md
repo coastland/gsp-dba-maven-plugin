@@ -379,6 +379,10 @@ export-schemaはDB2とSQLServerには対応しておりません。
 
 import-schemaはDB2とSQLServerには対応しておりません。
 
+### データベースごとの対応状況
+
+* [こちら](./doc/db-status.md)を参照して下さい。
+
 ### 制約事項
 
 各ゴールは、以下の制約事項が存在します。
