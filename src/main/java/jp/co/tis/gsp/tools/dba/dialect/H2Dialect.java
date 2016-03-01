@@ -32,7 +32,6 @@ public class H2Dialect extends Dialect {
     @Override
     public void exportSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -49,7 +48,6 @@ public class H2Dialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         PreparedStatement pstmt = null;
         
@@ -106,7 +104,6 @@ public class H2Dialect extends Dialect {
     @Override
     public void importSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(driver);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -144,7 +141,7 @@ public class H2Dialect extends Dialect {
         PreparedStatement pstmt = null;
     	
     	try{
-    		conn = getJDBCConnection(driver, admin, adminPassword);
+    		conn = DriverManager.getConnection(url, admin, adminPassword);
 
 			String nmzschema = normalizeSchemaName(schema);
 			
@@ -167,7 +164,7 @@ public class H2Dialect extends Dialect {
         Connection conn = null;
         
 		try {
-			conn = getJDBCConnection(driver, admin, adminPassword);
+			conn = DriverManager.getConnection(url, admin, adminPassword);
 			stmt = conn.createStatement();
 			stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
 		} catch (SQLException e) {

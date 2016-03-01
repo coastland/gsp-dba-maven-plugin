@@ -97,6 +97,7 @@ public abstract class Dialect {
     }
     
 	public void setDriver(String driver) {
+		DriverManagerUtil.registerDriver(driver);
 		this.driver = driver;
 	}
 	
@@ -250,12 +251,7 @@ public abstract class Dialect {
         }
         return null;
     }
-    
-    protected Connection getJDBCConnection(String driver, String user, String password) throws SQLException{
-    	DriverManagerUtil.registerDriver(driver);
-    	return DriverManager.getConnection(url, user, password);
-    }
-    
+
     protected void dropObjectsInSchema(Connection conn, String dropListSql, String schema, OBJECT_TYPE objType) throws SQLException {
     	Statement stmt = null;
     	ResultSet rs = null;

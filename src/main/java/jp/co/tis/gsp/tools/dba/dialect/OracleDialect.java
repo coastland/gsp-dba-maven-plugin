@@ -172,7 +172,6 @@ public class OracleDialect extends Dialect {
 	 */
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException {
-		DriverManagerUtil.registerDriver(driver);
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -208,7 +207,7 @@ public class OracleDialect extends Dialect {
         PreparedStatement pstmt = null;
         
         try{
-        	conn = getJDBCConnection(driver, admin, adminPassword);
+        	conn = DriverManager.getConnection(url, admin, adminPassword);
 			PreparedStatement stmt = conn.prepareStatement("SELECT OBJECT_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW', 'SEQUENCE') AND OWNER = ?");
 			stmt.setString(1, StringUtils.upperCase(schema));
 			ResultSet rs = stmt.executeQuery();
@@ -233,7 +232,7 @@ public class OracleDialect extends Dialect {
 		Connection conn = null;
 		
 		try{
-			conn = getJDBCConnection(driver, admin, adminPassword);
+			conn = DriverManager.getConnection(url, admin, adminPassword);
 			createUserStmt= conn.createStatement();
 			createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
 			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
@@ -268,7 +267,6 @@ public class OracleDialect extends Dialect {
 	@Override
 	public void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException {
-		DriverManagerUtil.registerDriver(driver);
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
