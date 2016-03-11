@@ -35,7 +35,7 @@ pom.xml
 &lt;<span class="pl-ent" style="color: #F01136;"><b>profiles</b></span>&gt;
   &lt;<span class="pl-ent"><b>profile</b></span>&gt;
     &lt;<span class="pl-ent"><b>id</span>&gt;BACKUP&lt;/<span class="pl-ent">id</b></span>&gt;
-    &lt;<span class="pl-ent"><b>properties</span>&gt;
+    &lt;<span class="pl-ent"><b>properties</b></span>&gt;
       &lt;<span class="pl-ent"><b>db</span>.schema&gt;TEST_BACKUP&lt;/<span class="pl-ent">db</span>.schema</b>&gt;
       &lt;<span class="pl-ent"><b>db</span>.user&gt;TEST_BACKUP&lt;/<span class="pl-ent">db</span>.user</b>&gt;
       &lt;<span class="pl-ent"><b>db</span>.password&gt;password&lt;/<span class="pl-ent">db</span>.password</b>&gt;
