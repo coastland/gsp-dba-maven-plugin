@@ -50,7 +50,7 @@ pom.xml
 		<plugin>
 			<groupId>jp.co.tis.gsp</groupId>
 			<artifactId>gsp-dba-maven-plugin</artifactId>
-			<version><仕様するgspのバージョン></version>
+			<version>【使用するgsp-dbaプラグインのバージョン】</version>
 			<configuration>
 				<driver>${db.jdbcDriver}</driver>
 				<url>${db.url}</url>
