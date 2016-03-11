@@ -50,7 +50,7 @@ pom.xml
 		<plugin>
 			<groupId>jp.co.tis.gsp</groupId>
 			<artifactId>gsp-dba-maven-plugin</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version><仕様するgspのバージョン></version>
 			<configuration>
 				<driver>${db.jdbcDriver}</driver>
 				<url>${db.url}</url>
@@ -123,15 +123,15 @@ pom.xml
 </build>	
 ```
 * 上記のようなpom.xmlが用意出来たら、mvnコマンドでプロファイルを指定して実行します。  
-  実行するゴールは、**generate-ddl** 、**execute-ddl** 、 **load-data** 。 -P オプションで実行！
+  実行するゴールは、**generate-ddl** 、**execute-ddl** 、 **load-data** 。 -P オプションで実行。
 ```shell
 ## プロファイルBACKUPを-Pオプションで指定
 mvn clean gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:load-data -P BACKUP
 ```
         
 * <a name ="pos1">注意点
-    * extraDdlDirectoryに用意されているSQLやedmファイルのview定義がスキーマ修飾されたSQL文だとダメです。
+    * extraDdlDirectoryに用意されているSQLやedmファイルのview定義のSQLがスキーマ修飾されていると、結局そのスキーマのテーブルが作成されてしまうのでバックアップとしては不完全なものとなります。
     extraDdl/db2/hogehoge.sql
     ```sql
-    CREATE TABLE TAMORI.USERS(...　-- これはNG
+    CREATE TABLE TAMORI.USERS(...　-- これはNG。TEST_BACKUPスキーマに作成したいのにTAMORIスキーマに出来てしまう。
     ```
