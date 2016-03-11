@@ -13,117 +13,119 @@
 * 別スキーマ用プロファイルには、**`<db.schema>`** に別のスキーマ名(ここではTEST_BACKUP)を、そしてもう一つ重要なのが、**`<db.user>`**　にも別スキーマ名と同じ名前を指定して、スキーマ名＝ユーザ名となるようにして下さい。
 
 pom.xml
-```xml
-<properties>
-  <db.schema>HOGE</db.schema>
-  <db.user>HOGE</db.user>
-  <db.password>password</db.password>
-  <db.jdbcDriver>com.ibm.db2.jcc.DB2Driver</db.jdbcDriver>
-  <db.url>jdbc:db2://localhost:50000/sample</db.url>
-  <db.adminUser>HOGE</db.adminUser>
-  <db.adminPassword>password</db.adminPassword>
-  <dba.entity.rootPackage>com.nablarch.example.app</dba.entity.rootPackage>
-  <dba.entity.entityPackage>entity</dba.entity.entityPackage>
-  <dba.useDB>db2</dba.useDB>
-  <dba.classifier>${dba.useDB}</dba.classifier>
-  <dba.erdFile>src/main/resources/entity/${dba.useDB}.edm</dba.erdFile>
-  <dba.extraDdlDirectory>src/main/resources/extraDdl/${dba.useDB}</dba.extraDdlDirectory>
-  <dba.dataDirectory>src/test/resources/data/${dba.useDB}</dba.dataDirectory>
-  <dba.entity.javaFileDestDir>target/generated-sources/entity</dba.entity.javaFileDestDir>
-</properties>
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">properties</span>&gt;
+  &lt;<span class="pl-ent">db</span>.schema&gt;HOGE&lt;/<span class="pl-ent">db</span>.schema&gt;
+  &lt;<span class="pl-ent">db</span>.user&gt;HOGE&lt;/<span class="pl-ent">db</span>.user&gt;
+  &lt;<span class="pl-ent">db</span>.password&gt;password&lt;/<span class="pl-ent">db</span>.password&gt;
+  &lt;<span class="pl-ent">db</span>.jdbcDriver&gt;com.ibm.db2.jcc.DB2Driver&lt;/<span class="pl-ent">db</span>.jdbcDriver&gt;
+  &lt;<span class="pl-ent">db</span>.url&gt;jdbc:db2://localhost:50000/sample&lt;/<span class="pl-ent">db</span>.url&gt;
+  &lt;<span class="pl-ent">db</span>.adminUser&gt;HOGE&lt;/<span class="pl-ent">db</span>.adminUser&gt;
+  &lt;<span class="pl-ent">db</span>.adminPassword&gt;password&lt;/<span class="pl-ent">db</span>.adminPassword&gt;
+  &lt;<span class="pl-ent">dba</span>.entity.rootPackage&gt;com.nablarch.example.app&lt;/<span class="pl-ent">dba</span>.entity.rootPackage&gt;
+  &lt;<span class="pl-ent">dba</span>.entity.entityPackage&gt;entity&lt;/<span class="pl-ent">dba</span>.entity.entityPackage&gt;
+  &lt;<span class="pl-ent">dba</span>.useDB&gt;db2&lt;/<span class="pl-ent">dba</span>.useDB&gt;
+  &lt;<span class="pl-ent">dba</span>.classifier&gt;${dba.useDB}&lt;/<span class="pl-ent">dba</span>.classifier&gt;
+  &lt;<span class="pl-ent">dba</span>.erdFile&gt;src/main/resources/entity/${dba.useDB}.edm&lt;/<span class="pl-ent">dba</span>.erdFile&gt;
+  &lt;<span class="pl-ent">dba</span>.extraDdlDirectory&gt;src/main/resources/extraDdl/${dba.useDB}&lt;/<span class="pl-ent">dba</span>.extraDdlDirectory&gt;
+  &lt;<span class="pl-ent">dba</span>.dataDirectory&gt;src/test/resources/data/${dba.useDB}&lt;/<span class="pl-ent">dba</span>.dataDirectory&gt;
+  &lt;<span class="pl-ent">dba</span>.entity.javaFileDestDir&gt;target/generated-sources/entity&lt;/<span class="pl-ent">dba</span>.entity.javaFileDestDir&gt;
+&lt;/<span class="pl-ent">properties</span>&gt;
 
-<!-- バックアップ用プロファイル ここから -->
-<profiles>
-  <profile>
-    <id>BACKUP</id>
-    <properties>
-      <db.schema>TEST_BACKUP</db.schema>
-      <db.user>TEST_BACKUP</db.user>
-      <db.password>password</db.password>
-    </properties>
-  </profile>
-</profiles>
-<!-- バックアップ用プロファイル ここまで -->
+<span class="pl-c">&lt;!-- バックアップ用プロファイル ここから --&gt;</span>
+&lt;<span class="pl-ent" style="color: #F01136;"><b>profiles</b></span>&gt;
+  &lt;<span class="pl-ent"><b>profile</b></span>&gt;
+    &lt;<span class="pl-ent"><b>id</span>&gt;BACKUP&lt;/<span class="pl-ent">id</b></span>&gt;
+    &lt;<span class="pl-ent"><b>properties</span>&gt;
+      &lt;<span class="pl-ent"><b>db</span>.schema&gt;TEST_BACKUP&lt;/<span class="pl-ent">db</span>.schema</b>&gt;
+      &lt;<span class="pl-ent"><b>db</span>.user&gt;TEST_BACKUP&lt;/<span class="pl-ent">db</span>.user</b>&gt;
+      &lt;<span class="pl-ent"><b>db</span>.password&gt;password&lt;/<span class="pl-ent">db</span>.password</b>&gt;
+    &lt;/<span class="pl-ent"><b>properties</b></span>&gt;
+  &lt;/<span class="pl-ent"><b>profile</b></span>&gt;
+&lt;/<span class="pl-ent"><b>profiles</b></span>&gt;
+<span class="pl-c">&lt;!-- バックアップ用プロファイル ここまで --&gt;</span>
 
-<build>
-	<plugins>
-		<plugin>
-			<groupId>jp.co.tis.gsp</groupId>
-			<artifactId>gsp-dba-maven-plugin</artifactId>
-			<version>【使用するgsp-dbaプラグインのバージョン】</version>
-			<configuration>
-				<driver>${db.jdbcDriver}</driver>
-				<url>${db.url}</url>
-				<adminUser>${db.adminUser}</adminUser>
-				<adminPassword>${db.adminPassword}</adminPassword>
-				<user>${db.user}</user>
-				<password>${db.password}</password>
-				<schema>${db.schema}</schema>
-				<dataDirectory>src/test/resources/data</dataDirectory>
-				<erdFile>${dba.erdFile}</erdFile>
-				<lengthSemantics>CHAR</lengthSemantics>
-				<rootPackage>${dba.entity.rootPackage}</rootPackage>
-				<entityPackageName>${dba.entity.entityPackage}</entityPackageName>
-				<extraDdlDirectory>${dba.extraDdlDirectory}</extraDdlDirectory>
-				<dataDirectory>${dba.dataDirectory}</dataDirectory>
-				<useAccessor>true</useAccessor>
-				<javaFileDestDir>${dba.entity.javaFileDestDir}</javaFileDestDir>
-			</configuration>
-			<executions>
-				<!-- DDLをObjectBrowserERから生成する -->
-				<execution>
-					<id>generate-ddl</id>
-					<phase>generate-sources</phase>
-					<goals>
-						<goal>generate-ddl</goal>
-					</goals>
-				</execution>
-				<!-- DDLを実行する -->
-				<execution>
-					<id>execute-ddl</id>
-					<phase>generate-sources</phase>
-					<goals>
-						<goal>execute-ddl</goal>
-					</goals>
-				</execution>
-				<!-- Entityを生成する -->
-				<execution>
-					<id>generate-entity</id>
-					<phase>generate-sources</phase>
-					<goals>
-						<goal>generate-entity</goal>
-					</goals>
-				</execution>
-				<!-- データをロードする -->
-				<execution>
-					<id>load-data</id>
-					<phase>pre-integration-test</phase>
-					<goals>
-						<goal>load-data</goal>
-					</goals>
-				</execution>
-				<!-- ダンプを作る -->
-				<execution>
-					<id>export-schema</id>
-					<phase>install</phase>
-					<goals>
-						<goal>export-schema</goal>
-					</goals>
-				</execution>
-			</executions>
-			<dependencies>
-				<dependency>
-					<groupId>com.ibm</groupId>
-					<artifactId>db2jcc4</artifactId>
-					<version>9.7.200.358</version>
-				</dependency>
-			</dependencies>
-		</plugin>
-	</plugins>
-</build>	
-```
+&lt;<span class="pl-ent">build</span>&gt;
+    &lt;<span class="pl-ent">plugins</span>&gt;
+        &lt;<span class="pl-ent">plugin</span>&gt;
+            &lt;<span class="pl-ent">groupId</span>&gt;jp.co.tis.gsp&lt;/<span class="pl-ent">groupId</span>&gt;
+            &lt;<span class="pl-ent">artifactId</span>&gt;gsp-dba-maven-plugin&lt;/<span class="pl-ent">artifactId</span>&gt;
+            &lt;<span class="pl-ent">version</span>&gt;【使用するgsp-dbaプラグインのバージョン】&lt;/<span class="pl-ent">version</span>&gt;
+            &lt;<span class="pl-ent">configuration</span>&gt;
+                &lt;<span class="pl-ent">driver</span>&gt;${db.jdbcDriver}&lt;/<span class="pl-ent">driver</span>&gt;
+                &lt;<span class="pl-ent">url</span>&gt;${db.url}&lt;/<span class="pl-ent">url</span>&gt;
+                &lt;<span class="pl-ent">adminUser</span>&gt;${db.adminUser}&lt;/<span class="pl-ent">adminUser</span>&gt;
+                &lt;<span class="pl-ent">adminPassword</span>&gt;${db.adminPassword}&lt;/<span class="pl-ent">adminPassword</span>&gt;
+                &lt;<span class="pl-ent">user</span>&gt;${db.user}&lt;/<span class="pl-ent">user</span>&gt;
+                &lt;<span class="pl-ent">password</span>&gt;${db.password}&lt;/<span class="pl-ent">password</span>&gt;
+                &lt;<span class="pl-ent">schema</span>&gt;${db.schema}&lt;/<span class="pl-ent">schema</span>&gt;
+                &lt;<span class="pl-ent">dataDirectory</span>&gt;src/test/resources/data&lt;/<span class="pl-ent">dataDirectory</span>&gt;
+                &lt;<span class="pl-ent">erdFile</span>&gt;${dba.erdFile}&lt;/<span class="pl-ent">erdFile</span>&gt;
+                &lt;<span class="pl-ent">lengthSemantics</span>&gt;CHAR&lt;/<span class="pl-ent">lengthSemantics</span>&gt;
+                &lt;<span class="pl-ent">rootPackage</span>&gt;${dba.entity.rootPackage}&lt;/<span class="pl-ent">rootPackage</span>&gt;
+                &lt;<span class="pl-ent">entityPackageName</span>&gt;${dba.entity.entityPackage}&lt;/<span class="pl-ent">entityPackageName</span>&gt;
+                &lt;<span class="pl-ent">extraDdlDirectory</span>&gt;${dba.extraDdlDirectory}&lt;/<span class="pl-ent">extraDdlDirectory</span>&gt;
+                &lt;<span class="pl-ent">dataDirectory</span>&gt;${dba.dataDirectory}&lt;/<span class="pl-ent">dataDirectory</span>&gt;
+                &lt;<span class="pl-ent">useAccessor</span>&gt;true&lt;/<span class="pl-ent">useAccessor</span>&gt;
+                &lt;<span class="pl-ent">javaFileDestDir</span>&gt;${dba.entity.javaFileDestDir}&lt;/<span class="pl-ent">javaFileDestDir</span>&gt;
+            &lt;/<span class="pl-ent">configuration</span>&gt;
+            &lt;<span class="pl-ent">executions</span>&gt;
+                <span class="pl-c">&lt;!-- DDLをObjectBrowserERから生成する --&gt;</span>
+                &lt;<span class="pl-ent">execution</span>&gt;
+                    &lt;<span class="pl-ent">id</span>&gt;generate-ddl&lt;/<span class="pl-ent">id</span>&gt;
+                    &lt;<span class="pl-ent">phase</span>&gt;generate-sources&lt;/<span class="pl-ent">phase</span>&gt;
+                    &lt;<span class="pl-ent">goals</span>&gt;
+                        &lt;<span class="pl-ent">goal</span>&gt;generate-ddl&lt;/<span class="pl-ent">goal</span>&gt;
+                    &lt;/<span class="pl-ent">goals</span>&gt;
+                &lt;/<span class="pl-ent">execution</span>&gt;
+                <span class="pl-c">&lt;!-- DDLを実行する --&gt;</span>
+                &lt;<span class="pl-ent">execution</span>&gt;
+                    &lt;<span class="pl-ent">id</span>&gt;execute-ddl&lt;/<span class="pl-ent">id</span>&gt;
+                    &lt;<span class="pl-ent">phase</span>&gt;generate-sources&lt;/<span class="pl-ent">phase</span>&gt;
+                    &lt;<span class="pl-ent">goals</span>&gt;
+                        &lt;<span class="pl-ent">goal</span>&gt;execute-ddl&lt;/<span class="pl-ent">goal</span>&gt;
+                    &lt;/<span class="pl-ent">goals</span>&gt;
+                &lt;/<span class="pl-ent">execution</span>&gt;
+                <span class="pl-c">&lt;!-- Entityを生成する --&gt;</span>
+                &lt;<span class="pl-ent">execution</span>&gt;
+                    &lt;<span class="pl-ent">id</span>&gt;generate-entity&lt;/<span class="pl-ent">id</span>&gt;
+                    &lt;<span class="pl-ent">phase</span>&gt;generate-sources&lt;/<span class="pl-ent">phase</span>&gt;
+                    &lt;<span class="pl-ent">goals</span>&gt;
+                        &lt;<span class="pl-ent">goal</span>&gt;generate-entity&lt;/<span class="pl-ent">goal</span>&gt;
+                    &lt;/<span class="pl-ent">goals</span>&gt;
+                &lt;/<span class="pl-ent">execution</span>&gt;
+                <span class="pl-c">&lt;!-- データをロードする --&gt;</span>
+                &lt;<span class="pl-ent">execution</span>&gt;
+                    &lt;<span class="pl-ent">id</span>&gt;load-data&lt;/<span class="pl-ent">id</span>&gt;
+                    &lt;<span class="pl-ent">phase</span>&gt;pre-integration-test&lt;/<span class="pl-ent">phase</span>&gt;
+                    &lt;<span class="pl-ent">goals</span>&gt;
+                        &lt;<span class="pl-ent">goal</span>&gt;load-data&lt;/<span class="pl-ent">goal</span>&gt;
+                    &lt;/<span class="pl-ent">goals</span>&gt;
+                &lt;/<span class="pl-ent">execution</span>&gt;
+                <span class="pl-c">&lt;!-- ダンプを作る --&gt;</span>
+                &lt;<span class="pl-ent">execution</span>&gt;
+                    &lt;<span class="pl-ent">id</span>&gt;export-schema&lt;/<span class="pl-ent">id</span>&gt;
+                    &lt;<span class="pl-ent">phase</span>&gt;install&lt;/<span class="pl-ent">phase</span>&gt;
+                    &lt;<span class="pl-ent">goals</span>&gt;
+                        &lt;<span class="pl-ent">goal</span>&gt;export-schema&lt;/<span class="pl-ent">goal</span>&gt;
+                    &lt;/<span class="pl-ent">goals</span>&gt;
+                &lt;/<span class="pl-ent">execution</span>&gt;
+            &lt;/<span class="pl-ent">executions</span>&gt;
+            &lt;<span class="pl-ent">dependencies</span>&gt;
+                &lt;<span class="pl-ent">dependency</span>&gt;
+                    &lt;<span class="pl-ent">groupId</span>&gt;com.ibm&lt;/<span class="pl-ent">groupId</span>&gt;
+                    &lt;<span class="pl-ent">artifactId</span>&gt;db2jcc4&lt;/<span class="pl-ent">artifactId</span>&gt;
+                    &lt;<span class="pl-ent">version</span>&gt;9.7.200.358&lt;/<span class="pl-ent">version</span>&gt;
+                &lt;/<span class="pl-ent">dependency</span>&gt;
+            &lt;/<span class="pl-ent">dependencies</span>&gt;
+        &lt;/<span class="pl-ent">plugin</span>&gt;
+    &lt;/<span class="pl-ent">plugins</span>&gt;
+&lt;/<span class="pl-ent">build</span>&gt;
+ </pre>
+</div>
+
 * 上記のようなpom.xmlが用意出来たら、mvnコマンドでプロファイルを指定して実行します。  
   実行するゴールは、**generate-ddl** 、**execute-ddl** 、 **load-data** 。 -P オプションで実行。
+
 ```shell
 ## プロファイルBACKUPを-Pオプションで指定
 mvn clean gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:load-data -P BACKUP
