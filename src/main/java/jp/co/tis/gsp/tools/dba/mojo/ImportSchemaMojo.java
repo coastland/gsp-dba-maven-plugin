@@ -103,7 +103,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
         }
 
 		getLog().info("スキーマのインポートを開始します。:" + importFile);
-		dialect.importSchema(user, password, schema, importFile);
+		dialect.importSchema(adminUser, adminPassword, schema, importFile);
 		getLog().info("スキーマのインポートを終了しました");
 	}
 
