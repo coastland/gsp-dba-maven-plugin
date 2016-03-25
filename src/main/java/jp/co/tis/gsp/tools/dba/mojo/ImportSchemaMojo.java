@@ -71,8 +71,8 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
     @Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
 		Dialect dialect = DialectFactory.getDialect(url, driver);
-		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 		dialect.createUser(user, password, adminUser, adminPassword);
+		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 
         Artifact artifact = repositorySystem.createArtifact(groupId, artifactId, version, "jar");
         ArtifactResolutionRequest schemaArtifactRequest = new ArtifactResolutionRequest()
