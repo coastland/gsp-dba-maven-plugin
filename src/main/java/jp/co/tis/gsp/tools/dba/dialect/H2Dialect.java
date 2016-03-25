@@ -96,6 +96,11 @@ public class H2Dialect extends Dialect {
        	  StatementUtil.close(pstmt);
         }
     }   
+    
+    @Override
+    public String normalizeUserName(String userName) {
+    	return StringUtils.upperCase(userName);
+    }
         
 	public String normalizeSchemaName(String schemaName) {
 		return StringUtils.upperCase(schemaName);

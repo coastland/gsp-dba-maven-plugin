@@ -132,7 +132,7 @@ public class MysqlDialect extends Dialect {
 			stmt = conn.createStatement();
 
 			// スキーマ内のテーブル、ビュー削除
-			String nmzschema = normalizeSchemaName(schema);
+			String nmzschema = schema;
 			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA='" + nmzschema + "'";
 			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
 			
@@ -211,7 +211,7 @@ public class MysqlDialect extends Dialect {
 		try {
 			conn = DriverManager.getConnection(url, admin, adminPassword);
 			
-			String nmzschema = normalizeSchemaName(schema);
+			String nmzschema = schema;
 			
 			String grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'";
 			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);

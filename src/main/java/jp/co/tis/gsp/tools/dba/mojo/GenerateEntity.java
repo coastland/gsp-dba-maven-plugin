@@ -183,7 +183,7 @@ public class GenerateEntity extends AbstractDbaMojo {
         Dialect dialect = DialectFactory.getDialect(url, driver);
         DialectUtil.setDialect(dialect);
         final GenerateEntityCommand command = new GenerateEntityCommand();
-        command.setSchemaName(dialect.normalizeSchemaName(schema));
+        command.setSchemaName(schema);
         command.setOverwrite(true);
         command.setApplyDbCommentToJava(true);
         command.setEntityPackageName(entityPackageName);

@@ -209,7 +209,7 @@ public class OracleDialect extends Dialect {
         try{
         	conn = DriverManager.getConnection(url, admin, adminPassword);
 			PreparedStatement stmt = conn.prepareStatement("SELECT OBJECT_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW', 'SEQUENCE') AND OWNER = ?");
-			stmt.setString(1, StringUtils.upperCase(schema));
+			stmt.setString(1, schema);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				String tableName = rs.getString("OBJECT_NAME");
@@ -255,7 +255,7 @@ public class OracleDialect extends Dialect {
 		try {
 			stmt = conn.prepareStatement(
 					"SELECT count(*) AS num FROM dba_users WHERE username=?");
-			stmt.setString(1, StringUtils.upperCase(user));
+			stmt.setString(1, user);
 			ResultSet rs = stmt.executeQuery();
 			rs.next();
 			return (rs.getInt("num") > 0);
@@ -324,6 +324,11 @@ public class OracleDialect extends Dialect {
 	public TypeMapper getTypeMapper() {
 		return new TypeMapper(typeToNameMap);
 	}
+	
+    @Override
+    public String normalizeUserName(String userName) {
+    	return StringUtils.upperCase(userName);
+    }
 
 	@Override
 	public String normalizeSchemaName(String schemaName) {
