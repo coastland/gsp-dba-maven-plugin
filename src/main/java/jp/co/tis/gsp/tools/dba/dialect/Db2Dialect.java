@@ -253,6 +253,11 @@ public class Db2Dialect extends Dialect {
     }
     
     @Override
+    public String normalizeUserName(String userName) {
+    	return StringUtils.upperCase(userName);
+    }
+    
+    @Override
     public String normalizeSchemaName(String schemaName) {
         return StringUtils.upperCase(schemaName);
     }

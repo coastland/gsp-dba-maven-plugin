@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.persistence.GenerationType;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.framework.util.DriverManagerUtil;
@@ -115,6 +116,10 @@ public abstract class Dialect {
     }
 
 	public abstract TypeMapper getTypeMapper();
+	
+    public String normalizeUserName(String userName) {
+        return userName;
+    }
 
 	public String normalizeSchemaName(String schemaName) {
 		return schemaName;
@@ -172,7 +177,7 @@ public abstract class Dialect {
         ResultSet rs = null;
         try {
             rs = metaData.getColumns(null,
-                                                normalizeSchemaName(schema),
+            		                            schema,
                                                 normalizeTableName(tableName),
                                                 normalizeColumnName(colName));
             if (!rs.next()) {

@@ -239,6 +239,11 @@ public class PostgresqlDialect extends Dialect {
     public TypeMapper getTypeMapper() {
         return null;
     }
+    
+    @Override
+    public String normalizeUserName(String userName) {
+        return StringUtils.lowerCase(userName);
+    }
 
     @Override
     public String normalizeSchemaName(String schemaName) {
