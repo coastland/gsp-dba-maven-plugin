@@ -16,26 +16,33 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.persistence.GenerationType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
-import javax.persistence.GenerationType;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class OracleDialect extends Dialect {
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -44,6 +51,7 @@ public class OracleDialect extends Dialect {
 		USABLE_TYPE_NAMES.add("CHAR");
 		USABLE_TYPE_NAMES.add("DATE");
 		USABLE_TYPE_NAMES.add("LONG");
+		USABLE_TYPE_NAMES.add("FLOAT");
 		USABLE_TYPE_NAMES.add("NCHAR");
 		USABLE_TYPE_NAMES.add("NUMBER");
 		USABLE_TYPE_NAMES.add("NVARCHAR2");
