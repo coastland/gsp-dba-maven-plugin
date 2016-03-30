@@ -1,4 +1,4 @@
-ALTER TABLE ${entity.name} ADD
+ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD
 <#if index.isPrimaryKey()>
 PRIMARY KEY ${index.name!}
 <#else>
