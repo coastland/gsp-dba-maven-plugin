@@ -107,9 +107,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
         dialect.grantAllToUser(schema, user, password, adminUser, adminPassword);
 
         // コネクション解放
-        if(conn != null) {
-           ConnectionUtil.close(conn);
-        }
+        ConnectionUtil.close(conn);
 	}
 
     private void executeSql(String sql) throws SQLException {
