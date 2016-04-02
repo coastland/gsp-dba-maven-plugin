@@ -16,6 +16,8 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.persistence.TemporalType;
@@ -33,6 +35,27 @@ public class ExtendedPostgreGenDialect extends PostgreGenDialect {
         columnTypeMap.put("timestamp", ExtendedPostgreColumnType.TIMESTAMP);
         columnTypeMap.put("timestamptz", ExtendedPostgreColumnType.TIMESTAMPTZ);
         columnTypeMap.put("bool", ExtendedPostgreColumnType.BOOL);
+        columnTypeMap.put("numeric", new PostgreColumnType("numeric($p,$s)", BigDecimal.class) {
+            @Override
+            public Class<?> getAttributeClass(int length, int precision, int scale) {
+                if (scale != 0) {
+                    return BigDecimal.class;
+                }
+                if (precision == 1) {
+                    return boolean.class;
+                }
+                if (precision < 5) {
+                    return Short.class;
+                }
+                if (precision < 10) {
+                    return Integer.class;
+                }
+                if (precision < 19) {
+                    return Long.class;
+                }
+                return BigInteger.class;
+            }
+        });
     }
 
     public static class ExtendedPostgreColumnType extends PostgreColumnType {
@@ -47,7 +70,7 @@ public class ExtendedPostgreGenDialect extends PostgreGenDialect {
         
         private static ExtendedPostgreColumnType BOOL = new ExtendedPostgreColumnType(
                 "bool", boolean.class);
-        
+
         public ExtendedPostgreColumnType(String dataType, Class<?> attributeClass) {
             super(dataType, attributeClass);
         }
