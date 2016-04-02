@@ -37,6 +37,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
@@ -104,6 +105,9 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 
 		// DBユーザにスキーマオブジェクトの権限を付与する
         dialect.grantAllToUser(schema, user, password, adminUser, adminPassword);
+
+        // コネクション解放
+        ConnectionUtil.close(conn);
 	}
 
     private void executeSql(String sql) throws SQLException {
