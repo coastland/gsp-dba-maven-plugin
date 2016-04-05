@@ -16,9 +16,7 @@
 
 package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,21 +30,18 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
-
 import org.apache.commons.lang.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
 import org.seasar.extension.jdbc.gen.internal.meta.DbTableMetaReaderImpl;
-import org.seasar.extension.jdbc.gen.meta.DbColumnMeta;
 import org.seasar.extension.jdbc.gen.meta.DbForeignKeyMeta;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.gen.meta.DbUniqueKeyMeta;
 import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.ArrayMap;
 import org.seasar.framework.util.ResultSetUtil;
-import org.seasar.framework.util.StatementUtil;
+
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	public DbTableMetaReaderWithView(DataSource dataSource, GenDialect dialect,
@@ -82,36 +77,6 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	    } catch (SQLException e) {
 	        throw new SQLRuntimeException(e);
 	    }
-    }
-
-    @Override
-    protected void doDbColumnMeta(DatabaseMetaData metaData,
-                                  DbTableMeta tableMeta, Set<String> primaryKeySet) {
-        super.doDbColumnMeta(metaData, tableMeta, primaryKeySet);
-
-        Dialect dialect = DialectUtil.getDialect();
-        String sequenceDefinitionSql = dialect.getSequenceDefinitionSql();
-        if (sequenceDefinitionSql != null) {
-            for (DbColumnMeta columnMeta : tableMeta.getColumnMetaList()) {
-                try {
-                    Connection conn = metaData.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(sequenceDefinitionSql);
-                    try {
-                        stmt.setString(1, columnMeta.getName() + "_USEQ");
-                        stmt.setString(2, schemaName);
-                        ResultSet rs = stmt.executeQuery();
-                        if (rs.next()) {
-                            columnMeta.setAutoIncrement(true);
-                        }
-                    } finally {
-                        StatementUtil.close(stmt);
-                    }
-                } catch (SQLException e) {
-                    throw new SQLRuntimeException(e);
-                }
-            }
-        }
-
     }
 
     @Override
