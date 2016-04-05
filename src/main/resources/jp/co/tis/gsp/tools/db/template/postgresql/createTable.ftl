@@ -18,8 +18,3 @@ COMMENT ON table <#if entity.schema??>${entity.schema}</#if>${entity.name} is '$
 COMMENT ON column <#if entity.schema??>${entity.schema}</#if>${entity.name}.${column.name} is '${column.label}';
 </#if>
 </#foreach>
-<#foreach column in entity.columnList>
-<#if column.isAutoIncrement() && column.dataType!='SERIAL' && column.dataType!='BIGSERIAL'>
-CREATE SEQUENCE <#if entity.schema??>${entity.schema}</#if>${column.generatorKeyName} increment by 1 start with 1;
-</#if>
-</#foreach>

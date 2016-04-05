@@ -60,7 +60,7 @@ public class Column {
         }
         return false;
     }
-
+    
     public Boolean isSingularPrimaryKey() {
         if (!isPrimaryKey() || isForeignKey())
             return false;
@@ -74,8 +74,7 @@ public class Column {
     }
 
     public Boolean isAutoIncrement() {
-        return StringUtils.equalsIgnoreCase(defaultValue, "AUTO_INCREMENT")
-                || (isSingularPrimaryKey() && isNumericDataType());
+        return (isSingularPrimaryKey() && isNumericDataType());
     }
 
 	private Boolean isNumericDataType() {
