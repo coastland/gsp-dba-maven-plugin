@@ -101,6 +101,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
             executeBySqlFiles(files.toArray(new File[files.size()]));
 		} catch (Exception e) {
 			getLog().warn(e);
+			throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
 		}
 
 		// DBユーザにスキーマオブジェクトの権限を付与する
@@ -161,8 +162,6 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
             try {
                 reader = new FileReader(sqlFile);
                 runStatements(reader);
-            } catch(Exception e) {
-                getLog().error(e);
             } finally {
                 IOUtils.closeQuietly(reader);
             }

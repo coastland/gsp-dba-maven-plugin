@@ -143,8 +143,10 @@ public class LoadDataMojo extends AbstractDbaMojo {
 					insertHandler.close();
 				} catch (IOException e) {
 					getLog().warn("ファイルがオープンできません:"+file, e);
+					throw new MojoExecutionException("", e);
 				} catch (SQLException e) {
 					getLog().warn("SQL実行中にエラーが発生しました:"+file, e);
+					throw new MojoExecutionException("", e);
 				} finally {
 					if (reader != null)
 						reader.close();
