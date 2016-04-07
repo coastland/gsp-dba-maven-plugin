@@ -97,10 +97,11 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
                 return f1.getName().compareTo(f2.getName());
             }
         });
+
 		try {
-            executeBySqlFiles(files.toArray(new File[files.size()]));
+			executeBySqlFiles(files.toArray(new File[files.size()]));
 		} catch (Exception e) {
-			getLog().warn(e);
+			getLog().error(e);
 			throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
 		}
 
@@ -150,7 +151,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 
     }
 
-    private void executeBySqlFiles(File...sqlFiles) throws SQLException, IOException {
+    private void executeBySqlFiles(File...sqlFiles) throws SQLException, IOException, MojoExecutionException {
         if (conn == null || conn.isClosed()) {
             setConnection();
         }
@@ -162,6 +163,12 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
             try {
                 reader = new FileReader(sqlFile);
                 runStatements(reader);
+            } catch(Exception e){
+            	getLog().warn(e);
+            	
+            	if(onError.equals("abort"))
+            	  throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
+            	
             } finally {
                 IOUtils.closeQuietly(reader);
             }
