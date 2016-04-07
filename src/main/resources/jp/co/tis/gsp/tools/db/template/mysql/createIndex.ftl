@@ -6,7 +6,10 @@ PRIMARY KEY ${index.name!}
   ${column.name}<#if column_has_next>,</#if>
 </#foreach>
 )
-<#if index.isAutoIncrement() >,MODIFY ${index.firstColumn.name} ${index.firstColumn.dataType}<#if index.firstColumn.length != 0>(${index.firstColumn.length})</#if><#if index.firstColumn.defaultValue?has_content> DEFAULT ${index.firstColumn.defaultValue} </#if><#if !index.firstColumn.isNullable()> NOT NULL </#if><#if index.firstColumn.label?has_content> COMMENT '${index.firstColumn.label}'</#if> AUTO_INCREMENT</#if>
+<#foreach column in index.columnList>
+  <#if column.isAutoIncrement() >,MODIFY ${column.name} ${column.dataType}<#if column.length != 0>(${column.length})</#if><#if column.defaultValue?has_content> DEFAULT ${column.defaultValue} </#if><#if !column.isNullable()> NOT NULL </#if><#if column.label?has_content> COMMENT '${column.label}'</#if> AUTO_INCREMENT</#if>
+</#foreach>
+;
 </#if>
 
 <#if index.type=1>
