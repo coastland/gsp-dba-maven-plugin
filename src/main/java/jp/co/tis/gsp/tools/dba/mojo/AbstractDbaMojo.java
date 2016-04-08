@@ -95,6 +95,14 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
      */
     @Parameter
     protected Map<String, String> optionalDialects;
+    
+    /**
+     * Action to perform if an error is found, When execute-ddl and load-data is runnnig. 
+     * Possible values are abort and continue.
+     * Default value is: abort.
+     */
+    @Parameter(defaultValue = "abort")
+    protected String onError;
 
     /**
      * setup execution environments.

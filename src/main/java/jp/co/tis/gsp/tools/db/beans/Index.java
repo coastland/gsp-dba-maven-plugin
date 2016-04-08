@@ -121,12 +121,6 @@ public class Index {
 	public Boolean isPrimaryKey() {
 		return type == 0;
 	}
-	public Boolean isAutoIncrement() {
-		return isPrimaryKey()
-				&& columnList != null
-				&& columnList.size() == 1
-				&& StringUtils.endsWithIgnoreCase(columnList.get(0).getName(), "_id");
-	}
 
 	public Column getFirstColumn() {
 		if (columnList == null)

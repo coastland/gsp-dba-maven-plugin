@@ -4,7 +4,7 @@
 <#-- IDENTITYが指定できるのは1テーブルに1つであるため、シングル主キーでない自動インクリメントのカラムにはIDENTITYは設定しない。 -->
 CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
 <#foreach column in entity.columnList>
-  ${column.name} ${column.dataType}<#if column.length != 0>(${column.length}<#if column.scale != 0 && (column.dataType = 'DECIMAL' || column.dataType = 'NUMERIC')>,${column.scale}</#if>)</#if><#if column.isArray()> ARRAY</#if><#if column.isAutoIncrement() && column.isPrimaryKey()><#if column.dataType == 'SMALLINT' || column.dataType == 'INT' || column.dataType == 'BIGINT' || column.dataType == "NUMERIC" || column.dataType == 'DECIMAL'> IDENTITY</#if></#if><#if !column.isNullable()> NOT</#if> NULL <#if column.defaultValue?has_content> DEFAULT ${column.defaultValue} </#if><#if column_has_next>,</#if>
+  ${column.name} ${column.dataType}<#if column.length != 0>(${column.length}<#if column.scale != 0 && (column.dataType = 'DECIMAL' || column.dataType = 'NUMERIC')>,${column.scale}</#if>)</#if><#if column.isArray()> ARRAY</#if><#if column.isAutoIncrement()> IDENTITY</#if><#if !column.isNullable()> NOT</#if> NULL <#if column.defaultValue?has_content> DEFAULT ${column.defaultValue} </#if><#if column_has_next>,</#if>
 </#foreach>
 );
 <#-- コメントの設定には拡張プロパティを利用する。 -->
