@@ -17,7 +17,7 @@ PRIMARY KEY ${index.name!}
 <#if index.type=1>
 ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD UNIQUE
 <#elseif index.type=3>
-CREATE INDEX <#if entity.schema??>${entity.schema}</#if>${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
+CREATE INDEX ${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
 </#if>
 (
 <#foreach column in index.columnList>
