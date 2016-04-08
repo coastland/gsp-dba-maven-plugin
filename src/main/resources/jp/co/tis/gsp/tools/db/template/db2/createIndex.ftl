@@ -8,19 +8,15 @@ ADD CONSTRAINT ${index.name!} PRIMARY KEY
   ${column.name}<#if column_has_next>,</#if>
 </#foreach>
 );
-</#if>
-<#if index.type=1>
-<#-- DB2はunique制約へのconstraintはサポートしていない。 -->
+<#else>
+<#if index.type==1>
 ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD UNIQUE
+<#elseif index.type=2 || index.type=3>
+CREATE <#if index.type==2>UNIQUE </#if>INDEX <#if entity.schema??>${entity.schema}</#if>${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
+</#if>
 (
 <#foreach column in index.columnList>
   ${column.name}<#if column_has_next>,</#if>
 </#foreach>
 );
 </#if>
-CREATE <#if index.type!=3>UNIQUE </#if>INDEX ${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
-(
-<#foreach column in index.columnList>
-  ${column.name}<#if column_has_next>,</#if>
-</#foreach>
-);
