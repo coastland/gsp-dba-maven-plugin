@@ -8,7 +8,8 @@ ADD CONSTRAINT ${index.name!} PRIMARY KEY
   ${column.name}<#if column_has_next>,</#if>
 </#foreach>
 );
-<#elseif index.type=1>
+<#else>
+<if index.type=1>
 ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD UNIQUE
 <#elseif index.type=2 || index.type=3>
 CREATE <#if index.type==2>UNIQUE </#if>INDEX <#if entity.schema??>${entity.schema}</#if>${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
@@ -18,3 +19,4 @@ CREATE <#if index.type==2>UNIQUE </#if>INDEX <#if entity.schema??>${entity.schem
   ${column.name}<#if column_has_next>,</#if>
 </#foreach>
 );
+</#if>
