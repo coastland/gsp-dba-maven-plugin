@@ -16,13 +16,15 @@
 
 package jp.co.tis.gsp.tools.db.beans;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.Arrays;
-import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 @XmlRootElement(name="ATTR")
 public class Column {
@@ -58,7 +60,7 @@ public class Column {
         }
         return false;
     }
-
+    
     public Boolean isSingularPrimaryKey() {
         if (!isPrimaryKey() || isForeignKey())
             return false;
@@ -72,8 +74,7 @@ public class Column {
     }
 
     public Boolean isAutoIncrement() {
-        return StringUtils.equalsIgnoreCase(defaultValue, "AUTO_INCREMENT")
-                || (isSingularPrimaryKey() && isNumericDataType());
+        return (isSingularPrimaryKey() && isNumericDataType());
     }
 
 	private Boolean isNumericDataType() {
@@ -104,12 +105,9 @@ public class Column {
 	}
 
     public String getGeneratorKeyName() {
-        if (isSingularPrimaryKey()) {
             return name + "_SEQ";
-        } else {
-            return name + "_USEQ";
-        }
     }
+    
 	public Boolean isArray() {
 		return isArray;
 	}

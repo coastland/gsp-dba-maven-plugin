@@ -23,9 +23,6 @@ CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
 <#foreach column in entity.columnList>
 - <#if column.isAutoIncrement()>CREATE SEQUENCE <#if entity.schema??>${entity.schema}</#if>${column.generatorKeyName} increment by 1 start with 1;
 + <#if column.isAutoIncrement()>CREATE SEQUENCE <#if entity.schema??>${entity.schema}</#if>${entity.name}_${column.generatorKeyName} increment by 1 start with 1;
-  <#if column.generatorKeyName?ends_with("_USEQ")>
-CREATE SYNONYM <#if entity.schema??>${entity.schema}</#if>${column.generatorKeyName?replace("_USEQ", "_SEQ")} FOR ${column.generatorKeyName};
-  </#if>
 </#if>
 </#foreach>
 ```

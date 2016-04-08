@@ -16,6 +16,10 @@ gsp-dba-maven-pluginは、DBAのルーチンワークを自動化し、本来の
 
 > * gsp-dba-maven-pluginは開発フェーズで用いることを想定しています。本番環境での使用は推奨しません。
 
+想定されるデータモデリングは以下の資料を参考にしています。
+* [イミュータブル データモデル (入門編)](http://www.slideshare.net/kawasima/ss-40471672)  
+* [イミュータブルデータモデル(世代編)](http://www.slideshare.net/kawasima/ss-44958468)  
+
 ## ゴールの概要
 
 * [generate-ddl](#generate-ddl) データモデルを解析し、DDLを生成する。
@@ -28,7 +32,6 @@ gsp-dba-maven-pluginは、DBAのルーチンワークを自動化し、本来の
 
 データベースによって、動作が異なる場合や制約事項があります。
 詳細は、 **データベースの対応状況** を参照してください。
-
 
 ## 使用方法
 
