@@ -9,7 +9,7 @@ ADD CONSTRAINT ${index.name!} PRIMARY KEY
 </#foreach>
 );
 <#else>
-<if index.type=1>
+<#if index.type==1>
 ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD UNIQUE
 <#elseif index.type=2 || index.type=3>
 CREATE <#if index.type==2>UNIQUE </#if>INDEX <#if entity.schema??>${entity.schema}</#if>${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
