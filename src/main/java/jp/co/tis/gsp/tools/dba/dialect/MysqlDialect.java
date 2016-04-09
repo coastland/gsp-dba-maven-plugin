@@ -88,7 +88,9 @@ public class MysqlDialect extends Dialect {
 					"mysqldump",
 					schema,
 					"-u", user,
-					"--password="+password);
+					"--password="+password,
+					"--default-character-set=utf8",
+					"--hex-blob");
 			Process process = pb.start();
 			in = new BufferedInputStream(process.getInputStream());
 
