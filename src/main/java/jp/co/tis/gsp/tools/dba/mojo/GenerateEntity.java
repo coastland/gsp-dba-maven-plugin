@@ -205,7 +205,7 @@ public class GenerateEntity extends AbstractDbaMojo {
         try {
             urlList.add(diconDir.toURI().toURL());
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("URL(" + diconDir + ") がオカシイんじゃないの?", e);
+            throw new IllegalArgumentException("URL(" + diconDir + ") が誤っている可能性があります。", e);
         }
 
         final ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
