@@ -89,23 +89,24 @@ public class ProcessUtil {
                 stdin.write(buf, 0, res);
             }
             stdin.flush();
+            
+        	stdin.close();
+        	process.waitFor();
+        	
+            br = new BufferedReader(new InputStreamReader(stdout));
+			String line;
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+		    }
+            
         } catch(IOException e) {
             throw e;
         } finally {
             IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(br);
             
             if(process != null){
-            	stdin.close();
-            	process.waitFor();
-            	
-                br = new BufferedReader(new InputStreamReader(stdout));
-    			String line;
-    			while ((line = br.readLine()) != null) {
-    				System.out.println(line);
-    		    }
-    			br.close();
     			stdout.close();
-    			
             	process.destroy();
             }
         }
