@@ -185,7 +185,7 @@ public class PostgresqlDialect extends Dialect {
                     "--username", user,
                     getDatabase()
             );
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("スキーマインポート実行中にエラー", e);
         }
     }

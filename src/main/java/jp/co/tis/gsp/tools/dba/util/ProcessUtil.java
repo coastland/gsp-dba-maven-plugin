@@ -58,12 +58,18 @@ public class ProcessUtil {
 
 	}
 
-	public static void execWithInput(File dumpFile, String... args) throws IOException {
+	public static void execWithInput(File dumpFile, String... args) throws IOException, InterruptedException {
         execWithInput(dumpFile, null, args);
 	}
 
-    public static void execWithInput(File dumpFile, Map<String, String> environment, String... args) throws IOException {
+    public static void execWithInput(File dumpFile, Map<String, String> environment, String... args) throws IOException, InterruptedException {
         FileInputStream in=null;
+        
+        Process process = null;
+        OutputStream stdin = null;
+        InputStream stdout = null;
+        BufferedReader br = null;
+        
         try {
             in = FileInputStreamUtil.create(dumpFile);
             ProcessBuilder pb = new ProcessBuilder(args);
@@ -72,20 +78,37 @@ public class ProcessUtil {
                 pb.environment().putAll(environment);
             }
             log.info(StringUtils.join(args, ' ')+"を実行します");
-            Process process = pb.start();
-            OutputStream stdin = process.getOutputStream();
-            InputStream stdout = process.getInputStream();
-            stdout.close();
+            process = pb.start();
+            stdin = process.getOutputStream();
+            stdout = process.getInputStream();
+            
             byte[] buf = new byte[8192];
             while(true) {
                 int res = in.read(buf);
                 if (res <= 0) break;
                 stdin.write(buf, 0, res);
             }
+            stdin.flush();
+            
+        	stdin.close();
+        	process.waitFor();
+        	
+            br = new BufferedReader(new InputStreamReader(stdout));
+			String line;
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+		    }
+            
         } catch(IOException e) {
             throw e;
         } finally {
             IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(br);
+            
+            if(process != null){
+    			stdout.close();
+            	process.destroy();
+            }
         }
 
     }

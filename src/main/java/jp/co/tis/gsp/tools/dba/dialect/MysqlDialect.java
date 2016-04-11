@@ -254,7 +254,7 @@ public class MysqlDialect extends Dialect {
 					"--password="+ password,
 					schema
 					);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new MojoExecutionException("スキーマインポート実行中にエラー", e);
 		}
 
