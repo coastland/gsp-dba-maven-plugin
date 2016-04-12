@@ -165,13 +165,13 @@ public class MysqlDialect extends Dialect {
     	  while (rs.next()) {
       	      switch (objType) {
 		        case FK:
-  		        	dropSql = "ALTER TABLE " + schema + "." + rs.getString(1) + " DROP FOREIGN KEY " + rs.getString(2);
+  		        	dropSql = "ALTER TABLE " + rs.getString(1) + " DROP FOREIGN KEY " + rs.getString(2);
           		  break;
   		        case TABLE:
-  		        	dropSql = "DROP TABLE "  + schema + "." + rs.getString(1);
+  		        	dropSql = "DROP TABLE "  + rs.getString(1);
     		      break;
   		        case VIEW:
-  		        	dropSql = "DROP VIEW "  + schema + "." + rs.getString(1);
+  		        	dropSql = "DROP VIEW "  + rs.getString(1);
   			      break;
          		default: // シーケンスは未サポート
   			      break;

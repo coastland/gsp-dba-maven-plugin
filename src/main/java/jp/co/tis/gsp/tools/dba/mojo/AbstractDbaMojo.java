@@ -16,15 +16,18 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Map;
-
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 public abstract class AbstractDbaMojo extends AbstractMojo {
     /**
@@ -130,10 +133,22 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
         if(schema == null){
             if (url.split(":")[1].equals("h2")) {
                 schema = "PUBLIC";
-            } else {
+            } else if(url.split(":")[1].equals("mysql")) {
+            	try {
+            		//データベース名をスキーマ名としてセット
+					Connection conn = DriverManager.getConnection(url, adminUser, adminPassword);
+					schema = dialect.normalizeSchemaName(conn.getCatalog());
+				} catch (SQLException e) {
+					throw new MojoExecutionException("MySQL:データベース名の取得に失敗しました。", e);
+				}
+            }else {
                 schema = user;
             }
         }else{
+        	if(url.split(":")[1].equals("mysql")) {
+        		throw new MojoExecutionException("MySQLではスキーマを指定することは出来ません。");
+        	}
+        	
         	schema = dialect.normalizeSchemaName(schema);
         }
         
