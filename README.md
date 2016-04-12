@@ -74,7 +74,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
 | user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。PostgreSQLの場合は常に小文字に変換して処理されます。|
 | password       | ×     | userに設定したユーザのパスワード。                             |
-| schema         | ×     | データベースのスキーマ名。<br />H2Databaseの場合は指定不可、常にPUBLICスキーマとして解釈します。 MySQLの場合は指定不可、jdbcのURLよりスキーマ名を自動設定します。 それ以外のDBでスキーマを指定しない場合はユーザ名と同じスキーマ名を使用すると解釈されます。 PostgreSQLの場合は常に小文字に、H2、DB2、Oracleの場合は常に大文字に変換して処理されます。|
+| schema         | ×     | データベースのスキーマ名。<br />H2Databaseの場合は指定不可、常にPUBLICスキーマとして解釈します。<br /> MySQLの場合は指定不可、jdbcのURLのデータベース名をスキーマ名として設定します。<br /> 例）jdbc:mysql://localhost:3306/gspdb → gspdbをスキーマ名として内部で使用します。<br /> それ以外のDBでスキーマを指定しない場合はユーザ名と同じスキーマ名を使用すると解釈されます。 PostgreSQLの場合は常に小文字に、H2、DB2、Oracleの場合は常に大文字に変換して処理されます。|
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
 |optionalDialects | ×    | 使用するダイアレクトクラスのFQCN。|
 |onError | ×    | generate-ddlとload-dataで使用。SQL実行中にエラーが発生した場合の挙動を指定。<br />`abort`(デフォルト)・・・処理を中断する。<br />`continue` ・・・処理を継続する。|
