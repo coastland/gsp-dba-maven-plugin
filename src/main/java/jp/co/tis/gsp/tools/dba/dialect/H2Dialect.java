@@ -4,7 +4,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -12,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
@@ -45,6 +43,10 @@ public class H2Dialect extends Dialect {
         }
     }
 
+    /**
+     * GSPではPUBLICスキーマしか対応していないのでスキーマの生成は不要。
+     * 
+     */
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
@@ -54,13 +56,6 @@ public class H2Dialect extends Dialect {
         try {
         	conn = DriverManager.getConnection(url, adminUser, adminPassword);
         	
-        	// 指定スキーマが存在しない場合は作成
-			if(!existsSchema(conn, normalizeSchemaName(schema))) {
-				createSchema(schema, user, password, adminUser, adminPassword);
-		        // スキーマ生成
-				return;
-			}
-
 			// スキーマ内のテーブル、ビュー、シーケンス削除
 			String nmzschema = normalizeSchemaName(schema);
 			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE CONSTRAINT_SCHEMA='" + nmzschema + "'";
@@ -82,20 +77,6 @@ public class H2Dialect extends Dialect {
             ConnectionUtil.close(conn);
         }
     }
-    
-    private boolean existsSchema(Connection conn, String schema) throws SQLException {
-        PreparedStatement pstmt = null;
-        
-        try{
-          pstmt = conn.prepareStatement("SELECT COUNT(SCHEMA_NAME) AS num FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?");
-          pstmt.setString(1, StringUtils.upperCase(schema));
-          ResultSet rs = pstmt.executeQuery();
-          rs.next();
-          return (rs.getInt("num") > 0);
-        }finally{
-       	  StatementUtil.close(pstmt);
-        }
-    }   
     
     @Override
     public String normalizeUserName(String userName) {
@@ -162,22 +143,6 @@ public class H2Dialect extends Dialect {
         	StatementUtil.close(pstmt);
             ConnectionUtil.close(conn);
         }
-    }
-
-    private void createSchema(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-        Statement stmt = null;
-        Connection conn = null;
-        
-		try {
-			conn = DriverManager.getConnection(url, admin, adminPassword);
-			stmt = conn.createStatement();
-			stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
-		} catch (SQLException e) {
-			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
-		} finally {
-			StatementUtil.close(stmt);
-			ConnectionUtil.close(conn);
-		}
     }
 
     @Override
