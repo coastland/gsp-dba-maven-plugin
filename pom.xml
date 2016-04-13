@@ -211,6 +211,12 @@
             <!--<version>11.2.0.2.0</version>-->
             <!--<scope>test</scope>-->
         <!--</dependency>-->
+        
+        <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <version>1.5</version>
+        </dependency>        
 
     </dependencies>
 
