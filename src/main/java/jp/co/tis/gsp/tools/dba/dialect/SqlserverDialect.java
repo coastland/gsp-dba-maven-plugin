@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.db.EntityDependencyParser;
@@ -103,9 +103,22 @@ public class SqlserverDialect extends Dialect {
             if (!existsSchema(conn, schema)) {
             	stmt.execute("CREATE SCHEMA " + schema);
             	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
+                
+            	if (!StringUtils.equalsIgnoreCase(schema, "dbo")
+               		 && !StringUtils.equalsIgnoreCase(schema, "sys")
+               		 && !StringUtils.equalsIgnoreCase(schema, "INFORMATION_SCHEMA")) {
+               	      stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
+                }
+            	
                 return;
             }else{
             	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
+            	
+                if (!StringUtils.equalsIgnoreCase(schema, "dbo")
+               		 && !StringUtils.equalsIgnoreCase(schema, "sys")
+               		 && !StringUtils.equalsIgnoreCase(schema, "INFORMATION_SCHEMA")) {
+             	      stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
+               }
             }
             
             // 依存関係を考慮し削除するテーブルをソートする
@@ -158,7 +171,7 @@ public class SqlserverDialect extends Dialect {
             stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
             stmt.execute("CREATE USER " + user + " FOR LOGIN " + user);
             stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
-
+            
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
