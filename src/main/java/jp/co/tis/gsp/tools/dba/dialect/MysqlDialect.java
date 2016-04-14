@@ -198,6 +198,8 @@ public class MysqlDialect extends Dialect {
 				return;
 			}
 			stmt.execute("CREATE USER '"+ user + "' IDENTIFIED BY '"+ password +"'");
+			String db = normalizeSchemaName(conn.getCatalog());
+			stmt.execute("GRANT ALL ON " + db + ".* TO '" + user + "'");
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
