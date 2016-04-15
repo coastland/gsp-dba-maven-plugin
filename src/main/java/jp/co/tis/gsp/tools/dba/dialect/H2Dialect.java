@@ -67,9 +67,6 @@ public class H2Dialect extends Dialect {
 			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
 	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
 			
-			dropListSql = "SELECT SEQUENCE_NAME FROM INFORMATION_SCHEMA.SEQUENCES WHERE IS_GENERATED=FALSE AND SEQUENCE_SCHEMA='" + nmzschema + "'";
-	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);
-            
         } catch (SQLException e) {
             throw new MojoExecutionException("DROP ALL実行中にエラー", e);
         } finally {

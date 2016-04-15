@@ -141,9 +141,6 @@ public class PostgresqlDialect extends Dialect {
 			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='" + nmzschema + "'";
 	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
 			
-			dropListSql = "SELECT RELNAME FROM PG_STATIO_ALL_SEQUENCES WHERE SCHEMANAME='" + nmzschema + "'";
-	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);            
-            
         } catch (SQLException e) {
             throw new MojoExecutionException("データ削除中にエラー", e);
         } finally {
