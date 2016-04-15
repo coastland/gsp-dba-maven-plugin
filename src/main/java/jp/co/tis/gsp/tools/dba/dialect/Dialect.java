@@ -89,10 +89,6 @@ public abstract class Dialect {
     protected String url;
     protected String driver;
 
-    public String getUrl() {
-        return this.url;
-    }
-    
     public void setUrl(String url) {
         this.url = url;
     }

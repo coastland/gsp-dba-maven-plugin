@@ -34,30 +34,6 @@ import org.seasar.framework.util.FileInputStreamUtil;
 public class ProcessUtil {
 	private static final Log log = new SystemStreamLog();
 
-	public static void exec(String... args) throws IOException{
-		BufferedReader in = null;
-		try {
-			ProcessBuilder pb = new ProcessBuilder(args);
-			Process process = pb.start();
-			in = new BufferedReader(
-		            new InputStreamReader(process.getInputStream()));
-			char[] cbuf = new char[512];
-			while(true) {
-				int res = in.read(cbuf);
-				if (res <= 0) break;
-				System.out.print(cbuf);
-			}
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			IOUtils.closeQuietly(in);
-		}
-	}
-
-	public static void execWithOutput(File dumpFile, String... args) throws IOException {
-
-	}
-
 	public static void execWithInput(File dumpFile, String... args) throws IOException, InterruptedException {
         execWithInput(dumpFile, null, args);
 	}

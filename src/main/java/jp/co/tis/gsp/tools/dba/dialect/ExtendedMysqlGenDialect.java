@@ -45,11 +45,6 @@ public class ExtendedMysqlGenDialect extends MysqlGenDialect {
         private static ExtendedMysqlColumnType TIMESTAMP = new ExtendedMysqlColumnType("timestamp",
                 Timestamp.class, false, TemporalType.TIMESTAMP);
        
-        
-        public ExtendedMysqlColumnType(String dataType, Class<?> attributeClass) {
-            super(dataType, attributeClass);
-        }
-
         public ExtendedMysqlColumnType(String dataType, Class<?> attributeClass,
                 boolean lob, TemporalType temporalType) {
             super(dataType, attributeClass, lob);
