@@ -267,28 +267,6 @@ public class MysqlDialect extends Dialect {
 		return new TypeMapper(typeToNameMap);
 	}
 
-	@Override
-	public List<AlternativeGenerator> getAlternativeGenerators() {
-		List<AlternativeGenerator> generators = CollectionsUtil.newArrayList(10);
-		generators.add(new AlternativeGenerator() {
-			@Override public String getName() { return "sequence"; }
-			@Override public void generate(List<Map<String, String>> objectDef, AbstractDbObjectParser context) {
-				if (CollectionUtils.isEmpty(objectDef))
-					return;
-
-				try {
-					FileUtils.write(new File(context.getOutputDirectory(), "01_CREATE_SEQUENCES.sql"),
-							"create TABLE sequences("
-							+ "name varchar(255) primary key,"
-							+ "seq BIGINT default 1);");
-				} catch (IOException e) {
-					throw new IORuntimeException(e);
-				}
-			}
-		});
-		return generators;
-	}
-
     /**
      * ビュー定義を検索するSQLを返却する。
      * @return ビュー定義を検索するSQL文
