@@ -49,6 +49,10 @@ import org.seasar.framework.util.tiger.CollectionsUtil;
 import com.csvreader.CsvReader;
 
 /**
+ * load-data.
+ * 
+ * CSV形式で定義したデータをデータベースに登録する。
+ * 
  * @author kawasima
  */
 @Mojo(name = "load-data")

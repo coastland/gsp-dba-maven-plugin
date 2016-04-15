@@ -34,6 +34,10 @@ import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 /**
+ * export-schema.
+ * 
+ * データベーススキーマをダンプする。
+ * 
  * @author kawasima
  */
 @Mojo(name = "export-schema", requiresProject = true)

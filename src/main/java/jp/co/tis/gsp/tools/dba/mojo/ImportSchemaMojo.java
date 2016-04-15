@@ -42,7 +42,10 @@ import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 /**
- *
+ * import-schema.
+ * 
+ * リポジトリから取得したダンプファイルをインポートする。
+ * 
  * @author kawasima
  */
 @Mojo(name = "import-schema", requiresProject = true)

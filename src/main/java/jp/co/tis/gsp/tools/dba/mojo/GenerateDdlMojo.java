@@ -30,7 +30,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Generate DDL.
+ * generate-ddl.
+ *
+ * データモデルを解析し、DDLを生成する。
  *
  * @author kawasima
  */
