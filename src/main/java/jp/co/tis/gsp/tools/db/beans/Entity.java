@@ -158,8 +158,8 @@ public class Entity {
 					foreignKey.setReferenceEntity(parentEntity);
 					foreignKeyMap.put(relation.getId(), foreignKey);
 				}
-				foreignKey.getColumnList().add(column);
-				foreignKey.getReferenceColumnList().add(parentEntity.getColumn(fkColumn.getColumnId()));
+				foreignKey.addColumn(column);
+				foreignKey.addReferenceColumn(parentEntity.getColumn(fkColumn.getColumnId()));
 			}
 		}
 
