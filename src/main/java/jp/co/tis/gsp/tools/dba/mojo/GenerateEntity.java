@@ -51,6 +51,10 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
+ * generate-entity.
+ * 
+ * 指定したスキーマを解析し、Entityクラスを生成する。
+ * 
  * @author kawasima
  */
 @Mojo(name = "generate-entity")

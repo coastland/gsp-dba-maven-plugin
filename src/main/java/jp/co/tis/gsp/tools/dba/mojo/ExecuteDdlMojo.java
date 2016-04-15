@@ -47,7 +47,10 @@ import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 /**
- *
+ * execute-ddl.
+ * 
+ * DDLを実行する。
+ * 
  * @author kawasima
  */
 @Mojo(name = "execute-ddl")
