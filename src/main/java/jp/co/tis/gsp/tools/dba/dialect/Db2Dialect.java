@@ -30,7 +30,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
@@ -106,9 +105,6 @@ public class Db2Dialect extends Dialect {
 			dropListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('T') AND TABSCHEMA='" + nmzschema + "'";
 	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
 			
-			dropListSql = "SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE OWNERTYPE='U' AND ORIGIN='U' AND SEQSCHEMA='" + nmzschema + "'";
-	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.SEQUENCE);
-            
         } catch (SQLException e) {
             throw new MojoExecutionException("データ削除中にエラー", e);
         } finally {
