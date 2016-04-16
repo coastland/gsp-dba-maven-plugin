@@ -179,9 +179,6 @@ public class Db2Dialect extends Dialect {
 			grantListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('T') AND TABSCHEMA='" + nmzschema + "'";
 			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
 			
-			grantListSql = "SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE OWNERTYPE='U' AND ORIGIN='U' AND SEQSCHEMA='" + nmzschema + "'";
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.SEQUENCE);
-        
         } catch (SQLException e) {
             throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
         } finally {
@@ -208,9 +205,6 @@ public class Db2Dialect extends Dialect {
   		        case VIEW: // ビュー
   		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO USER " + user;
   			      break;
-  		        case SEQUENCE: // シーケンス
-  		        	grantSql = "GRANT ALTER ON SEQUENCE "  + schema + "." + rs.getString(1) + " TO USER " + user;
-          		  break;
          		default:
           		  break;
   		      }
