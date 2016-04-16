@@ -222,7 +222,6 @@ public class PostgresqlDialect extends Dialect {
         	stmt = conn.createStatement();
         	stmt.execute("GRANT ALL ON SCHEMA " + schema + " TO " + user); // スキーマ自体への権限
         	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user); // テーブルとビュー
-        	stmt.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user); // シーケンス
         
         } catch (SQLException e) {
             throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
