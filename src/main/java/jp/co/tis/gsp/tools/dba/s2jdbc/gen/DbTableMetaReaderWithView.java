@@ -199,7 +199,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	        	}
 	        }
             ResultSet rs = metaData.getImportedKeys(tableMeta.getCatalogName(),
-                    tableMeta.getSchemaName(), tableMeta.getName());
+                    tableMeta.getSchemaName(), tableName);
             try {
                 while (rs.next()) {
                     String name = rs.getString("FK_NAME");
@@ -224,7 +224,10 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
                 ResultSetUtil.close(rs);
             }
             if (viewAnalyzer != null && !map.isEmpty()) {
-            	for (DbForeignKeyMeta fkMeta : map.values()) {
+            	
+            	Map<String, DbForeignKeyMeta> tmpMap = new ArrayMap(map);
+            	
+            	for (DbForeignKeyMeta fkMeta : tmpMap.values()) {
             		boolean fkContains = true;
             		for (String fkColumn : fkMeta.getForeignKeyColumnNameList()) {
             			fkContains &= viewAnalyzer.getColumnNames().contains(fkColumn.toUpperCase());
@@ -233,7 +236,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             			map.remove(fkMeta.getName());
             	}
             }
-
+            
             DbForeignKeyMeta[] array = map.values().toArray(
                     new DbForeignKeyMeta[map.size()]);
             return Arrays.asList(array);
