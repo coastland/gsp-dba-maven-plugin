@@ -90,7 +90,9 @@ public class MysqlDialect extends Dialect {
 					"-u", user,
 					"--password="+password,
 					"--default-character-set=utf8",
-					"--hex-blob");
+					"--hex-blob",
+					"-R"
+					);
 			Process process = pb.start();
 			in = new BufferedInputStream(process.getInputStream());
 

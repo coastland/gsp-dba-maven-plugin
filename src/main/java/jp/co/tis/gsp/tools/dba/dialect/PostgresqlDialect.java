@@ -81,6 +81,7 @@ public class PostgresqlDialect extends Dialect {
                     "--port=" + getPort(),
                     "--username=" + user,
                     "--schema=" + schema,
+                    "-c",
                     getDatabase()
                     );
             pb.redirectErrorStream(true);
