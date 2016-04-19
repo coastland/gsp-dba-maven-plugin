@@ -34,7 +34,7 @@ public class H2Dialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement();
-            stmt.execute("SCRIPT TO '" + dumpFile.getAbsolutePath()+ "'");
+            stmt.execute("SCRIPT DROP TO '" + dumpFile.getAbsolutePath()+ "'");
             StatementUtil.close(stmt);
         } catch (SQLException e) {
             throw new MojoExecutionException("Schema export実行中にエラー", e);

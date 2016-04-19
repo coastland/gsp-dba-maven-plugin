@@ -142,17 +142,8 @@ public class OracleDialect extends Dialect {
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
             
-            // Oracleの場合はユーザのドロップと生成を行う。
-            Connection conn = null;
-            Statement stmt = null;
-            try {
-                conn = DriverManager.getConnection(url, user, password);
-                stmt = conn.createStatement();
-                stmt.execute("DROP USER " + schema + " CASCADE");
-            }finally{
-            	stmt.close();
-            	conn.close();
-            }
+            // Oracleの場合はオブジェクトのドロップをする
+            dropAllObjects(user, password, schema);
             
 			ProcessBuilder pb = new ProcessBuilder(
 					"impdp",
@@ -366,4 +357,54 @@ public class OracleDialect extends Dialect {
         return USABLE_TYPE_NAMES.contains(type) 
             || type.startsWith("TIMESTAMP"); // oracleのtimestamp型名はTIMESTAMP(0)～TIMESTAMP(9)となるため
     }
+    
+    /**
+     * 指定されたスキーマ内のオブジェクトを全て削除します.
+     * 
+     * @param adminUser
+     * @param adminPassword
+     * @param schema
+     * @throws MojoExecutionException
+     */
+	private void dropAllObjects(String adminUser,
+	    String adminPassword, String schema) throws MojoExecutionException {
+		Connection conn = null;
+		PreparedStatement stmtMeta = null;
+		Statement stmt = null;
+		try {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			stmtMeta = conn.prepareStatement("SELECT DISTINCT OBJECT_TYPE FROM ALL_OBJECTS WHERE OWNER = ?");
+			stmtMeta.setString(1, schema);
+			ResultSet rsMeta = stmtMeta.executeQuery();
+			ArrayList<String> tmpObjList = new ArrayList<String>(); 
+			while(rsMeta.next()) {
+				tmpObjList.add(rsMeta.getString(1));
+			}
+			String dropObjectTypes = "'" + org.apache.commons.lang.StringUtils.join(tmpObjList, "','") + "'";
+			stmtMeta.close();
+			rsMeta.close();
+			
+			
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ("+ dropObjectTypes +") and owner = ?");
+			stmtMeta.setString(1, schema);
+			
+			rsMeta = stmtMeta.executeQuery();
+			while(rsMeta.next()) {
+				String objectType = rsMeta.getString("OBJECT_TYPE");
+				String objectName = rsMeta.getString("OBJECT_NAME");
+				if (!objectName.startsWith("BIN$")) {
+					dropObject(conn, objectType, schema + "." + objectName);
+				}
+			}
+			stmt = conn.createStatement();
+			stmt.execute("PURGE RECYCLEBIN");
+		} catch (SQLException e) {
+			throw new MojoExecutionException("データ削除中にエラー", e);
+		} finally {
+			StatementUtil.close(stmtMeta);
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
+	}
 }
