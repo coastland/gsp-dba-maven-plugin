@@ -109,9 +109,6 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 			throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
 		}
 
-		// DBユーザにスキーマオブジェクトの権限を付与する
-        dialect.grantAllToUser(schema, user, password, adminUser, adminPassword);
-
         // コネクション解放
         ConnectionUtil.close(conn);
 	}
@@ -157,7 +154,7 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 
     private void executeBySqlFiles(File...sqlFiles) throws SQLException, IOException, MojoExecutionException {
         if (conn == null || conn.isClosed()) {
-            setConnection();
+        	conn = DriverManager.getConnection(url, user, password);
         }
 
         successfulStatements = 0;
@@ -181,17 +178,4 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
                 + " SQL statements executed successfully");
     }
 
-    /**
-     * ユーザ名とスキーマ名に応じて適切なコネクションを設定する。
-     * データベースがOracleでかつユーザ名とスキーマ名が異なる時、
-     * DDLの実行に管理者ユーザでのログインが必要なため。
-     * @throws SQLException SQLエラー
-     */
-    private void setConnection() throws SQLException {
-        if (schema.equals(user)) {
-            conn = DriverManager.getConnection(url, user, password);
-        } else {
-            conn = DriverManager.getConnection(url, adminUser, adminPassword);
-        }
-    }
 }

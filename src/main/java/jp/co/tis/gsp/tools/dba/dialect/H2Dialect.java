@@ -118,31 +118,6 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-    	
-    	try{
-    		conn = DriverManager.getConnection(url, admin, adminPassword);
-
-			String nmzschema = normalizeSchemaName(schema);
-			
-			String grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
-			
-			grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
-        
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(pstmt);
-            ConnectionUtil.close(conn);
-        }
-    }
-
-    @Override
     public TypeMapper getTypeMapper() {
         return new TypeMapper();
     }

@@ -194,9 +194,7 @@ public class OracleDialect extends Dialect {
 			}
 
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " + 
-	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
-	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
+			String grantSql = "GRANT UNLIMITED TABLESPACE, EXP_FULL_DATABASE, IMP_FULL_DATABASE TO " + user;
 			stmt.execute(grantSql);
             System.err.println("GRANT文を実行しました:\n" + grantSql);
 
@@ -206,56 +204,6 @@ public class OracleDialect extends Dialect {
 			StatementUtil.close(stmt);
 			ConnectionUtil.close(conn);
 		}
-	}
-
-	@Override
-	public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try{
-        	conn = DriverManager.getConnection(url, admin, adminPassword);
-			PreparedStatement stmt = conn.prepareStatement("SELECT OBJECT_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW', 'SEQUENCE') AND OWNER = ?");
-			stmt.setString(1, schema);
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				String tableName = rs.getString("OBJECT_NAME");
-				// PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-				String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
-				conn.createStatement().execute(sql);
-			}
-		
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(pstmt);
-            ConnectionUtil.close(conn);
-        }
-	}
-
-	private void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
-		
-		Statement createUserStmt = null;
-		Connection conn = null;
-		
-		try{
-			conn = DriverManager.getConnection(url, admin, adminPassword);
-			createUserStmt= conn.createStatement();
-			createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
-			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
-					"CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
-					"CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
-			createUserStmt.execute(grantSql);
-			System.out.println("GRANT文を実行しました:\n" + grantSql);
-		
-		} catch (SQLException e) {
-			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
-		} finally {
-			StatementUtil.close(createUserStmt);
-			ConnectionUtil.close(conn);
-		}
-
 	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
@@ -279,8 +227,9 @@ public class OracleDialect extends Dialect {
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
 			// 指定スキーマがいなければ作成する。
+			// Oracleの場合はユーザ＝スキーマなのでcreateUserで作成。
 			if(!existsUser(conn, schema)) {
-				createSchema(schema, user, password, adminUser, adminPassword);
+				createUser(schema, password, adminUser, adminPassword);
 				return;
 			}
 		} catch (SQLException e) {

@@ -19,7 +19,6 @@ package jp.co.tis.gsp.tools.dba.dialect;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +29,6 @@ import java.util.List;
 
 import javax.persistence.GenerationType;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.framework.util.DriverManagerUtil;
@@ -40,7 +38,6 @@ import org.seasar.framework.util.StringUtil;
 
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect.OBJECT_TYPE;
 
 public abstract class Dialect {
 	
@@ -97,19 +94,6 @@ public abstract class Dialect {
 		DriverManagerUtil.registerDriver(driver);
 		this.driver = driver;
 	}
-	
-    /**
-     * ユーザ名とスキーマ名が不一致の場合、別名のスキーマに対して
-     * アプリユーザが操作を行えるよう権限を付与する。
-     * デフォルトでは何もしない。
-     * @param conn DBコネクション
-     * @param schema スキーマ名
-     * @param user ユーザ名
-     * @throws MojoExecutionException エラー
-     */
-    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-        // nop
-    }
 
 	public abstract TypeMapper getTypeMapper();
 	
