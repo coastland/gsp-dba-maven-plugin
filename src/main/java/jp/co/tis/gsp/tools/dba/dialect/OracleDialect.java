@@ -141,6 +141,19 @@ public class OracleDialect extends Dialect {
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
+            
+            // Oracleの場合はユーザのドロップと生成を行う。
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                conn = DriverManager.getConnection(url, user, password);
+                stmt = conn.createStatement();
+                stmt.execute("DROP USER " + schema + " CASCADE");
+            }finally{
+            	stmt.close();
+            	conn.close();
+            }
+            
 			ProcessBuilder pb = new ProcessBuilder(
 					"impdp",
 					user + "/" + password,
