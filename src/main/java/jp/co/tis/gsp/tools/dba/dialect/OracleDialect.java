@@ -236,31 +236,18 @@ public class OracleDialect extends Dialect {
 				createUser(schema, password, adminUser, adminPassword);
 				return;
 			}
-		} catch (SQLException e) {
-			throw new MojoExecutionException("データ削除中にエラー", e);
-		}
-
-		PreparedStatement stmtMeta = null;
-		Statement stmt = null;
-		try {
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE') and owner = ?");
-			stmtMeta.setString(1, schema);
 			
-			ResultSet rsMeta = stmtMeta.executeQuery();
-			while(rsMeta.next()) {
-				String objectType = rsMeta.getString("OBJECT_TYPE");
-				String objectName = rsMeta.getString("OBJECT_NAME");
-				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, schema + "." + objectName);
-				}
-			}
-			stmt = conn.createStatement();
-			stmt.execute("PURGE RECYCLEBIN");
+			// テーブル、ビュー、シーケンスのみ削除
+			ArrayList<String> dropObjectTypeList = new ArrayList<String>();
+			dropObjectTypeList.add("TABLE");
+			dropObjectTypeList.add("VIEW");
+			dropObjectTypeList.add("SEQUENCE");
+			
+			dropObjectSpecifiedTypes(schema, adminUser, adminPassword, dropObjectTypeList);
+			
 		} catch (SQLException e) {
 			throw new MojoExecutionException("データ削除中にエラー", e);
-		} finally {
-			StatementUtil.close(stmtMeta);
-			StatementUtil.close(stmt);
+		} finally{
 			ConnectionUtil.close(conn);
 		}
 	}
@@ -359,7 +346,52 @@ public class OracleDialect extends Dialect {
     }
     
     /**
-     * 指定されたスキーマ内のオブジェクトを全て削除します.
+     * 指定スキーマ内で指定したタイプのオブジェクトを全削除します。
+     * 
+     * @param user
+     * @param password
+     * @param adminUser
+     * @param adminPassword
+     * @param schema
+     * @param objectTypeList
+     * @throws MojoExecutionException
+     */
+    private void dropObjectSpecifiedTypes(String schema, String adminUser, String adminPassword, 
+    		 List<String> objectTypeList) throws MojoExecutionException {
+    	
+		PreparedStatement stmtMeta = null;
+		Statement stmt = null;
+		
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			String dropObjectTypes = "'" + org.apache.commons.lang.StringUtils.join(objectTypeList, "','") + "'";
+			
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in (" + dropObjectTypes + ") and owner = ?");
+			stmtMeta.setString(1, schema);
+			
+			ResultSet rsMeta = stmtMeta.executeQuery();
+			while(rsMeta.next()) {
+				String objectType = rsMeta.getString("OBJECT_TYPE");
+				String objectName = rsMeta.getString("OBJECT_NAME");
+				if (!objectName.startsWith("BIN$")) {
+					dropObject(conn, objectType, schema + "." + objectName);
+				}
+			}
+			stmt = conn.createStatement();
+			stmt.execute("PURGE RECYCLEBIN");
+		} catch (SQLException e) {
+			throw new MojoExecutionException("Drop Object実行中にエラー", e);
+		} finally {
+			StatementUtil.close(stmtMeta);
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
+    }
+    
+    /**
+     * 指定スキーマ内のオブジェクトを全て削除します.
      * 
      * @param adminUser
      * @param adminPassword
@@ -381,24 +413,11 @@ public class OracleDialect extends Dialect {
 			while(rsMeta.next()) {
 				tmpObjList.add(rsMeta.getString(1));
 			}
-			String dropObjectTypes = "'" + org.apache.commons.lang.StringUtils.join(tmpObjList, "','") + "'";
 			stmtMeta.close();
 			rsMeta.close();
 			
+			dropObjectSpecifiedTypes(schema, adminUser, adminPassword, tmpObjList);
 			
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ("+ dropObjectTypes +") and owner = ?");
-			stmtMeta.setString(1, schema);
-			
-			rsMeta = stmtMeta.executeQuery();
-			while(rsMeta.next()) {
-				String objectType = rsMeta.getString("OBJECT_TYPE");
-				String objectName = rsMeta.getString("OBJECT_NAME");
-				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, schema + "." + objectName);
-				}
-			}
-			stmt = conn.createStatement();
-			stmt.execute("PURGE RECYCLEBIN");
 		} catch (SQLException e) {
 			throw new MojoExecutionException("データ削除中にエラー", e);
 		} finally {
