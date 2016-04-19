@@ -198,7 +198,7 @@ public class OracleDialect extends Dialect {
 			}
 
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-			String grantSql = "GRANT UNLIMITED TABLESPACE, EXP_FULL_DATABASE, IMP_FULL_DATABASE TO " + user;
+			String grantSql = "GRANT UNLIMITED TABLESPACE, DATAPUMP_EXP_FULL_DATABASE, DATAPUMP_IMP_FULL_DATABASE TO " + user;
 			stmt.execute(grantSql);
             System.err.println("GRANT文を実行しました:\n" + grantSql);
 
