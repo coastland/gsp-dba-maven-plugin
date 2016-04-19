@@ -141,6 +141,10 @@ public class OracleDialect extends Dialect {
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
+            
+            // Oracleの場合はオブジェクトのドロップをする
+            dropAllObjects(user, password, schema);
+            
 			ProcessBuilder pb = new ProcessBuilder(
 					"impdp",
 					user + "/" + password,
@@ -194,9 +198,7 @@ public class OracleDialect extends Dialect {
 			}
 
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " + 
-	                   "CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " + 
-	                   "CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
+			String grantSql = "GRANT UNLIMITED TABLESPACE, DATAPUMP_EXP_FULL_DATABASE, DATAPUMP_IMP_FULL_DATABASE TO " + user;
 			stmt.execute(grantSql);
             System.err.println("GRANT文を実行しました:\n" + grantSql);
 
@@ -206,56 +208,6 @@ public class OracleDialect extends Dialect {
 			StatementUtil.close(stmt);
 			ConnectionUtil.close(conn);
 		}
-	}
-
-	@Override
-	public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try{
-        	conn = DriverManager.getConnection(url, admin, adminPassword);
-			PreparedStatement stmt = conn.prepareStatement("SELECT OBJECT_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW', 'SEQUENCE') AND OWNER = ?");
-			stmt.setString(1, schema);
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				String tableName = rs.getString("OBJECT_NAME");
-				// PreparedStatementで埋め込めるのはキーワードだけであり、スキーマ名やテーブル名には使用できないため。
-				String sql = "GRANT ALL ON " + schema + "." + tableName + " TO " + user;
-				conn.createStatement().execute(sql);
-			}
-		
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(pstmt);
-            ConnectionUtil.close(conn);
-        }
-	}
-
-	private void createSchema(String schema, String user, String password, String admin, String adminPassword)  throws MojoExecutionException {
-		
-		Statement createUserStmt = null;
-		Connection conn = null;
-		
-		try{
-			conn = DriverManager.getConnection(url, admin, adminPassword);
-			createUserStmt= conn.createStatement();
-			createUserStmt.execute("CREATE USER "+ schema + " IDENTIFIED BY "+ schema + " DEFAULT TABLESPACE users");
-			String grantSql = "GRANT CREATE SESSION, UNLIMITED TABLESPACE, CREATE CLUSTER, CREATE INDEXTYPE, CREATE OPERATOR, " +
-					"CREATE PROCEDURE, CREATE SEQUENCE, CREATE TABLE, CREATE TRIGGER, CREATE TYPE, SELECT ANY TABLE, " +
-					"CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + schema;
-			createUserStmt.execute(grantSql);
-			System.out.println("GRANT文を実行しました:\n" + grantSql);
-		
-		} catch (SQLException e) {
-			throw new MojoExecutionException("CREATE SCHEMA実行中にエラー", e);
-		} finally {
-			StatementUtil.close(createUserStmt);
-			ConnectionUtil.close(conn);
-		}
-
 	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
@@ -279,35 +231,23 @@ public class OracleDialect extends Dialect {
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
 			// 指定スキーマがいなければ作成する。
+			// Oracleの場合はユーザ＝スキーマなのでcreateUserで作成。
 			if(!existsUser(conn, schema)) {
-				createSchema(schema, user, password, adminUser, adminPassword);
+				createUser(schema, password, adminUser, adminPassword);
 				return;
 			}
-		} catch (SQLException e) {
-			throw new MojoExecutionException("データ削除中にエラー", e);
-		}
-
-		PreparedStatement stmtMeta = null;
-		Statement stmt = null;
-		try {
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE') and owner = ?");
-			stmtMeta.setString(1, schema);
 			
-			ResultSet rsMeta = stmtMeta.executeQuery();
-			while(rsMeta.next()) {
-				String objectType = rsMeta.getString("OBJECT_TYPE");
-				String objectName = rsMeta.getString("OBJECT_NAME");
-				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, schema + "." + objectName);
-				}
-			}
-			stmt = conn.createStatement();
-			stmt.execute("PURGE RECYCLEBIN");
+			// テーブル、ビュー、シーケンスのみ削除
+			ArrayList<String> dropObjectTypeList = new ArrayList<String>();
+			dropObjectTypeList.add("TABLE");
+			dropObjectTypeList.add("VIEW");
+			dropObjectTypeList.add("SEQUENCE");
+			
+			dropObjectSpecifiedTypes(schema, adminUser, adminPassword, dropObjectTypeList);
+			
 		} catch (SQLException e) {
 			throw new MojoExecutionException("データ削除中にエラー", e);
-		} finally {
-			StatementUtil.close(stmtMeta);
-			StatementUtil.close(stmt);
+		} finally{
 			ConnectionUtil.close(conn);
 		}
 	}
@@ -404,4 +344,86 @@ public class OracleDialect extends Dialect {
         return USABLE_TYPE_NAMES.contains(type) 
             || type.startsWith("TIMESTAMP"); // oracleのtimestamp型名はTIMESTAMP(0)～TIMESTAMP(9)となるため
     }
+    
+    /**
+     * 指定スキーマ内で指定したタイプのオブジェクトを全削除します。
+     * 
+     * @param user
+     * @param password
+     * @param adminUser
+     * @param adminPassword
+     * @param schema
+     * @param objectTypeList
+     * @throws MojoExecutionException
+     */
+    private void dropObjectSpecifiedTypes(String schema, String adminUser, String adminPassword, 
+    		 List<String> objectTypeList) throws MojoExecutionException {
+    	
+		PreparedStatement stmtMeta = null;
+		Statement stmt = null;
+		
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			String dropObjectTypes = "'" + org.apache.commons.lang.StringUtils.join(objectTypeList, "','") + "'";
+			
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in (" + dropObjectTypes + ") and owner = ?");
+			stmtMeta.setString(1, schema);
+			
+			ResultSet rsMeta = stmtMeta.executeQuery();
+			while(rsMeta.next()) {
+				String objectType = rsMeta.getString("OBJECT_TYPE");
+				String objectName = rsMeta.getString("OBJECT_NAME");
+				if (!objectName.startsWith("BIN$")) {
+					dropObject(conn, objectType, schema + "." + objectName);
+				}
+			}
+			stmt = conn.createStatement();
+			stmt.execute("PURGE RECYCLEBIN");
+		} catch (SQLException e) {
+			throw new MojoExecutionException("Drop Object実行中にエラー", e);
+		} finally {
+			StatementUtil.close(stmtMeta);
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
+    }
+    
+    /**
+     * 指定スキーマ内のオブジェクトを全て削除します.
+     * 
+     * @param adminUser
+     * @param adminPassword
+     * @param schema
+     * @throws MojoExecutionException
+     */
+	private void dropAllObjects(String adminUser,
+	    String adminPassword, String schema) throws MojoExecutionException {
+		Connection conn = null;
+		PreparedStatement stmtMeta = null;
+		Statement stmt = null;
+		try {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			stmtMeta = conn.prepareStatement("SELECT DISTINCT OBJECT_TYPE FROM ALL_OBJECTS WHERE OWNER = ?");
+			stmtMeta.setString(1, schema);
+			ResultSet rsMeta = stmtMeta.executeQuery();
+			ArrayList<String> tmpObjList = new ArrayList<String>(); 
+			while(rsMeta.next()) {
+				tmpObjList.add(rsMeta.getString(1));
+			}
+			stmtMeta.close();
+			rsMeta.close();
+			
+			dropObjectSpecifiedTypes(schema, adminUser, adminPassword, tmpObjList);
+			
+		} catch (SQLException e) {
+			throw new MojoExecutionException("データ削除中にエラー", e);
+		} finally {
+			StatementUtil.close(stmtMeta);
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
+	}
 }

@@ -160,32 +160,6 @@ public class Db2Dialect extends Dialect {
             ConnectionUtil.close(conn);
         }
     }
-
-    @Override
-    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try{
-        	// テーブルとビュー
-        	conn = DriverManager.getConnection(url, admin, adminPassword);
-        	
-			String nmzschema = normalizeSchemaName(schema);
-			
-			String grantListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('V') AND TABSCHEMA='" + nmzschema + "'";
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
-			
-			grantListSql = "SELECT TABNAME FROM SYSCAT.TABLES WHERE OWNERTYPE='U' AND TYPE IN('T') AND TABSCHEMA='" + nmzschema + "'";
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
-			
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(pstmt);
-            ConnectionUtil.close(conn);
-        }
-    }
 	
 	@Override
     protected void grantSchemaObjToUser(Connection conn, String grantListSql, String schema, String user, OBJECT_TYPE objType) throws SQLException {

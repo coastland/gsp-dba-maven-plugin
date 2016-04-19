@@ -34,7 +34,7 @@ public class H2Dialect extends Dialect {
         try {
             conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement();
-            stmt.execute("SCRIPT TO '" + dumpFile.getAbsolutePath()+ "'");
+            stmt.execute("SCRIPT DROP TO '" + dumpFile.getAbsolutePath()+ "'");
             StatementUtil.close(stmt);
         } catch (SQLException e) {
             throw new MojoExecutionException("Schema export実行中にエラー", e);
@@ -113,31 +113,6 @@ public class H2Dialect extends Dialect {
             throw new MojoExecutionException("CREATE USER 実行中にエラー: ", e);
         } finally {
             StatementUtil.close(stmt);
-            ConnectionUtil.close(conn);
-        }
-    }
-
-    @Override
-    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-    	
-    	try{
-    		conn = DriverManager.getConnection(url, admin, adminPassword);
-
-			String nmzschema = normalizeSchemaName(schema);
-			
-			String grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
-			
-			grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
-        
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(pstmt);
             ConnectionUtil.close(conn);
         }
     }

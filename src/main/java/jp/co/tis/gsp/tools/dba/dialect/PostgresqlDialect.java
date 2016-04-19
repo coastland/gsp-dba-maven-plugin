@@ -16,28 +16,32 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect.OBJECT_TYPE;
-import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class PostgresqlDialect extends Dialect {
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -208,27 +212,6 @@ public class PostgresqlDialect extends Dialect {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
             StatementUtil.close(stmt);
-            ConnectionUtil.close(conn);
-        }
-    }
-
-    @Override
-    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
-        Connection conn = null;
-        Statement stmt = null;
-        
-        try{
-        	conn = DriverManager.getConnection(url, admin, adminPassword);
-        	stmt = conn.createStatement();
-        	stmt.execute("GRANT ALL ON SCHEMA " + schema + " TO " + user); // スキーマ自体への権限
-        	stmt.execute("GRANT ALL ON ALL TABLES IN SCHEMA " + schema + " TO " + user); // テーブルとビュー
-        	stmt.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA " + schema + " TO " + user); // シーケンス
-        
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(stmt);
             ConnectionUtil.close(conn);
         }
     }

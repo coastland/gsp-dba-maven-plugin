@@ -239,41 +239,6 @@ public class SqlserverDialect extends Dialect {
         }
     }
 
-    /**
-     * ユーザ名とスキーマ名が不一致の時、そのスキーマ内の全オブジェクトに対して
-     * オブジェクト権限を付与する。
-     * SQL Serverは自分で新規作成したスキーマならスキーマごど権限を任意のユーザに委譲できるが、
-     * dbo(ユーザ新規作成時のデフォルトスキーマ)などの特殊なスキーマだけは
-     * スキーマの権限移譲ができないため、このように対応する必要があった。
-     * @param conn DBコネクション
-     * @param schema スキーマ名
-     * @param user ユーザ名
-     * @throws SQLException SQL実行時のエラー
-     */
-    @Override
-    public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-    	
-        Connection conn = null;
-    	Statement stmt = null;
-    	
-    	try{    	
-	    	conn = DriverManager.getConnection(url, admin, adminPassword);
-	    	stmt = conn.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT NAME FROM SYS.OBJECTS WHERE SCHEMA_ID = SCHEMA_ID('" + schema + "') AND TYPE IN ('U','V')");
-	        StringBuilder sb = new StringBuilder();
-	        Statement grantStmt = conn.createStatement();
-	        while (rs.next()) {
-	            grantStmt.execute("GRANT ALL ON " + schema + "." + rs.getString("NAME") + " TO " + user);
-	        }
-        
-        } catch (SQLException e) {
-            throw new MojoExecutionException("権限付与処理 実行中にエラー: ", e);
-        } finally {
-        	StatementUtil.close(stmt);
-            ConnectionUtil.close(conn);
-        }
-    }
-
     private String getUrlReplaceDatabaseName(String newDatabaseName) {
         String[] properties = url.split(";");
         String newUrl = properties[0];

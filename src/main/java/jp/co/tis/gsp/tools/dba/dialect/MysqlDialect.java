@@ -27,26 +27,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.exception.IORuntimeException;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
-import org.seasar.framework.util.tiger.CollectionsUtil;
 import org.seasar.framework.util.tiger.Maps;
 
-import jp.co.tis.gsp.tools.db.AbstractDbObjectParser;
-import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
@@ -209,30 +201,6 @@ public class MysqlDialect extends Dialect {
 			ConnectionUtil.close(conn);
 		}
 	}
-	
-	@Override
-	public void grantAllToUser(String schema, String user, String password, String admin, String adminPassword) throws MojoExecutionException {
-		Statement stmt = null;
-		Connection conn = null;
-		try {
-			conn = DriverManager.getConnection(url, admin, adminPassword);
-			
-			String nmzschema = schema;
-			
-			String grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'";
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.VIEW);
-			
-			grantListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'";
-			grantSchemaObjToUser(conn, grantListSql, nmzschema, user, OBJECT_TYPE.TABLE);
-			
-		} catch (SQLException e) {
-			throw new MojoExecutionException("スキーマ権限付与実行エラー", e);
-		} finally {
-			StatementUtil.close(stmt);
-			ConnectionUtil.close(conn);
-		}
-		 
- 	}
 
 	private boolean existsUser(Connection conn, String user) throws SQLException {
 		PreparedStatement stmt = null;
