@@ -11,4 +11,3 @@ CREATE <#if index.type=2>UNIQUE </#if>INDEX ${index.name} ON <#if entity.schema?
   ${column.name}<#if column_has_next>,</#if>
 </#foreach>
 );
-</#if>
