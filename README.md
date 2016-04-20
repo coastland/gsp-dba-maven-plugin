@@ -423,8 +423,6 @@ import-schemaはDB2とSQLServerには対応しておりません。
   使用できません。
 * DB2<br />
   使用できません。
-* H2<br />
-  ユーザ名とスキーマ名に **同一の値を設定すると** 失敗します。
 
 #### import-schema
 
