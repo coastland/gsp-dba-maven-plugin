@@ -16,11 +16,18 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.persistence.TemporalType;
 
+import org.seasar.extension.jdbc.gen.dialect.GenDialect.ColumnType;
 import org.seasar.extension.jdbc.gen.internal.dialect.Db2GenDialect;
+import org.seasar.extension.jdbc.gen.internal.dialect.OracleGenDialect.OracleColumnType;
+import org.seasar.framework.util.StringUtil;
+
+import jp.co.tis.gsp.tools.dba.dialect.ExtendedOracleGenDialect.ExtendedOracleColumnType;
 
 /**
  * @author Naoki Yamamoto
@@ -31,6 +38,20 @@ public class ExtendedDb2GenDialect extends Db2GenDialect {
         super();
         columnTypeMap.put("date", ExtendedDb2ColumnType.DATE);
         columnTypeMap.put("timestamp", ExtendedDb2ColumnType.TIMESTAMP);
+        
+        columnTypeMap.put("decimal", new Db2ColumnType(
+                "decimal($p,$s)", BigDecimal.class) {
+            @Override
+            public Class<?> getAttributeClass(int length, int precision,
+                                              int scale) {
+                
+            	if (scale == 0 && precision == 1) {
+                    return boolean.class;
+                }
+                
+                return BigDecimal.class;
+            }
+        });
     }
 
     public static class ExtendedDb2ColumnType extends Db2ColumnType {
