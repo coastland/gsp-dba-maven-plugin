@@ -1,3 +1,5 @@
+<#-- 引数で指定されたカラムが、関連モデルに含まれるかどうかを判定するファンクション -->
+<#-- @JoinColumnと@JoinColumnsに指定したカラム名が存在するかどうかで判定する。 -->
 <#function isForeignKey attr associationModelList>
   <#list associationModelList as asso>
     <#if asso.joinColumnModel?? && asso.joinColumnModel.name == attr.columnName>
