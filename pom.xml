@@ -463,6 +463,7 @@
                                 <goal>gsp-dba:generate-ddl</goal>
                                 <goal>gsp-dba:execute-ddl</goal>
                                 <goal>gsp-dba:generate-entity</goal>
+                                <goal>resources:testResources</goal>
                                 <goal>test</goal>
                             </goals>
                             <properties>
