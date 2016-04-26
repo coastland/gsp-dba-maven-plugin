@@ -188,11 +188,14 @@ public class MysqlDialect extends Dialect {
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
 			stmt = conn.createStatement();
+			String db = normalizeSchemaName(conn.getCatalog());
+
 			if(existsUser(conn, user)) {
+				// 既にユーザが存在している場合でも必要な権限を付与しておく。
+			    stmt.execute("GRANT ALL ON " + db + ".* TO '" + user + "'");
 				return;
 			}
 			stmt.execute("CREATE USER '"+ user + "' IDENTIFIED BY '"+ password +"'");
-			String db = normalizeSchemaName(conn.getCatalog());
 			stmt.execute("GRANT ALL ON " + db + ".* TO '" + user + "'");
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
