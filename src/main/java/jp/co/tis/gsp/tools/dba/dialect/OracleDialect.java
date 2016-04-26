@@ -194,6 +194,10 @@ public class OracleDialect extends Dialect {
 			stmt = conn.createStatement();
 			
 			if(existsUser(conn, user)) {
+				// 既にユーザが存在している場合でも必要な権限を付与しておく。
+  			    String grantSql = "GRANT UNLIMITED TABLESPACE, DATAPUMP_EXP_FULL_DATABASE, DATAPUMP_IMP_FULL_DATABASE TO " + user;
+			    stmt.execute(grantSql);
+                System.err.println("GRANT文を実行しました:\n" + grantSql);
 				return;
 			}
 
