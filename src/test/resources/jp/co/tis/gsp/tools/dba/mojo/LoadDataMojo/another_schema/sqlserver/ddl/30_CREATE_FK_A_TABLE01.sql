@@ -1,0 +1,7 @@
+ALTER TABLE gspanother.A_TABLE
+ADD 
+FOREIGN KEY (
+  B_ID
+) REFERENCES gspanother.B_TABLE (
+  B_ID
+)

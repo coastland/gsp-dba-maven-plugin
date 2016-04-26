@@ -16,6 +16,7 @@
         <seasarVersion>2.4.46</seasarVersion>
         <mavenVersion>3.0.5</mavenVersion>
         <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
+        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
     </properties>
 
     <prerequisites>
@@ -66,6 +67,27 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>-Dfile.encoding=UTF-8</argLine>
+                            <excludes>
+                                <exclude>jp.co.tis.gsp.tools.dba.mojo.*</exclude>
+                                <exclude>jp.co.tis.gsp.test.util.*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -98,18 +120,34 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>2.0</version>
+            <version>${mavenVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
             <version>2.4.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>plexus-container-default</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-tools-annotations</artifactId>
             <version>${mavenPluginPluginVersion}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>maven-project</artifactId>
+                    <groupId>org.apache.maven</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>plexus-container-default</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -216,7 +254,93 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
             <version>1.5</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>maven-project</artifactId>
+                    <groupId>org.apache.maven</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>        
+        
+        
+        <!-- Test -->
+        <dependency>
+            <groupId>org.apache.maven.plugin-testing</groupId>
+            <artifactId>maven-plugin-testing-harness</artifactId>
+            <version>2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-plexus-shim</artifactId>
+            <version>2.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-invoker</artifactId>
+            <version>2.0.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.aether</groupId>
+            <artifactId>aether-connector-file</artifactId>
+            <version>1.13.1</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+        <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1208.jre6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+            <scope>test</scope>
+        </dependency>
+        
+<!--
+        <dependency>
+            <groupId>com.ibm</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>9.7.200.358</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+-->
+
 
     </dependencies>
 
@@ -274,6 +398,192 @@
                     <optional>true</optional>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>all_test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.19.1</version>
+                        <executions>
+                            <execution>
+                                <id>default-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration combine.self="override">
+                                    <argLine>-Dfile.encoding=UTF-8 ${jacocoArgs}</argLine>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.7.6.201602180812</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${jacoco.ut.execution.data.file}</destFile>
+                                    <propertyName>jacocoArgs</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${jacoco.ut.execution.data.file}</dataFile>
+                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <version>2.0.0</version>
+                        <configuration>
+                            <pom>src/it/simple-jpa-test/pom.xml</pom>
+                            <addTestClassPath>true</addTestClassPath>
+                            <invokerPropertiesFile>invoker.properties</invokerPropertiesFile>
+                            <settingsFile>src/test/resources/settings.xml</settingsFile>
+                            <postBuildHookScript>verify</postBuildHookScript>
+                            <goals>
+                                <goal>clean</goal>
+                                <goal>gsp-dba:generate-ddl</goal>
+                                <goal>gsp-dba:execute-ddl</goal>
+                                <goal>gsp-dba:generate-entity</goal>
+                                <goal>test</goal>
+                            </goals>
+                            <properties>
+                              <gsp.version>${project.version}</gsp.version>
+                            </properties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>gsp-install</id>
+                                <goals>
+                                    <goal>install</goal>
+                                </goals>
+                           </execution>
+                           <execution>
+                               <id>db2</id>
+                               <goals>
+                                   <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <profiles>
+                                       <profile>db2</profile>
+                                   </profiles>
+                               </configuration>
+                           </execution>
+                           <execution>
+                               <id>h2</id>
+                               <goals>
+                                   <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <profiles>
+                                       <profile>h2</profile>
+                                   </profiles>
+                               </configuration>
+                           </execution>
+                           <execution>
+                               <id>mysql</id>
+                               <goals>
+                                   <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <profiles>
+                                       <profile>mysql</profile>
+                                   </profiles>
+                               </configuration>
+                           </execution>
+                           <execution>
+                               <id>oracle</id>
+                               <goals>
+                                   <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <profiles>
+                                       <profile>oracle</profile>
+                                   </profiles>
+                               </configuration>
+                           </execution>
+                           <execution>
+                               <id>postgresql</id>
+                               <goals>
+                                   <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <profiles>
+                                       <profile>postgresql</profile>
+                                   </profiles>
+                               </configuration>
+                           </execution>
+                           <execution>
+                               <id>sqlserver</id>
+                               <goals>
+                                   <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <profiles>
+                                       <profile>sqlserver</profile>
+                                   </profiles>
+                               </configuration>
+                           </execution>
+                       </executions>
+                   </plugin>
+                </plugins>
+            </build>
+            
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-report-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>report-only</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <inherited>true</inherited>
+                                <reports>
+                                    <report>report</report>
+                                </reports>
+                                <configuration>
+                                    <excludes>
+                                        <exclude>**/HelpMojo.class</exclude>
+                                        <exclude>**/GenerateService.class</exclude>
+                                        <exclude>**/SolrGenDialect.class</exclude>
+                                        <exclude>**/ViewAnalyzer.class</exclude>
+                                    </excludes>
+                                    <dataFile>${jacoco.ut.execution.data.file}</dataFile>
+                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                                </configuration>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
     </profiles>
 </project>
