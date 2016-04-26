@@ -99,6 +99,15 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<filters>
+			<filter>../../test/resources/jdbc_test.properties</filter>
+		</filters>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
