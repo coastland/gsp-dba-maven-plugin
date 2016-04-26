@@ -44,6 +44,12 @@ public class GspAttributeDescFactoryImpl extends AttributeDescFactoryImpl {
 
         // PrimaryKeyでも外部キーになっているものは、ID生成しないので対象から外す。
         if (attributeDesc.getGenerationType() != null) {
+        
+        	// JPA仕様を考慮し、GSPで生成されるシーケンスの増分値１と合わせる
+            if(attributeDesc.getGenerationType().equals(GenerationType.SEQUENCE)){
+            	attributeDesc.setAllocationSize(1);
+            }
+        	
             for (DbForeignKeyMeta foreignKeyMeta : tableMeta.getForeignKeyMetaList()) {
                 if (foreignKeyMeta.getForeignKeyColumnNameList().contains(columnMeta.getName())) {
                     attributeDesc.setGenerationType(null);

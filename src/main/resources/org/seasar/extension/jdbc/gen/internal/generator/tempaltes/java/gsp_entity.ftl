@@ -20,8 +20,8 @@
     @Id
     <#if attr.generationType??>
       <#if attr.generationType == "SEQUENCE">
-    @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "generator", sequenceName = "${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
+    @GeneratedValue(generator = "${attr.columnName}_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "${attr.columnName}_SEQ", sequenceName = "${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
       <#else>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
       </#if>
