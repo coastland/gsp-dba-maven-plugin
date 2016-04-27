@@ -14,7 +14,9 @@ gsp-dba-maven-pluginは、DBAのルーチンワークを自動化し、本来の
 > * ER図からDDLを生成するには、モデリングツールとして[SI Object Browser ER](http://www.sint.co.jp/siob/er/)を使用する必要があります。
 > それ以外のツールを使用する場合、DDL生成機能は使用できません。
 
-> * gsp-dba-maven-pluginは開発フェーズで用いることを想定しています。本番環境での使用は推奨しません。
+> * gsp-dba-maven-pluginは開発フェーズで用いることを想定しています。開発者のローカルDBを主ターゲットとしたツールです。  
+本番環境での使用は推奨しません。  
+ 
 
 想定されるデータモデリングは以下の資料を参考にしています。
 * [イミュータブル データモデル (入門編)](http://www.slideshare.net/kawasima/ss-40471672)  
