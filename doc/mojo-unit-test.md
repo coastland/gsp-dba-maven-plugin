@@ -17,7 +17,7 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
 * integration-testで生成されたエンティティを使って簡単なJPA(Eclpselink)での検証をします。
 
 ## SetUp
-1. [jdbc_test.properties](src/test/resources/jdbc_test.properties)とDB接続の変更。
+1. [jdbc_test.properties](../src/test/resources/jdbc_test.properties)とDB接続の変更。
     * この接続情報を使ってテストを実行するので、jdbc_test.propertiesを修正するかDBのほうを変更して合わせる。
     * 一般ユーザはいなくてもよい。ただDB2はDBユーザをOSユーザとして用意しておく必要があるので用意しておくこと。
 
@@ -29,7 +29,7 @@ mvn -P all_test clean integration-test site
 
 ## TestCase Level 1
 
-1. [テストリソース](src/test/resources/jp/co/tis/gsp/tools/dba/mojo)を眺める。
+1. [テストリソース](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo)を眺める。
     * Mojo毎にフォルダがある。
     * そのMojoの中にテストケース毎のフォルダがある。
     * さらにそのテストケースフォルダの中にDB名フォルダがある。
@@ -80,17 +80,17 @@ mvn -P all_test clean integration-test site
 ## TestCase Level 2
 
 * あるDBだけで実行したい。
-    * [mojoTest.properties](src/test/resources/jp/co/tis/gsp/tools/dba/mojo/mojoTest.properties)で指定。
+    * [mojoTest.properties](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/mojoTest.properties)で指定。
 ```
 testDB=db2
 ```
 * pom.xmlによるパラメータ指定の詳細
-    * [親pom](src/test/resources/jp/co/tis/gsp/tools/dba/mojo/testParentPom.xml)にDB接続パラメータなどを定義している。
-    * さらに[settings.xml](src/test/resources/settings.xml)でプロファイルを定義して、これを利用している。
+    * [親pom](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/testParentPom.xml)にDB接続パラメータなどを定義している。
+    * さらに[settings.xml](../src/test/resources/settings.xml)でプロファイルを定義して、これを利用している。
     * 解決の流れ
-        * [jdbc_test.properties](src/test/resources/jdbc_test.properties)  
-            * [settings.xml](src/test/resources/settings.xml)  
-                * [testParentPom.xml](src/test/resources/jp/co/tis/gsp/tools/dba/mojo/testParentPom.xml)  
-                    * 各テストケースのpom.xml。[例えば](src/test/resources/jp/co/tis/gsp/tools/dba/mojo/ExecuteDdlMojo/type/db2/pom.xml)
+        * [jdbc_test.properties](../src/test/resources/jdbc_test.properties)  
+            * [settings.xml](../src/test/resources/settings.xml)  
+                * [testParentPom.xml](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/testParentPom.xml)  
+                    * 各テストケースのpom.xml。[例えば](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/ExecuteDdlMojo/type/db2/pom.xml)
     
     
