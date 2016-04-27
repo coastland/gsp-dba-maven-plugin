@@ -38,8 +38,8 @@ public class TestTbl1 implements Serializable {
      * @return TEST_TBL1_ID
      */
     @Id
-    @GeneratedValue(generator = "TEST_TBL1_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "TEST_TBL1_ID_SEQ", sequenceName = "TEST_TBL1_ID_SEQ", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(generator = "GSPANOTHER.TEST_TBL1_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "GSPANOTHER.TEST_TBL1_ID_SEQ", sequenceName = "GSPANOTHER.TEST_TBL1_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "TEST_TBL1_ID", nullable = false, unique = true)
     public BigDecimal getTestTbl1Id() {
         return testTbl1Id;
