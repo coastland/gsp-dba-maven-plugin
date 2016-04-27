@@ -36,8 +36,8 @@ public class IndexTest1 implements Serializable {
      * @return INDEX_TEST1_ID
      */
     @Id
-    @GeneratedValue(generator = "INDEX_TEST1_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "INDEX_TEST1_ID_SEQ", sequenceName = "INDEX_TEST1_ID_SEQ", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(generator = "GSPANOTHER.INDEX_TEST1_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "GSPANOTHER.INDEX_TEST1_ID_SEQ", sequenceName = "GSPANOTHER.INDEX_TEST1_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "INDEX_TEST1_ID", precision = 18, nullable = false, unique = true)
     public Long getIndexTest1Id() {
         return indexTest1Id;
