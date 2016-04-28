@@ -135,3 +135,11 @@ testDB=db2
 
 * Mojoテストクラスを、Eclipse上でJunit実行するとすぐに`AssertionError`っぽいエラーが出て落ちることがある。
     * *プロジェクトのフルクリア・フルビルド*をすれば直ります。
+
+## JPA簡易検証
+
+* `integration-test`フェーズで実施。メインフォルダは[it](../src/it)フォルダ。
+* `maven-invoker-plugin`プラグインを使用。
+* [simple-jpa-test](../src/it/simple-jpa-test)プロジェクトを各DBごとで使い回して実行。
+    * 上記プロジェクトの[各DBのedmファイル](../src/it/simple-jpa-test/src/main/resources)をインプットにして、generate-ddl、execute-dd、generate-entityを実行。
+    * [テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31)を実行。
