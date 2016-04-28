@@ -31,9 +31,9 @@ mvn -P all_test clean integration-test site
 
 1. [テストリソース](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo)を眺める。
     * Mojo毎にフォルダがある。
-    * そのMojoの中にテストケース毎のフォルダがある。
-    * さらにそのテストケースフォルダの中にDB名フォルダがある。
-    * さらにさらにDB名フォルダの中に、pom.xmlがある。
+    * Mojoの中にテストケース毎のフォルダがある。
+    * テストケースフォルダの中にDB名フォルダがある。
+    * DB名フォルダの中に、pom.xmlがある。
     * pom.xmlにはそのゴールで必要となるパラメータが指定されている。
 2. [テストクラスとメソッド](https://github.com/coastland/gsp-dba-maven-plugin/blob/feature-10745/src/test/java/jp/co/tis/gsp/tools/dba/mojo/GenerateDdlMojoTest.java#L33)を眺める。
     * `@TestDBPattern(testCase=..., testDb=...)`でどのテストケース、どのDBでテストをするか制御している。<br />
