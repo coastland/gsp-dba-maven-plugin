@@ -14,18 +14,55 @@ gsp-dba-maven-pluginで用意しているユニットテストについて説明
 mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..)
 ```
 * `mvn clean install`ではテストは実行されないようにしています。
-* integration-testで生成されたエンティティを使って簡単なJPA(Eclpselink)での検証をします。
+* JPA簡易検証。
+    * integration-testで生成されたエンティティを使って簡単なJPA(Eclpselink)での検証をします。
 
 ## SetUp
 1. [jdbc_test.properties](../src/test/resources/jdbc_test.properties)とDB接続の変更。
     * この接続情報を使ってテストを実行するので、jdbc_test.propertiesを修正するかDBのほうを変更して合わせる。
     * 一般ユーザはいなくてもよい。ただDB2はDBユーザをOSユーザとして用意しておく必要があるので用意しておくこと。
+1. [](../pom.xml)のサードパーティのJDBCドライバの依存関係の定義
+    * Oracle、DB2、SQLServerのJDBCドライバはMavenセントラルにいません。  
+      JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義して下さい。
+
+
+        * ローカルインストールの例（バージョンとかよしなに変更して下さい）
+    
+        ```shell
+        mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.2.0 -Dpackaging=jar
+        mvn install:install-file -Dfile=db2jcc4.jar -DgroupId=com.ibm -DartifactId=db2jcc4 -Dversion=9.7.200.358 -Dpackaging=jar
+        mvn install:install-file -Dfile=sqljdbc4.jar -DgroupId=com.microsoft -DartifactId=sqljdbc4 -Dversion=4.0 -Dpackaging=jar
+        ```
+        
+        * pom.xmlに追加する依存関係定義の例
+        
+        ```xml
+        <dependency>
+            <groupId>com.ibm</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>9.7.200.358</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+        ```
 
 ## Usage
 ```
 mvn -P all_test clean integration-test site
 ```
-多分30分くらいかかる。
+多分30分くらいかかる。  
+Mojoのテスト、簡易JPAテストが実行されます。
 
 ## TestCase Level 1
 
@@ -94,3 +131,7 @@ testDB=db2
                     * 各テストケースのpom.xml。[例えば](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/ExecuteDdlMojo/type/db2/pom.xml)
     
     
+## Troubleshoot
+
+* Mojoテストクラスを、Eclipse上でJunit実行するとすぐに`AssertionError`っぽいエラーが出て落ちることがある。
+    * プロジェクトのフルクリア・フルビルドをすれば直ります。
