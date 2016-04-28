@@ -14,7 +14,7 @@ gsp-dba-maven-pluginで用意しているユニットテストについて説明
 mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..)
 ```
 * `mvn clean install`ではテストは実行されないようにしています。
-* [JPA簡易検証](#user-content-jpa簡易検証)
+* [JPA簡易検証](#jpa簡易検証)
     * integration-testで生成されたエンティティを使って簡単なJPA(Eclpselink)での検証をします。
 
 ## SetUp
