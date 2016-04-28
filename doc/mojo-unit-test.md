@@ -21,7 +21,7 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
 1. [jdbc_test.properties](../src/test/resources/jdbc_test.properties)とDB接続の変更。
     * この接続情報を使ってテストを実行するので、jdbc_test.propertiesを修正するかDBのほうを変更して合わせる。
     * 一般ユーザはいなくてもよい。ただDB2はDBユーザをOSユーザとして用意しておく必要があるので用意しておくこと。
-1. [](../pom.xml)のサードパーティのJDBCドライバの依存関係の定義
+1. [pom.xml](../pom.xml)にサードパーティ製JDBCドライバの依存関係定義
     * Oracle、DB2、SQLServerのJDBCドライバはMavenセントラルにいません。  
       JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義して下さい。
 
