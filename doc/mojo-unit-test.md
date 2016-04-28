@@ -118,7 +118,7 @@ Mojoのテスト、簡易JPAテストが実行されます。
 
 * あるDBだけで実行したい。
     * [mojoTest.properties](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/mojoTest.properties)で指定。
-```shell:mojoTest.properties
+```shell
 testDB=db2
 ```
 * pom.xmlによるパラメータ指定の詳細
