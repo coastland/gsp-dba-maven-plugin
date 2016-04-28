@@ -36,7 +36,7 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
         
         * pom.xmlに追加する依存関係定義の例
         
-        ```xml
+        ```xml:pom.xml
         <dependency>
             <groupId>com.ibm</groupId>
             <artifactId>db2jcc4</artifactId>
@@ -118,7 +118,7 @@ Mojoのテスト、簡易JPAテストが実行されます。
 
 * あるDBだけで実行したい。
     * [mojoTest.properties](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/mojoTest.properties)で指定。
-```
+```shell:mojoTest.properties
 testDB=db2
 ```
 * pom.xmlによるパラメータ指定の詳細
