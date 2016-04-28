@@ -79,7 +79,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | password       | ×     | userに設定したユーザのパスワード。                             |
 | schema         | ×     | データベースのスキーマ名。<br />H2Databaseの場合は指定不可、常にPUBLICスキーマとして解釈します。<br /> MySQLの場合は指定不可、jdbcのURLのデータベース名をスキーマ名として設定します。<br /> 例）jdbc:mysql://localhost:3306/gspdb → gspdbをスキーマ名として内部で使用します。<br /> それ以外のDBでスキーマを指定しない場合はユーザ名と同じスキーマ名を使用すると解釈されます。 PostgreSQLの場合は常に小文字に、H2、DB2、Oracleの場合は常に大文字に変換して処理されます。|
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
-|optionalDialects | ×    | 使用する[ダイアレクトクラス](#Dialectについて)のFQCN。|
+|optionalDialects | ×    | 使用する[ダイアレクトクラス](#lnk_dialect)のFQCN。|
 |onError | ×    | generate-ddlとload-dataで使用。SQL実行中にエラーが発生した場合の挙動を指定。<br />`abort`(デフォルト)・・・処理を中断する。<br />`continue` ・・・処理を継続する。|
 
  * optionalDialectsの指定方法  
@@ -93,7 +93,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 </configuration>
 ```
 
- * Dialectについて
+ * <a name ="lnk_dialect"> Dialectについて
     * Dialectとは各DBの仕様・振る舞いに応じた処理を定義しているクラスで、DB毎に存在します。
     * [jp.co.tis.gsp.tools.dba.dialect](src/main/java/jp/co/tis/gsp/tools/dba/dialect)パッケージで管理しています。
     * デフォルトではgspがJDBCのURLを元に、対応するDBのDialectクラス(gspで用意)を使って処理を実行します。<br />gspで用意しているDialectクラスで不都合がある場合は、上記のoptionalDialectsパラメータとカスタマイズしたDialectクラスを用意することで挙動を変更することが出来ます。
