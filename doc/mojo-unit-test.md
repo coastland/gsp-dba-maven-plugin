@@ -139,8 +139,8 @@ testDB=db2
 ## JPA簡易検証
 
 * `integration-test`フェーズで実施。メインフォルダは[it](../src/it)フォルダ。
+* * `maven-invoker-plugin`プラグインを使用。
 * DB接続情報はMojoテストクラスで利用した[jdbc_test.properties](../src/test/resources/jdbc_test.properties)を使用。
-* `maven-invoker-plugin`プラグインを使用。
 * [simple-jpa-test](../src/it/simple-jpa-test)プロジェクトを各DBごとで使い回して実行。
     1. 上記プロジェクトの[各DBのedmファイル](../src/it/simple-jpa-test/src/main/resources)をインプットにして、generate-ddl、execute-ddl、generate-entityを実行。
     1. [テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31)を実行。
