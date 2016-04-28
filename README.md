@@ -96,7 +96,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
  * <a name ="lnk_dialect"> Dialectについて
     * Dialectとは各DBの仕様を考慮し、適切な振る舞いを定義したクラスで、DB毎に存在します。
     * [jp.co.tis.gsp.tools.dba.dialect](src/main/java/jp/co/tis/gsp/tools/dba/dialect)パッケージで管理しています。
-    * デフォルトではgspがJDBCのURLを元に、対応するDBのDialectクラス(gspで用意)を決定します。<br />gspで用意しているDialectクラスで不都合がある場合は、上記のoptionalDialectsパラメータとカスタマイズしたDialectクラスを用意することで挙動を変更することが出来ます。
+    * デフォルトではgsp-dba-maven-pluginがJDBCのURLを元に、対応するDBのDialectクラス(gspで用意)を決定します。<br />gsp-dba-maven-pluginで用意しているDialectクラスで不都合がある場合は、上記のoptionalDialectsパラメータとカスタマイズしたDialectクラスを用意することで挙動を変更することが出来ます。
 
 ### generate-ddl
 
