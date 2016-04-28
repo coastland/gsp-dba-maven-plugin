@@ -1,4 +1,4 @@
-GSP ユニットテスト
+gsp-dba-maven-plugin テスト
 ========
 
 ## Overview
