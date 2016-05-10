@@ -190,7 +190,7 @@ public class PostgresqlDialect extends Dialect {
                     "-f", dumpFile.getAbsolutePath(),
                     getDatabase()};
             
-            ProcessUtil.execWithInput(environment, args);
+            ProcessUtil.exec(environment, args);
             
         } catch (Exception e) {
             throw new MojoExecutionException("スキーマインポート実行中にエラー", e);

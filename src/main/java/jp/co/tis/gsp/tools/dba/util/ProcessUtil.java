@@ -29,11 +29,11 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 public class ProcessUtil {
 	private static final Log log = new SystemStreamLog();
 
-	public static void execWithInput(String... args) throws IOException, InterruptedException {
-        execWithInput(null, args);
+	public static void exec(String... args) throws IOException, InterruptedException {
+        exec(null, args);
 	}
 
-    public static void execWithInput(Map<String, String> environment, String... args) throws IOException, InterruptedException {
+    public static void exec(Map<String, String> environment, String... args) throws IOException, InterruptedException {
         
         Process process = null;
         InputStream stdout = null;

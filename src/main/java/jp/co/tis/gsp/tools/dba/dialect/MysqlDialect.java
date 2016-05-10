@@ -234,7 +234,7 @@ public class MysqlDialect extends Dialect {
 					"-e", "\"source " + dumpFile.getAbsolutePath().replaceAll("\\\\", "/") + "\""
 			};
             
-            ProcessUtil.execWithInput(args);
+            ProcessUtil.exec(args);
 
 		} catch (Exception e) {
 			throw new MojoExecutionException("スキーマインポート実行中にエラー", e);
