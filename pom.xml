@@ -17,6 +17,7 @@
         <mavenVersion>3.0.5</mavenVersion>
         <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
         <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+        <builtByUser>${user.name}</builtByUser>
     </properties>
 
     <prerequisites>
@@ -39,7 +40,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Built-By>${project.artifactId}</Built-By>
+                            <Built-By>${builtByUser}</Built-By>
                         </manifestEntries>
                     </archive>
                 </configuration>
