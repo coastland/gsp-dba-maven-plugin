@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -44,6 +43,7 @@ import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class PostgresqlDialect extends Dialect {
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -181,10 +181,6 @@ public class PostgresqlDialect extends Dialect {
             environment.put("PGPASSWORD", password);
         }
         
-        Process process = null;
-        InputStream stdout = null;
-        BufferedReader br = null;
-        
         try {
             String[] args = new String[]{
                     "psql",
@@ -194,29 +190,10 @@ public class PostgresqlDialect extends Dialect {
                     "-f", dumpFile.getAbsolutePath(),
                     getDatabase()};
             
-            ProcessBuilder pb = new ProcessBuilder(args);
-            pb.redirectErrorStream(true);
-            if (environment != null) {
-                pb.environment().putAll(environment);
-            }
-            
-            process = pb.start();
-            stdout = process.getInputStream();
-            br = new BufferedReader(new InputStreamReader(stdout));
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
+            ProcessUtil.exec(environment, args);
             
         } catch (Exception e) {
             throw new MojoExecutionException("スキーマインポート実行中にエラー", e);
-        } finally {
-            IOUtils.closeQuietly(br);
-            IOUtils.closeQuietly(stdout);
-            
-            if(process != null){
-            	process.destroy();
-            }
         }
     }
 
