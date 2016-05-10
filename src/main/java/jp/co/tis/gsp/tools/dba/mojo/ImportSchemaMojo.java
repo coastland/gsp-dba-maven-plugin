@@ -42,7 +42,10 @@ import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 /**
- *
+ * import-schema.
+ * 
+ * リポジトリから取得したダンプファイルをインポートする。
+ * 
  * @author kawasima
  */
 @Mojo(name = "import-schema", requiresProject = true)
@@ -70,9 +73,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
     @Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-		Dialect dialect = DialectFactory.getDialect(url);
-		dialect.dropAll(user, password, adminUser, adminPassword, schema);
+		Dialect dialect = DialectFactory.getDialect(url, driver);
 		dialect.createUser(user, password, adminUser, adminPassword);
+		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 
         Artifact artifact = repositorySystem.createArtifact(groupId, artifactId, version, "jar");
         ArtifactResolutionRequest schemaArtifactRequest = new ArtifactResolutionRequest()
@@ -103,7 +106,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
         }
 
 		getLog().info("スキーマのインポートを開始します。:" + importFile);
-		dialect.importSchema(user, password, schema, importFile);
+		dialect.importSchema(adminUser, adminPassword, schema, importFile);
 		getLog().info("スキーマのインポートを終了しました");
 	}
 

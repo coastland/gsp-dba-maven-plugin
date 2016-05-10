@@ -1,12 +1,29 @@
+<#-- 引数で指定されたカラムが、関連モデルに含まれるかどうかを判定するファンクション -->
+<#-- @JoinColumnと@JoinColumnsに指定したカラム名が存在するかどうかで判定する。 -->
+<#function isForeignKey attr associationModelList>
+  <#list associationModelList as asso>
+    <#if asso.joinColumnModel?? && asso.joinColumnModel.name == attr.columnName>
+      <#return true>
+    </#if>
+    <#if asso.joinColumnsModel??>
+      <#list asso.joinColumnsModel.joinColumnModelList as joinColumn>
+        <#if joinColumn.name == attr.columnName>
+          <#return true>
+        </#if>
+      </#list>
+    </#if>
+  </#list>
+  <#return false>
+</#function>
 <#macro printAttrAnnotations tableName attr>
   <#if attr.id>
     @Id
     <#if attr.generationType??>
-    @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
       <#if attr.generationType == "SEQUENCE">
-    @SequenceGenerator(name = "generator", sequenceName = "${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
-      <#elseif attr.generationType == "TABLE">
-    @TableGenerator(name = "generator", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
+    @GeneratedValue(generator = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", sequenceName = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
+      <#else>
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
       </#if>
     </#if>
   </#if>
@@ -16,15 +33,10 @@
   <#if attr.temporalType??>
     @Temporal(TemporalType.${attr.temporalType})
   </#if>
-  <#if attr.transient>
-    @Transient
-  </#if>
   <#if attr.version>
     @Version
   </#if>
-  <#if !attr.transient>
-    @Column(<#if attr.columnName??>name = "${attr.columnName}", </#if><#if attr.columnDefinition??>columnDefinition = "${attr.columnDefinition}", <#else><#if attr.length??>length = ${attr.length}, </#if><#if attr.precision??>precision = ${attr.precision}, </#if><#if attr.scale??>scale = ${attr.scale}, </#if></#if>nullable = ${attr.nullable?string}, unique = ${attr.unique?string})
-  </#if>
+    @Column(<#if attr.columnName??>name = "${attr.columnName}", </#if><#if attr.columnDefinition??>columnDefinition = "${attr.columnDefinition}", <#else><#if attr.length??>length = ${attr.length}, </#if><#if attr.precision??>precision = ${attr.precision}, </#if><#if attr.scale??>scale = ${attr.scale}, </#if></#if>nullable = ${attr.nullable?string}, unique = ${attr.unique?string}<#if isForeignKey(attr, associationModelList)>, insertable = false, updatable = false</#if>)
 </#macro>
 <#macro printAssoAnnotations asso>
     @${asso.associationType.annotation.simpleName}<#if asso.mappedBy??>(mappedBy = "${asso.mappedBy}")</#if>

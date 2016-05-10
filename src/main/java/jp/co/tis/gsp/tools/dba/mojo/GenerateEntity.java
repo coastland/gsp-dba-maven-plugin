@@ -51,6 +51,10 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
+ * generate-entity.
+ * 
+ * 指定したスキーマを解析し、Entityクラスを生成する。
+ * 
  * @author kawasima
  */
 @Mojo(name = "generate-entity")
@@ -134,8 +138,10 @@ public class GenerateEntity extends AbstractDbaMojo {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("driver", driver);
         param.put("url", url);
-        param.put("user", user);
-        param.put("password", password);
+        param.put("user", adminUser);
+        /* NULLがfreemarkerに渡るとInvalidReferenceExceptionになるが、
+           Mojoのparameterは空要素をNULLと認識するため、ここで空文字に変換する */
+        param.put("password", (adminPassword == null) ? "" : adminPassword);
         param.put("rootPackage", rootPackage);
 
         String[] urlTokens = StringUtils.split(url, ':');
@@ -178,10 +184,10 @@ public class GenerateEntity extends AbstractDbaMojo {
      * エンティティ生成を実行する。
      */
     private void executeGenerateEntity() {
-        Dialect dialect = DialectFactory.getDialect(url);
+        Dialect dialect = DialectFactory.getDialect(url, driver);
         DialectUtil.setDialect(dialect);
         final GenerateEntityCommand command = new GenerateEntityCommand();
-        command.setSchemaName(dialect.normalizeSchemaName(schema));
+        command.setSchemaName(schema);
         command.setOverwrite(true);
         command.setApplyDbCommentToJava(true);
         command.setEntityPackageName(entityPackageName);
@@ -189,6 +195,9 @@ public class GenerateEntity extends AbstractDbaMojo {
         command.setEntityTemplateFileName(entityTemplate);
         command.setGenDialectClassName(genDialectClassName);
         command.setShowTableName(true);
+        if(!user.equals(schema)){
+            command.setShowSchemaName(true);
+        }
         command.setGenerationType(dialect.getGenerationType());
         command.setFactoryClassName(GspFactoryImpl.class.getName());
         command.setUseAccessor(useAccessor);
@@ -200,7 +209,7 @@ public class GenerateEntity extends AbstractDbaMojo {
         try {
             urlList.add(diconDir.toURI().toURL());
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("URL(" + diconDir + ") がオカシイんじゃないの?", e);
+            throw new IllegalArgumentException("URL(" + diconDir + ") が誤っている可能性があります。", e);
         }
 
         final ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();

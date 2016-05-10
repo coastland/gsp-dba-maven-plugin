@@ -44,6 +44,10 @@ public class ForeignKey {
 	public List<Column> getColumnList() {
 		return columnList;
 	}
+	
+	public void addColumn(Column column) {
+		this.columnList.add(column);
+	}
 
 	public void setColumnList(List<Column> columnList) {
 		this.columnList = columnList;
@@ -59,6 +63,10 @@ public class ForeignKey {
 
 	public List<Column> getReferenceColumnList() {
 		return referenceColumnList;
+	}
+	
+	public void addReferenceColumn(Column column) {
+		this.referenceColumnList.add(column);
 	}
 
 	public void setReferenceColumnList(List<Column> referenceColumnList) {

@@ -34,6 +34,10 @@ import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 /**
+ * export-schema.
+ * 
+ * データベーススキーマをダンプする。
+ * 
  * @author kawasima
  */
 @Mojo(name = "export-schema", requiresProject = true)
@@ -50,7 +54,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-		Dialect dialect = DialectFactory.getDialect(url);
+		Dialect dialect = DialectFactory.getDialect(url, driver);
 		if (!outputDirectory.exists()) {
 			try {
 				FileUtils.forceMkdir(outputDirectory);
@@ -59,9 +63,9 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 			}
 		}
 		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
-		getLog().info(user+"スキーマのExportを開始します。:" + exportFile);
+		getLog().info(schema+"スキーマのExportを開始します。:" + exportFile);
 		try {
-			dialect.exportSchema(user, password, schema, exportFile);
+			dialect.exportSchema(adminUser, adminPassword, schema, exportFile);
 
 		} catch (Exception e) {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);
@@ -73,7 +77,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
         } catch(IOException e) {
             throw new MojoExecutionException("アーカイブに失敗しました。", e);
         }
-		getLog().info(user+"スキーマのExport完了 ");
+		getLog().info(schema+"スキーマのExport完了 ");
 	}
 
 

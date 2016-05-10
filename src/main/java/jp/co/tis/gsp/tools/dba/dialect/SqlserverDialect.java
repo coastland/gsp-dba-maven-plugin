@@ -27,19 +27,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jp.co.tis.gsp.tools.db.EntityDependencyParser;
-import jp.co.tis.gsp.tools.db.TypeMapper;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
+import jp.co.tis.gsp.tools.db.EntityDependencyParser;
+import jp.co.tis.gsp.tools.db.TypeMapper;
+
 public class SqlserverDialect extends Dialect {
-    private String url;
-    private String schema;
-    private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 
     static {
@@ -95,16 +92,33 @@ public class SqlserverDialect extends Dialect {
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        this.schema = schema;
-        DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
-        PreparedStatement dropStmt = null;
+        PreparedStatement dropStmt;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
+            
+            // 指定スキーマが存在しない場合は作成
             if (!existsSchema(conn, schema)) {
+            	stmt.execute("CREATE SCHEMA " + schema);
+            	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
+                
+            	if (!StringUtils.equalsIgnoreCase(schema, "dbo")
+               		 && !StringUtils.equalsIgnoreCase(schema, "sys")
+               		 && !StringUtils.equalsIgnoreCase(schema, "INFORMATION_SCHEMA")) {
+               	      stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
+                }
+            	
                 return;
+            }else{
+            	conn.createStatement().execute("ALTER USER " + user + " WITH DEFAULT_SCHEMA = " + schema);
+            	
+                if (!StringUtils.equalsIgnoreCase(schema, "dbo")
+               		 && !StringUtils.equalsIgnoreCase(schema, "sys")
+               		 && !StringUtils.equalsIgnoreCase(schema, "INFORMATION_SCHEMA")) {
+             	      stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
+               }
             }
             
             // 依存関係を考慮し削除するテーブルをソートする
@@ -113,16 +127,17 @@ public class SqlserverDialect extends Dialect {
             final List<String> tableList = parser.getTableList();
             Collections.reverse(tableList);
             for (String table : tableList) {
-                dropObject(conn, "TABLE", table);
+                dropObject(conn, schema, "TABLE", table);
             }
-            // ↑で削除したテーブル以外のオブジェクトを削除する
-            dropStmt = conn.prepareStatement("SELECT name, type_desc FROM sys.objects WHERE schema_id = SCHEMA_ID('" + schema + "')");
+            
+            // ビューの削除を行う。
+            dropStmt = conn.prepareStatement("SELECT name, type_desc FROM sys.objects WHERE schema_id = SCHEMA_ID('" + schema + "') AND type IN ('U','V')");
             ResultSet rs = dropStmt.executeQuery();
             while (rs.next()) {
                 if (!tableList.contains(rs.getString("name"))) {
                     String objectType = getObjectType(rs.getString("type_desc"));
                     if (objectType != null) {  
-                        dropObject(conn, objectType, rs.getString("name"));
+                        dropObject(conn, schema, objectType, rs.getString("name"));
                     }
                 }
             }
@@ -145,52 +160,24 @@ public class SqlserverDialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         Statement stmt = null;
         try {
             conn = DriverManager.getConnection(url, adminUser, adminPassword);
             stmt = conn.createStatement();
-            if(!existsUser(adminUser, adminPassword, user)) {
-                
-                try {
-                    stmt.execute("DROP SCHEMA " + schema);
-                } catch(SQLException ignore) {
-                    // DROP SCHEMAに失敗しても気にしない
-                    ignore.printStackTrace();
-                }
-                
-                try {
-                    stmt.execute("DROP USER " + user);
-                } catch(SQLException ignore) {
-                    // DROP USERに失敗しても気にしない
-                    ignore.printStackTrace();
-                }
-                
-                try {
-                    stmt.execute("DROP LOGIN " + user);
-                } catch(SQLException ignore) {
-                    // DROP LOGINに失敗しても気にしない
-                    ignore.printStackTrace();
-                } 
-                
-                stmt.execute("CREATE SCHEMA " + schema);
-                stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
-                stmt.execute("CREATE USER " + user + " FOR LOGIN " + user + " WITH DEFAULT_SCHEMA = " + schema);
+            if(existsUser(adminUser, adminPassword, user)) {
+                return;
             }
-            stmt.execute("ALTER AUTHORIZATION ON SCHEMA::" + schema + " TO " + user);
+            stmt.execute("CREATE LOGIN " + user + " WITH PASSWORD = '" + password + "'");
+            stmt.execute("CREATE USER " + user + " FOR LOGIN " + user);
             stmt.execute("sp_addrolemember 'db_ddladmin','" + user + "'");
+            
         } catch (SQLException e) {
             throw new MojoExecutionException("CREATE USER実行中にエラー", e);
         } finally {
             StatementUtil.close(stmt);
             ConnectionUtil.close(conn);
         }
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     @Override
@@ -203,13 +190,16 @@ public class SqlserverDialect extends Dialect {
         return USABLE_TYPE_NAMES.contains(type);
     }
 
+    /**
+     * ビュー定義を検索するSQLを返却する。
+     * @return ビュー定義を検索するSQL文
+     */
     @Override
     public String getViewDefinitionSql() {
-        return "SELECT definition AS VIEW_DEFINITION FROM sys.sql_modules WHERE object_id = OBJECT_ID(?)";
+        return "SELECT VIEW_DEFINITION FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?";
     }
 
     private boolean existsUser(String adminUser, String adminPassword, String user) throws SQLException {
-        DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         PreparedStatement stmt = null;
         boolean existLogin = false;
@@ -268,7 +258,7 @@ public class SqlserverDialect extends Dialect {
         return newUrl + ";";
     }
 
-    private void dropObject(Connection conn, String objectType, String objectName) throws SQLException {
+    private void dropObject(Connection conn, String schema, String objectType, String objectName) throws SQLException {
         Statement stmt = null;
         try {
             stmt =  conn.createStatement();

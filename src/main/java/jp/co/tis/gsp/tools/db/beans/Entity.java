@@ -16,7 +16,6 @@
 
 package jp.co.tis.gsp.tools.db.beans;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +44,20 @@ public class Entity {
 	private Erd erd;
 	
 	private boolean havePrimaryKey = false;
+	
+	private String schema;
+	
+	
+	@XmlAttribute(name="SCHEMA")
+	public String getSchema() {
+        return schema;
+    }
 
-	@XmlAttribute(name="ID")
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+
+    @XmlAttribute(name="ID")
 	public Integer getId() {
 		return id;
 	}
@@ -103,6 +114,7 @@ public class Entity {
 	public void setErd(Erd erd) {
 		this.erd = erd;
 	}
+	
 
 	public Column getColumn(Integer id) {
 		for (Column column : columnList) {
@@ -128,24 +140,27 @@ public class Entity {
 			}
 			if (!column.hasForeignKeyColumn())
 				continue;
-			ForeignKeyColumn fkColumn = column.getForeignKeyColumn();
-			Relation relation = erd.getRelation(fkColumn.getRelationId());
-			if (relation.getShowType() != 0) {
-				continue;
-			}
+			
+			List<ForeignKeyColumn> fkColumnList = column.getForeignKeyColumnList();
+			for(ForeignKeyColumn fkColumn : fkColumnList){
+				Relation relation = erd.getRelation(fkColumn.getRelationId());
+				if (relation.getShowType() != 0) {
+					continue;
+				}
 
-			Entity parentEntity = erd.getEntity(relation.getParentEntityId());
+				Entity parentEntity = erd.getEntity(relation.getParentEntityId());
 
-			ForeignKey foreignKey;
-			if (foreignKeyMap.containsKey(relation.getId())) {
-				foreignKey = foreignKeyMap.get(relation.getId());
-			} else {
-				foreignKey = new ForeignKey();
-				foreignKey.setReferenceEntity(parentEntity);
-				foreignKeyMap.put(relation.getId(), foreignKey);
+				ForeignKey foreignKey;
+				if (foreignKeyMap.containsKey(relation.getId())) {
+					foreignKey = foreignKeyMap.get(relation.getId());
+				} else {
+					foreignKey = new ForeignKey();
+					foreignKey.setReferenceEntity(parentEntity);
+					foreignKeyMap.put(relation.getId(), foreignKey);
+				}
+				foreignKey.addColumn(column);
+				foreignKey.addReferenceColumn(parentEntity.getColumn(fkColumn.getColumnId()));
 			}
-			foreignKey.getColumnList().add(column);
-			foreignKey.getReferenceColumnList().add(parentEntity.getColumn(fkColumn.getColumnId()));
 		}
 
 		foreignKeyList.addAll(foreignKeyMap.values());

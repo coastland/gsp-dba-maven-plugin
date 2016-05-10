@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+
+	<persistence-unit name="persistence-h2"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jar-file>file:../classes</jar-file>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="${h2.jdbcDriver}" />
+			<property name="javax.persistence.jdbc.url" value="${h2.url}" />
+			<property name="javax.persistence.jdbc.user" value="${h2.user}" />
+			<property name="javax.persistence.jdbc.password" value="${h2.password}" />
+			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.logging.level" value="ALL" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="persistence-oracle"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jar-file>file:../classes</jar-file>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="${oracle.jdbcDriver}" />
+			<property name="javax.persistence.jdbc.url" value="${oracle.url}" />
+			<property name="javax.persistence.jdbc.user" value="${oracle.user}" />
+			<property name="javax.persistence.jdbc.password" value="${oracle.password}" />
+			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.logging.level" value="ALL" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="persistence-mysql"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jar-file>file:../classes</jar-file>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="${mysql.jdbcDriver}" />
+			<property name="javax.persistence.jdbc.url" value="${mysql.url}" />
+			<property name="javax.persistence.jdbc.user" value="${mysql.user}" />
+			<property name="javax.persistence.jdbc.password" value="${mysql.password}" />
+			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.logging.level" value="ALL" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="persistence-db2"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jar-file>file:../classes</jar-file>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="${db2.jdbcDriver}" />
+			<property name="javax.persistence.jdbc.url" value="${db2.url}" />
+			<property name="javax.persistence.jdbc.user" value="${db2.user}" />
+			<property name="javax.persistence.jdbc.password" value="${db2.password}" />
+			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.logging.level" value="ALL" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="persistence-sqlserver"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jar-file>file:../classes</jar-file>
+		<properties>
+			<property name="javax.persistence.jdbc.driver"
+				value="${sqlserver.jdbcDriver}" />
+			<property name="javax.persistence.jdbc.url"
+				value="${sqlserver.url}" />
+			<property name="javax.persistence.jdbc.user" value="${sqlserver.user}" />
+			<property name="javax.persistence.jdbc.password" value="${sqlserver.password}" />
+			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.logging.level" value="ALL" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="persistence-postgresql"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jar-file>file:../classes</jar-file>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="${postgresql.jdbcDriver}" />
+			<property name="javax.persistence.jdbc.url" value="${postgresql.url}" />
+			<property name="javax.persistence.jdbc.user" value="${postgresql.user}" />
+			<property name="javax.persistence.jdbc.password" value="${postgresql.password}" />
+			<property name="eclipselink.ddl-generation" value="none" />
+			<property name="eclipselink.logging.level" value="ALL" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

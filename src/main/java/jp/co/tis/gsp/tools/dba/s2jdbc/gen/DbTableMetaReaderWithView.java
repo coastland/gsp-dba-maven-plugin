@@ -16,9 +16,7 @@
 
 package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,22 +30,18 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-
-import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 import org.apache.commons.lang.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
 import org.seasar.extension.jdbc.gen.internal.meta.DbTableMetaReaderImpl;
-import org.seasar.extension.jdbc.gen.meta.DbColumnMeta;
 import org.seasar.extension.jdbc.gen.meta.DbForeignKeyMeta;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.extension.jdbc.gen.meta.DbUniqueKeyMeta;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.ArrayMap;
 import org.seasar.framework.util.ResultSetUtil;
-import org.seasar.framework.util.StatementUtil;
+
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	public DbTableMetaReaderWithView(DataSource dataSource, GenDialect dialect,
@@ -83,35 +77,6 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	    } catch (SQLException e) {
 	        throw new SQLRuntimeException(e);
 	    }
-    }
-
-    @Override
-    protected void doDbColumnMeta(DatabaseMetaData metaData,
-                                  DbTableMeta tableMeta, Set<String> primaryKeySet) {
-        super.doDbColumnMeta(metaData, tableMeta, primaryKeySet);
-
-        Dialect dialect = DialectUtil.getDialect();
-        String sequenceDefinitionSql = dialect.getSequenceDefinitionSql();
-        if (sequenceDefinitionSql != null) {
-            for (DbColumnMeta columnMeta : tableMeta.getColumnMetaList()) {
-                try {
-                    Connection conn = metaData.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(sequenceDefinitionSql);
-                    try {
-                        stmt.setString(1, columnMeta.getName() + "_USEQ");
-                        ResultSet rs = stmt.executeQuery();
-                        if (rs.next()) {
-                            columnMeta.setAutoIncrement(true);
-                        }
-                    } finally {
-                        StatementUtil.close(stmt);
-                    }
-                } catch (SQLException e) {
-                    throw new SQLRuntimeException(e);
-                }
-            }
-        }
-
     }
 
     @Override
@@ -167,12 +132,13 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData,
             DbTableMeta tableMeta) {
     	Set<String> result = new HashSet<String>();
+    	Dialect gspDialect = DialectUtil.getDialect();
         try {
 	        String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableName);
+	        	String sql = gspDialect.getViewDefinition(metaData.getConnection(), tableName, tableMeta);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -217,12 +183,13 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             DatabaseMetaData metaData, DbTableMeta tableMeta) {
         @SuppressWarnings("unchecked")
         Map<String, DbForeignKeyMeta> map = new ArrayMap();
+        Dialect gspDialect = DialectUtil.getDialect();
         try {
-	        String typeName = getObjectTypeName(metaData, tableMeta);
+            String typeName = getObjectTypeName(metaData, tableMeta);
 	        String tableName = tableMeta.getName();
 	        ViewAnalyzer viewAnalyzer = null;
 	        if (StringUtils.equals(typeName, "VIEW")) {
-	        	String sql = getViewDefinitionSql(metaData, tableMeta.getName());
+	        	String sql = gspDialect.getViewDefinition(metaData.getConnection(), tableMeta.getName(), tableMeta);
 	        	viewAnalyzer = new ViewAnalyzer();
 	        	viewAnalyzer.parse(sql);
 	        	if (viewAnalyzer.isSimple()) {
@@ -232,7 +199,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
 	        	}
 	        }
             ResultSet rs = metaData.getImportedKeys(tableMeta.getCatalogName(),
-                    tableMeta.getSchemaName(), tableMeta.getName());
+                    tableMeta.getSchemaName(), tableName);
             try {
                 while (rs.next()) {
                     String name = rs.getString("FK_NAME");
@@ -257,7 +224,10 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
                 ResultSetUtil.close(rs);
             }
             if (viewAnalyzer != null && !map.isEmpty()) {
-            	for (DbForeignKeyMeta fkMeta : map.values()) {
+            	
+            	Map<String, DbForeignKeyMeta> tmpMap = new ArrayMap(map);
+            	
+            	for (DbForeignKeyMeta fkMeta : tmpMap.values()) {
             		boolean fkContains = true;
             		for (String fkColumn : fkMeta.getForeignKeyColumnNameList()) {
             			fkContains &= viewAnalyzer.getColumnNames().contains(fkColumn.toUpperCase());
@@ -266,7 +236,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
             			map.remove(fkMeta.getName());
             	}
             }
-
+            
             DbForeignKeyMeta[] array = map.values().toArray(
                     new DbForeignKeyMeta[map.size()]);
             return Arrays.asList(array);
@@ -285,39 +255,5 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
     		ResultSetUtil.close(rs);
     	}
     }
-    protected void parseViewForUniqueKey(Map<String, DbUniqueKeyMeta> map, DatabaseMetaData metaData, String viewName) throws SQLException {
-    	String sql = getViewDefinitionSql(metaData, viewName);
-    	ViewAnalyzer viewAnalyzer = new ViewAnalyzer();
-    	viewAnalyzer.parse(sql);
-    	if (viewAnalyzer.isSimple()) {
-    		String tableName = viewAnalyzer.getTableName();
-    		tableName = dialect.unquote(tableName);
 
-    	}
-    }
-
-    protected String getViewDefinitionSql(DatabaseMetaData metaData, String viewName) throws SQLException {
-    	Dialect gspDialect = DialectFactory.getDialect(metaData.getURL());
-    	String sql = gspDialect.getViewDefinitionSql();
-    	if (sql == null) {
-    		return null;
-    	}
-
-    	Connection conn = metaData.getConnection();
-    	PreparedStatement stmt = null;
-    	ResultSet rs = null;
-    	try {
-    		stmt = conn.prepareStatement(sql);
-    		stmt.setString(1, viewName);
-    		rs = stmt.executeQuery();
-    		while(rs.next()) {
-    			return rs.getString("VIEW_DEFINITION");
-    		}
-    	} finally {
-    		ResultSetUtil.close(rs);
-    		StatementUtil.close(stmt);
-    	}
-    	return null;
-
-    }
 }

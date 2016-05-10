@@ -3,21 +3,20 @@ package jp.co.tis.gsp.tools.dba.dialect;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
-public class H2Dialect extends Dialect {
-    private String url;
-    private static final String DRIVER = "org.h2.Driver";
+import jp.co.tis.gsp.tools.db.TypeMapper;
 
+public class H2Dialect extends Dialect {
+    
     public H2Dialect(){
         GenDialectRegistry.deregister(
                 org.seasar.extension.jdbc.dialect.H2Dialect.class
@@ -31,12 +30,11 @@ public class H2Dialect extends Dialect {
     @Override
     public void exportSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement();
-            stmt.execute("SCRIPT TO '" + dumpFile.getAbsolutePath()+ "'");
+            stmt.execute("SCRIPT DROP TO '" + dumpFile.getAbsolutePath()+ "'");
             StatementUtil.close(stmt);
         } catch (SQLException e) {
             throw new MojoExecutionException("Schema export実行中にエラー", e);
@@ -45,28 +43,50 @@ public class H2Dialect extends Dialect {
         }
     }
 
+    /**
+     * GSPではPUBLICスキーマしか対応していないのでスキーマの生成は不要。
+     * 
+     */
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement pstmt = null;
+        
         try {
-            conn = DriverManager.getConnection(url, user, password);
-            stmt = conn.createStatement();
-            stmt.execute("DROP ALL OBJECTS");
+        	conn = DriverManager.getConnection(url, adminUser, adminPassword);
+        	
+			// スキーマ内のテーブル、ビュー、シーケンス削除
+			String nmzschema = normalizeSchemaName(schema);
+			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE CONSTRAINT_SCHEMA='" + nmzschema + "'";
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
+			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.VIEW);
+			
+			dropListSql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + nmzschema + "'"; 
+	        dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.TABLE);
+			
         } catch (SQLException e) {
-            throw new MojoExecutionException("DROP ALL OBJECTS 実行中にエラー", e);
+            throw new MojoExecutionException("DROP ALL実行中にエラー", e);
         } finally {
-            StatementUtil.close(stmt);
+            StatementUtil.close(pstmt);
             ConnectionUtil.close(conn);
         }
     }
+    
+    @Override
+    public String normalizeUserName(String userName) {
+    	return StringUtils.upperCase(userName);
+    }
+        
+	public String normalizeSchemaName(String schemaName) {
+		return StringUtils.upperCase(schemaName);
+	}
 
     @Override
     public void importSchema(String user, String password, String schema,
             File dumpFile) throws MojoExecutionException {
-        DriverManagerUtil.registerDriver(DRIVER);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
@@ -83,14 +103,18 @@ public class H2Dialect extends Dialect {
     @Override
     public void createUser(String user, String password, String adminUser,
             String adminPassword) throws MojoExecutionException {
-        // TODO 自動生成されたメソッド・スタブ
-
-    }
-
-    @Override
-    public void setUrl(String url) {
-        this.url = url;
-
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = DriverManager.getConnection(url, adminUser, adminPassword);
+            stmt = conn.createStatement();
+            stmt.execute("CREATE USER IF NOT EXISTS " + user + " PASSWORD '" + password + "'" + " ADMIN");
+        } catch (SQLException e) {
+            throw new MojoExecutionException("CREATE USER 実行中にエラー: ", e);
+        } finally {
+            StatementUtil.close(stmt);
+            ConnectionUtil.close(conn);
+        }
     }
 
     @Override

@@ -22,8 +22,4 @@ public class GspToolsException extends RuntimeException {
 	public GspToolsException(String name) {
 		super(name);
 	}
-
-	public GspToolsException(String name, Throwable cause) {
-		super(name, cause);
-	}
 }

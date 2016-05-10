@@ -30,7 +30,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Generate DDL.
+ * generate-ddl.
+ *
+ * データモデルを解析し、DDLを生成する。
  *
  * @author kawasima
  */
@@ -51,6 +53,9 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
 
     @Parameter(defaultValue = "BYTE")
     protected LengthSemantics lengthSemantics;
+
+    @Parameter
+    protected String ddlTemplateFileDir;
 
     /**
      * Generate DDL.
@@ -78,8 +83,9 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
 		parser.setOutputDirectory(outputDirectory);
 		parser.setSchema(schema);
 		parser.setUrl(url);
-
-		Dialect dialect = DialectFactory.getDialect(url);
+		parser.setUser(user);
+		parser.setDdlTemplateFileDir(ddlTemplateFileDir);
+		Dialect dialect = DialectFactory.getDialect(url, driver);
 		parser.setTypeMapper(dialect.getTypeMapper());
 
         parser.setPrintTable(dialect.canPrintTable());

@@ -22,20 +22,28 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.GenerationType;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
+import org.seasar.framework.util.DriverManagerUtil;
+import org.seasar.framework.util.ResultSetUtil;
+import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
+
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.seasar.framework.util.ResultSetUtil;
-import org.seasar.framework.util.StringUtil;
-
 public abstract class Dialect {
+	
+	protected enum OBJECT_TYPE {
+		FK, TABLE, VIEW, SEQUENCE;
+	}
 
 	protected DatabaseMetaData metaData = null;
 	protected static final int UN_USABLE_TYPE = -999;
@@ -43,17 +51,55 @@ public abstract class Dialect {
 	public abstract void exportSchema(String user, String password, String schema, File dumpFile)
 			throws MojoExecutionException;
 
+	/**
+	 * 指定したスキーマ内の全テーブル・ビュー・シーケンスを削除します。
+	 * 
+	 * 指定したスキーマが存在しない場合はスキーマを作成します。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @param schema
+	 * @throws MojoExecutionException
+	 */
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
 
 	public abstract void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException;
 
+	/**
+	 * ユーザを作成します。
+	 * 
+	 * 既にユーザが存在する場合はそのユーザを削除します。
+	 * 
+	 * @param user
+	 * @param password
+	 * @param adminUser
+	 * @param adminPassword
+	 * @throws MojoExecutionException
+	 */
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
+	
+	
+    protected String url;
+    protected String driver;
 
-	public abstract void setUrl(String url);
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+	public void setDriver(String driver) {
+		DriverManagerUtil.registerDriver(driver);
+		this.driver = driver;
+	}
 
 	public abstract TypeMapper getTypeMapper();
+	
+    public String normalizeUserName(String userName) {
+        return userName;
+    }
 
 	public String normalizeSchemaName(String schemaName) {
 		return schemaName;
@@ -111,7 +157,7 @@ public abstract class Dialect {
         ResultSet rs = null;
         try {
             rs = metaData.getColumns(null,
-                                                normalizeSchemaName(schema),
+            		                            schema,
                                                 normalizeTableName(tableName),
                                                 normalizeColumnName(colName));
             if (!rs.next()) {
@@ -153,6 +199,108 @@ public abstract class Dialect {
             stmt.setNull(parameterIndex, sqlType);
         } else {
             stmt.setObject(parameterIndex, value, sqlType);
+        }
+    }
+    
+    /**
+     * ViewのDDL定義を取得する。
+     * 
+     * @param conn コネクション 
+     * @param viewName　ビュー名
+     * @param tableMeta ビュー定義のメタデータ
+     * @return ViewのDDL
+     * @throws SQLException SQL例外 
+     */
+    public String getViewDefinition(Connection conn, String viewName, DbTableMeta tableMeta) throws SQLException {
+        String sql = getViewDefinitionSql();
+        if (sql == null) {
+            return null;
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int idx = 1;
+        
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(idx++, viewName);
+            stmt.setString(idx++, tableMeta.getSchemaName());	
+            
+            rs = stmt.executeQuery();
+            while(rs.next()) {
+                return rs.getString(1);
+            }
+        } finally {
+            ResultSetUtil.close(rs);
+            StatementUtil.close(stmt);
+        }
+        return null;
+    }
+
+    protected void dropObjectsInSchema(Connection conn, String dropListSql, String schema, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(dropListSql);
+    	  String dropSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+		        case FK: // 外部キー
+  		        	dropSql = "ALTER TABLE " + schema + "." + rs.getString(1) + " DROP CONSTRAINT " + rs.getString(2);
+          		  break;
+  		        case TABLE: // テーブル
+  		        	dropSql = "DROP TABLE "  + schema + "." + rs.getString(1);
+    		      break;
+  		        case VIEW: // ビュー
+  		        	dropSql = "DROP VIEW "  + schema + "." + rs.getString(1);
+  			      break;
+  		        case SEQUENCE: // シーケンス
+  		        	dropSql = "DROP SEQUENCE "  + schema + "." + rs.getString(1);
+          		  break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(dropSql);
+      	    stmt.execute(dropSql);
+    	  }
+        } finally {
+            StatementUtil.close(stmt);
+        }
+    }
+    
+    protected void grantSchemaObjToUser(Connection conn, String grantListSql, String schema, String user, OBJECT_TYPE objType) throws SQLException {
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	
+    	try {
+    	  stmt = conn.createStatement();
+    	  rs = stmt.executeQuery(grantListSql);
+    	  String grantSql = "";
+    	  
+    	  while (rs.next()) {
+      	      switch (objType) {
+  		        case TABLE: // テーブル
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO " + user;
+    		      break;
+  		        case VIEW: // ビュー
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO " + user;
+  			      break;
+  		        case SEQUENCE: // シーケンス
+  		        	grantSql = "GRANT ALL ON "  + schema + "." + rs.getString(1) + " TO " + user;
+          		  break;
+         		default:
+          		  break;
+  		      }
+      	    
+      	    stmt = conn.createStatement();
+      	    System.err.println(grantSql);
+      	    stmt.execute(grantSql);
+    	  }
+        } finally {
+            StatementUtil.close(stmt);
         }
     }
 }

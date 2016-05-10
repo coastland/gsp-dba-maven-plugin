@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -35,27 +34,24 @@ import java.util.Properties;
 
 import javax.persistence.GenerationType;
 
-import jp.co.tis.gsp.tools.db.TypeMapper;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.framework.util.DriverManagerUtil;
-import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
+import jp.co.tis.gsp.tools.db.TypeMapper;
+
 public class OracleDialect extends Dialect {
-	private String url;
-	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
 	static {
 		USABLE_TYPE_NAMES.add("CHAR");
 		USABLE_TYPE_NAMES.add("DATE");
 		USABLE_TYPE_NAMES.add("LONG");
+		USABLE_TYPE_NAMES.add("FLOAT");
 		USABLE_TYPE_NAMES.add("NCHAR");
 		USABLE_TYPE_NAMES.add("NUMBER");
 		USABLE_TYPE_NAMES.add("NVARCHAR2");
@@ -117,7 +113,7 @@ public class OracleDialect extends Dialect {
 			Process process = pb.start();
 
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                    Charset.forName("Shift_JIS") : StandardCharsets.UTF_8;
+                    Charset.forName("Shift_JIS") : Charset.forName("UTF-8");
 
             reader = new BufferedReader(
 		            new InputStreamReader(process.getInputStream(), terminalCharset));
@@ -145,17 +141,22 @@ public class OracleDialect extends Dialect {
 		BufferedReader reader = null;
 		try {
             createDirectory(user, password, dumpFile.getParentFile());
+            
+            // Oracleの場合はオブジェクトのドロップをする
+            dropAllObjects(user, password, schema);
+            
 			ProcessBuilder pb = new ProcessBuilder(
 					"impdp",
 					user + "/" + password,
                     "directory=exp_dir",
 					"dumpfile=" + dumpFile.getName(),
 					"schemas=" + schema,
-                    "nologfile=y");
+                    "nologfile=y",
+                    "exclude=user");
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
             Charset terminalCharset = System.getProperty("os.name").toLowerCase().contains("windows") ?
-                    Charset.forName("Shift_JIS") : StandardCharsets.UTF_8;
+                    Charset.forName("Shift_JIS") : Charset.forName("UTF-8");
 
 			reader = new BufferedReader(
 		            new InputStreamReader(process.getInputStream(), terminalCharset));
@@ -178,9 +179,11 @@ public class OracleDialect extends Dialect {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void createUser(String user, String password, String adminUser, String adminPassword) throws MojoExecutionException {
-		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -189,27 +192,20 @@ public class OracleDialect extends Dialect {
             props.put("password", adminPassword);
             conn = DriverManager.getConnection(url, props);
 			stmt = conn.createStatement();
+			
 			if(existsUser(conn, user)) {
+				// 既にユーザが存在している場合でも必要な権限を付与しておく。
+  			    String grantSql = "GRANT UNLIMITED TABLESPACE, DATAPUMP_EXP_FULL_DATABASE, DATAPUMP_IMP_FULL_DATABASE TO " + user;
+			    stmt.execute(grantSql);
+                System.err.println("GRANT文を実行しました:\n" + grantSql);
 				return;
 			}
-			try {
-				stmt.execute("DROP USER "+ user);
-			} catch(SQLException ignore) {
-				// DROP USERに失敗しても気にしない
-			}
+
 			stmt.execute("CREATE USER "+ user + " IDENTIFIED BY "+ password + " DEFAULT TABLESPACE users");
-            String grantSql = "GRANT CONNECT, RESOURCE, SELECT ANY TABLE, CREATE VIEW, CREATE ANY TABLE, CREATE SYNONYM, CREATE ANY DIRECTORY TO " + user;
+			String grantSql = "GRANT UNLIMITED TABLESPACE, DATAPUMP_EXP_FULL_DATABASE, DATAPUMP_IMP_FULL_DATABASE TO " + user;
 			stmt.execute(grantSql);
-            System.err.println(grantSql);
-            String grantExecuteSql = "GRANT EXECUTE ON SYS.DBMS_ALERT TO " + user;
-            try {
-                stmt.execute(grantExecuteSql);
-            } catch (SQLException e) {
-                System.err.println("DBMS_ALERT 権限の付与に失敗しました。\n"
-                        + "本権限は、tesloggerのDBキャプチャに必要になります。\n"
-                        + "DBキャプチャが必要であれば、手動で権限を設定してください。\n"
-                        + "実行SQL： [" + grantExecuteSql + "]");
-            }
+            System.err.println("GRANT文を実行しました:\n" + grantSql);
+
 		} catch (SQLException e) {
 			throw new MojoExecutionException("CREATE USER実行中にエラー", e);
 		} finally {
@@ -223,7 +219,7 @@ public class OracleDialect extends Dialect {
 		try {
 			stmt = conn.prepareStatement(
 					"SELECT count(*) AS num FROM dba_users WHERE username=?");
-			stmt.setString(1, StringUtils.upperCase(user));
+			stmt.setString(1, user);
 			ResultSet rs = stmt.executeQuery();
 			rs.next();
 			return (rs.getInt("num") > 0);
@@ -235,41 +231,27 @@ public class OracleDialect extends Dialect {
 	@Override
 	public void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException {
-		DriverManagerUtil.registerDriver(DRIVER);
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, adminUser, adminPassword);
-			// 目的のユーザがいなければ何もしない
-			if(!existsUser(conn, user)) {
+			// 指定スキーマがいなければ作成する。
+			// Oracleの場合はユーザ＝スキーマなのでcreateUserで作成。
+			if(!existsUser(conn, schema)) {
+				createUser(schema, password, adminUser, adminPassword);
 				return;
 			}
+			
+			// テーブル、ビュー、シーケンスのみ削除
+			ArrayList<String> dropObjectTypeList = new ArrayList<String>();
+			dropObjectTypeList.add("TABLE");
+			dropObjectTypeList.add("VIEW");
+			dropObjectTypeList.add("SEQUENCE");
+			
+			dropObjectSpecifiedTypes(schema, adminUser, adminPassword, dropObjectTypeList);
+			
 		} catch (SQLException e) {
 			throw new MojoExecutionException("データ削除中にエラー", e);
-		} finally {
-			ConnectionUtil.close(conn);
-		}
-
-		PreparedStatement stmtMeta = null;
-		Statement stmt = null;
-		try {
-			conn = DriverManager.getConnection(url, user, password);
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM user_objects WHERE object_type in ('TABLE', 'VIEW', 'SEQUENCE', 'PACKAGE', 'FUNCTION', 'SYNONYM')");
-
-			ResultSet rsMeta = stmtMeta.executeQuery();
-			while(rsMeta.next()) {
-				String objectType = rsMeta.getString("OBJECT_TYPE");
-				String objectName = rsMeta.getString("OBJECT_NAME");
-				if (!objectName.startsWith("BIN$")) {
-					dropObject(conn, objectType, objectName);
-				}
-			}
-			stmt = conn.createStatement();
-			stmt.execute("PURGE RECYCLEBIN");
-		} catch (SQLException e) {
-			throw new MojoExecutionException("データ削除中にエラー", e);
-		} finally {
-			StatementUtil.close(stmtMeta);
-			StatementUtil.close(stmt);
+		} finally{
 			ConnectionUtil.close(conn);
 		}
 	}
@@ -291,14 +273,14 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	@Override
 	public TypeMapper getTypeMapper() {
 		return new TypeMapper(typeToNameMap);
 	}
+	
+    @Override
+    public String normalizeUserName(String userName) {
+    	return StringUtils.upperCase(userName);
+    }
 
 	@Override
 	public String normalizeSchemaName(String schemaName) {
@@ -308,14 +290,22 @@ public class OracleDialect extends Dialect {
 	@Override
 	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
 
+    /**
+	 * ビュー定義を検索するSQLを返却する。
+	 * @return ビュー定義を検索するSQL文
+     */
 	@Override
-	public String getViewDefinitionSql() {
-		return "select text as view_definition from user_views where view_name=?";
-	}
+    public String getViewDefinitionSql() {
+		return "select text as view_definition from dba_views where view_name= ? and owner = ?";
+    }
 
-	@Override
+    /**
+     * シーケンス定義を検索するSQLを返却する。
+     * @return シーケンス定義を検索するSQL文
+     */
+    @Override
     public String getSequenceDefinitionSql() {
-        return "select sequence_name from user_sequences where sequence_name=?";
+        return "select sequence_name from dba_sequences where sequence_name= ? and sequence_owner = ?";
     }
 
     @Override
@@ -358,4 +348,86 @@ public class OracleDialect extends Dialect {
         return USABLE_TYPE_NAMES.contains(type) 
             || type.startsWith("TIMESTAMP"); // oracleのtimestamp型名はTIMESTAMP(0)～TIMESTAMP(9)となるため
     }
+    
+    /**
+     * 指定スキーマ内で指定したタイプのオブジェクトを全削除します。
+     * 
+     * @param user
+     * @param password
+     * @param adminUser
+     * @param adminPassword
+     * @param schema
+     * @param objectTypeList
+     * @throws MojoExecutionException
+     */
+    private void dropObjectSpecifiedTypes(String schema, String adminUser, String adminPassword, 
+    		 List<String> objectTypeList) throws MojoExecutionException {
+    	
+		PreparedStatement stmtMeta = null;
+		Statement stmt = null;
+		
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			String dropObjectTypes = "'" + org.apache.commons.lang.StringUtils.join(objectTypeList, "','") + "'";
+			
+			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in (" + dropObjectTypes + ") and owner = ?");
+			stmtMeta.setString(1, schema);
+			
+			ResultSet rsMeta = stmtMeta.executeQuery();
+			while(rsMeta.next()) {
+				String objectType = rsMeta.getString("OBJECT_TYPE");
+				String objectName = rsMeta.getString("OBJECT_NAME");
+				if (!objectName.startsWith("BIN$")) {
+					dropObject(conn, objectType, schema + "." + objectName);
+				}
+			}
+			stmt = conn.createStatement();
+			stmt.execute("PURGE RECYCLEBIN");
+		} catch (SQLException e) {
+			throw new MojoExecutionException("Drop Object実行中にエラー", e);
+		} finally {
+			StatementUtil.close(stmtMeta);
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
+    }
+    
+    /**
+     * 指定スキーマ内のオブジェクトを全て削除します.
+     * 
+     * @param adminUser
+     * @param adminPassword
+     * @param schema
+     * @throws MojoExecutionException
+     */
+	private void dropAllObjects(String adminUser,
+	    String adminPassword, String schema) throws MojoExecutionException {
+		Connection conn = null;
+		PreparedStatement stmtMeta = null;
+		Statement stmt = null;
+		try {
+			conn = DriverManager.getConnection(url, adminUser, adminPassword);
+			
+			stmtMeta = conn.prepareStatement("SELECT DISTINCT OBJECT_TYPE FROM ALL_OBJECTS WHERE OWNER = ?");
+			stmtMeta.setString(1, schema);
+			ResultSet rsMeta = stmtMeta.executeQuery();
+			ArrayList<String> tmpObjList = new ArrayList<String>(); 
+			while(rsMeta.next()) {
+				tmpObjList.add(rsMeta.getString(1));
+			}
+			stmtMeta.close();
+			rsMeta.close();
+			
+			dropObjectSpecifiedTypes(schema, adminUser, adminPassword, tmpObjList);
+			
+		} catch (SQLException e) {
+			throw new MojoExecutionException("データ削除中にエラー", e);
+		} finally {
+			StatementUtil.close(stmtMeta);
+			StatementUtil.close(stmt);
+			ConnectionUtil.close(conn);
+		}
+	}
 }

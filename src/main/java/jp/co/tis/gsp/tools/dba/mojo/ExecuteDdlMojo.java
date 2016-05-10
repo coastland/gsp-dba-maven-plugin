@@ -16,6 +16,7 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -32,20 +33,24 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.util.SqlSplitter;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.mojo.sql.SqlSplitter;
+import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.DriverManagerUtil;
 import org.seasar.framework.util.StatementUtil;
 
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+
 /**
- *
+ * execute-ddl.
+ * 
+ * DDLを実行する。
+ * 
  * @author kawasima
  */
 @Mojo(name = "execute-ddl")
@@ -68,10 +73,15 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
         DriverManagerUtil.registerDriver(driver);
-		Dialect dialect = DialectFactory.getDialect(url);
-		dialect.dropAll(user, password, adminUser, adminPassword, schema);
+		Dialect dialect = DialectFactory.getDialect(url, driver);
+		
+		// ユーザの作成を行います
 		dialect.createUser(user, password, adminUser, adminPassword);
-
+		
+		// 指定スキーマ内のテーブル、ビュー、シーケンスを全て削除します。
+		// 指定スキーマが存在しない場合は作成します。
+		dialect.dropAll(user, password, adminUser, adminPassword, schema);
+		
         FilenameFilter sqlFileFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -91,11 +101,16 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
                 return f1.getName().compareTo(f2.getName());
             }
         });
+
 		try {
-            executeBySqlFiles(files.toArray(new File[files.size()]));
+			executeBySqlFiles(files.toArray(new File[files.size()]));
 		} catch (Exception e) {
-			getLog().warn(e);
+			getLog().error(e);
+			throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
 		}
+
+        // コネクション解放
+        ConnectionUtil.close(conn);
 	}
 
     private void executeSql(String sql) throws SQLException {
@@ -137,9 +152,10 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 
     }
 
-    private void executeBySqlFiles(File...sqlFiles) throws SQLException, IOException {
-        if (conn == null || conn.isClosed())
-            conn = DriverManager.getConnection(url, user, password);
+    private void executeBySqlFiles(File...sqlFiles) throws SQLException, IOException, MojoExecutionException {
+        if (conn == null || conn.isClosed()) {
+        	conn = DriverManager.getConnection(url, user, password);
+        }
 
         successfulStatements = 0;
         totalStatements = 0;
@@ -148,8 +164,12 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
             try {
                 reader = new FileReader(sqlFile);
                 runStatements(reader);
-            } catch(Exception e) {
-                getLog().error(e);
+            } catch(Exception e){
+            	getLog().warn(e);
+            	
+            	if(onError.equals("abort"))
+            	  throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
+            	
             } finally {
                 IOUtils.closeQuietly(reader);
             }
@@ -157,4 +177,5 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
         getLog().info(successfulStatements + " of " + totalStatements
                 + " SQL statements executed successfully");
     }
+
 }

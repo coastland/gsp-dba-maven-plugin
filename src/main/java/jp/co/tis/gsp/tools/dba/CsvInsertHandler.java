@@ -59,7 +59,7 @@ public class CsvInsertHandler {
 
 	public void prepare() throws SQLException {
 		StringBuilder sb = new StringBuilder("INSERT INTO ");
-		sb.append(tableName).append("(")
+		sb.append(schema).append(".").append(tableName).append("(")
 			.append(StringUtils.join(columns, ','))
 			.append(") VALUES (");
 		for(int i=0; i<columns.size(); i++) {

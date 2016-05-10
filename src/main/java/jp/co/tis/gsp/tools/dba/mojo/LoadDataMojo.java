@@ -49,6 +49,10 @@ import org.seasar.framework.util.tiger.CollectionsUtil;
 import com.csvreader.CsvReader;
 
 /**
+ * load-data.
+ * 
+ * CSV形式で定義したデータをデータベースに登録する。
+ * 
  * @author kawasima
  */
 @Mojo(name = "load-data")
@@ -66,8 +70,8 @@ public class LoadDataMojo extends AbstractDbaMojo {
 	 * &lt;/specifiedEncodingFiles&gt;
 	 * </pre>
 	 * </p>
-	 * @parameter
 	 */
+    @Parameter
 	@SuppressWarnings("rawtypes")
 	protected Map specifiedEncodingFiles;
 
@@ -91,8 +95,8 @@ public class LoadDataMojo extends AbstractDbaMojo {
 
 		// 依存関係を考慮し読み込むファイル順をソートする
 		EntityDependencyParser parser = new EntityDependencyParser();
-		Dialect dialect = DialectFactory.getDialect(url);
-		parser.parse(conn, url, dialect.normalizeSchemaName(schema));
+		Dialect dialect = DialectFactory.getDialect(url, driver);
+		parser.parse(conn, url, schema);
 		final List<String> tableList = parser.getTableList();
 		Collections.sort(files, new Comparator<File>() {
 			@Override
@@ -143,8 +147,12 @@ public class LoadDataMojo extends AbstractDbaMojo {
 					insertHandler.close();
 				} catch (IOException e) {
 					getLog().warn("ファイルがオープンできません:"+file, e);
+	            	if(onError.equals("abort"))
+	            		throw new MojoExecutionException("", e);
 				} catch (SQLException e) {
 					getLog().warn("SQL実行中にエラーが発生しました:"+file, e);
+	            	if(onError.equals("abort"))
+	            		throw new MojoExecutionException("", e);
 				} finally {
 					if (reader != null)
 						reader.close();

@@ -16,6 +16,9 @@
 
 package jp.co.tis.gsp.tools.db.beans;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -57,7 +60,7 @@ public class Column {
         }
         return false;
     }
-
+    
     public Boolean isSingularPrimaryKey() {
         if (!isPrimaryKey() || isForeignKey())
             return false;
@@ -71,18 +74,40 @@ public class Column {
     }
 
     public Boolean isAutoIncrement() {
-        return StringUtils.equalsIgnoreCase(defaultValue, "AUTO_INCREMENT")
-                || isSingularPrimaryKey();
-
+        return (isSingularPrimaryKey() && isNumericDataType());
     }
+
+	private Boolean isNumericDataType() {
+		// 重複は削除してもたいしたパフォーマンス向上にならないうえ、
+		// 後々のメンテナンス性が著しく下がると思われるため放置する。
+		List<String> numericDataTypeList = Arrays.asList(
+				// Oracle
+				"INTEGER", "SHORTINTEGER", "LONGINTEGER", "DECIMAL", "SHORTDECIMAL", "NUMBER",
+				// Postgres
+				"smallint", "integer", "bigint", "decimal", "numeric", "real",
+				"double precision", "smallserial", "serial", "bigserial",
+				// DB2
+				"BIGINT", "SMALLINT", "INTEGER", "DOUBLE", "NUMERIC", "REAL",
+				// H2Database
+				"INT", "INTEGER", "MEDIUMINT", "INT4", "SIGNED",
+				"TINYINT", "SMALLINT", "INT2", "YEAR", "BIGINT",
+				"INT8", "IDENTITY", "DECIMAL", "NUMBER", "DEC",
+				"NUMERIC", "DOUBLE", "DOUBLE PRECISION", "FLOAT",
+				"FLOAT8", "REAL", "FLOAT4",
+				// SQL Server
+				"bigint", "bit", "decimal", "int", "money", "numeric",
+				"smallint", "smallmoney", "tinyint", "float", "real",
+				// MySQL
+				"INTEGER", "SMALLINT", "DECIMAL", "NUMERIC", "FLOAT", "REAL",
+				"DOUBLE PRECISION", "INT", "DEC", "FIXED", "DOUBLE", "BIT"
+		);
+		return numericDataTypeList.contains(dataType);
+	}
 
     public String getGeneratorKeyName() {
-        if (isSingularPrimaryKey()) {
             return name + "_SEQ";
-        } else {
-            return name + "_USEQ";
-        }
     }
+    
 	public Boolean isArray() {
 		return isArray;
 	}
@@ -93,7 +118,7 @@ public class Column {
 		return required != 1;
 	}
 
-	private ForeignKeyColumn foreignKeyColumn;
+	private List<ForeignKeyColumn> foreignKeyColumnList;
 
 	@XmlAttribute(name="ID")
 	public Integer getId() {
@@ -189,16 +214,16 @@ public class Column {
 	}
 
 	@XmlElementRef(name="FK")
-	public ForeignKeyColumn getForeignKeyColumn() {
-		return foreignKeyColumn;
+	public List<ForeignKeyColumn> getForeignKeyColumnList() {
+		return foreignKeyColumnList;
 	}
 
-	public void setForeignKeyColumn(ForeignKeyColumn foreignKeyColumn) {
-		this.foreignKeyColumn = foreignKeyColumn;
+	public void setForeignKeyColumnList(List<ForeignKeyColumn> foreignKeyColumnList) {
+		this.foreignKeyColumnList = foreignKeyColumnList;
 	}
 
 	public boolean hasForeignKeyColumn() {
-		return foreignKeyColumn != null;
+		return foreignKeyColumnList != null && foreignKeyColumnList.size() > 0;
 	}
 
     @XmlTransient
