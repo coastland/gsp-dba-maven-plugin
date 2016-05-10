@@ -222,17 +222,23 @@ public class MysqlDialect extends Dialect {
 	@Override
 	public void importSchema(String user, String password, String schema,
 			File dumpFile) throws MojoExecutionException {
+		
 		try {
-			ProcessUtil.execWithInput(dumpFile,
+			
+            String[] args = new String[]{
 					"mysql",
+					"--default-character-set=utf8",
 					"-u", user,
 					"--password="+ password,
-					schema
-					);
+					"-D", schema,
+					"-e", "\"source " + dumpFile.getAbsolutePath().replaceAll("\\\\", "/") + "\""
+			};
+            
+            ProcessUtil.execWithInput(args);
+
 		} catch (Exception e) {
 			throw new MojoExecutionException("スキーマインポート実行中にエラー", e);
 		}
-
 	}
 
 	@Override
