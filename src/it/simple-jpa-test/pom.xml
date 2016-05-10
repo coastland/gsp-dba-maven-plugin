@@ -15,7 +15,7 @@
 	</parent>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>1.6</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -112,6 +112,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
