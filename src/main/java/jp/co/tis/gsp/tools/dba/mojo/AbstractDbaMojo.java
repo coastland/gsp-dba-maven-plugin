@@ -54,11 +54,11 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     @Parameter
     protected String adminPassword;
     
-	/**
+    /**
      * The name of database user.
-	 */
+     */
     @Parameter(required = true)
-	protected String user;
+    protected String user;
 
     /**
      * The password of database user;
@@ -66,18 +66,18 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     @Parameter
     protected String password;
 
-	/**
-	 * The name of schema.
-	 */
+    /**
+     * The name of schema.
+     */
     @Parameter
-	protected String schema;
+    protected String schema;
 
 
-	/**
-	 * dumpFile
-	 */
+    /**
+     * dumpFile
+     */
     @Parameter
-	protected String dmpFile;
+    protected String dmpFile;
 
     /**
      * additional Dialect names.<br/>
@@ -134,22 +134,22 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
             if (url.split(":")[1].equals("h2")) {
                 schema = "PUBLIC";
             } else if(url.split(":")[1].equals("mysql")) {
-            	try {
-            		//データベース名をスキーマ名としてセット
-					Connection conn = DriverManager.getConnection(url, adminUser, adminPassword);
-					schema = dialect.normalizeSchemaName(conn.getCatalog());
-				} catch (SQLException e) {
-					throw new MojoExecutionException("MySQL:データベース名の取得に失敗しました。", e);
-				}
+                try {
+                    //データベース名をスキーマ名としてセット
+                    Connection conn = DriverManager.getConnection(url, adminUser, adminPassword);
+                    schema = dialect.normalizeSchemaName(conn.getCatalog());
+                } catch (SQLException e) {
+                    throw new MojoExecutionException("MySQL:データベース名の取得に失敗しました。", e);
+                }
             }else {
                 schema = user;
             }
         }else{
-        	if(url.split(":")[1].equals("mysql")) {
-        		throw new MojoExecutionException("MySQLではスキーマを指定することは出来ません。");
-        	}
-        	
-        	schema = dialect.normalizeSchemaName(schema);
+            if(url.split(":")[1].equals("mysql")) {
+                throw new MojoExecutionException("MySQLではスキーマを指定することは出来ません。");
+            }
+            
+            schema = dialect.normalizeSchemaName(schema);
         }
         
         executeMojoSpec();
@@ -162,4 +162,17 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
      * @throws MojoFailureException @{@link org.apache.maven.plugin.Mojo#execute()}
      */
     protected abstract void executeMojoSpec() throws MojoExecutionException, MojoFailureException;
+    
+    protected void copyParameter(AbstractDbaMojo mojo) {
+        mojo.adminPassword = adminPassword;
+        mojo.adminUser = adminUser;
+        mojo.driver = driver;
+        mojo.password = password;
+        mojo.schema = schema;
+        mojo.user = user;
+        mojo.url = url;
+        mojo.onError = onError;
+        mojo.dmpFile = dmpFile;
+        mojo.optionalDialects = optionalDialects;
+    }
 }
