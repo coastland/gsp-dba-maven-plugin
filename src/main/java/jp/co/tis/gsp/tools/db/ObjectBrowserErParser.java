@@ -47,6 +47,7 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
     protected boolean printForeignKey = true;
     protected boolean printView  = true;
     protected LengthSemantics lengthSemantics = LengthSemantics.BYTE;
+    protected int allocationSize;
 
 	public void parse(File erdFile) throws JAXBException, IOException, TemplateException {
 		JAXBContext context = JAXBContext.newInstance(Erd.class);
@@ -100,8 +101,12 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
                     .getEnumModels()
                     .get(LengthSemantics.class.getName()));
             dto.put("lengthSemantics", lengthSemantics);
-            if (printTable)
+            dto.put("allocationSize", allocationSize);
+
+            if (printTable) {
                 template.process(dto, getWriter("10_CREATE_"+entity.getName()));
+            }
+                
 
             // index
 			int i=0;
@@ -185,5 +190,13 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 
     public void setLengthSemantics(LengthSemantics lengthSemantics) {
         this.lengthSemantics = lengthSemantics;
+    }
+
+    public int getAllocationSize() {
+        return allocationSize;
+    }
+
+    public void setAllocationSize(int allocationSize) {
+        this.allocationSize = allocationSize;
     }
 }

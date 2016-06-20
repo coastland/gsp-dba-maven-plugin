@@ -8,5 +8,5 @@ CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
 <#if column.label?has_content>COMMENT ON column <#if entity.schema??>${entity.schema}</#if>${entity.name}.${column.name} is '${column.label}';</#if>
 </#foreach>
 <#foreach column in entity.columnList>
-<#if column.isAutoIncrement()>CREATE SEQUENCE <#if entity.schema??>${entity.schema}</#if>${column.generatorKeyName} increment by 1 start with 1;</#if>
+<#if column.isAutoIncrement()>CREATE SEQUENCE <#if entity.schema??>${entity.schema}</#if>${column.generatorKeyName} increment by ${allocationSize} start with 1;</#if>
 </#foreach>

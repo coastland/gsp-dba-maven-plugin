@@ -32,7 +32,7 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "type", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
-			TestDB.sqlserver, TestDB.mysql })
+	        TestDB.sqlserver, TestDB.mysql })
 	public void testType() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
@@ -80,7 +80,7 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "basic", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
-			TestDB.sqlserver, TestDB.mysql })
+	        TestDB.sqlserver, TestDB.mysql })
 	public void testBasic() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
@@ -115,7 +115,7 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "ddlTemplateFileDir", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
-			TestDB.sqlserver, TestDB.mysql })
+	        TestDB.sqlserver, TestDB.mysql })
 	public void testDdlTemplateFileDir() throws Exception {
 		for (MojoTestFixture mf : mojoTestFixtureList) {
 
@@ -185,7 +185,7 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "another_schema", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.sqlserver,
-			TestDB.db2 })
+	        TestDB.db2 })
 	public void testAnotherSchema() throws Exception {
 		for (MojoTestFixture mf : mojoTestFixtureList) {
 
@@ -346,8 +346,44 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 
 			// 検証
 			String actualPath = mojo.outputDirectory.getAbsolutePath();
-			Directory actualFiles = (Directory)DirUtil.collectEntry(actualPath);
+			Directory actualFiles = (Directory) DirUtil.collectEntry(actualPath);
 			assertThat("TestDb:" + mf.testDb, actualFiles.getList().size(), is(0));
+		}
+	}
+
+	/**
+	 * allocationSizeを指定した場合のテスト。
+	 * 
+	 * <h4>検証内容</h4>
+	 * <ul>
+	 * <li>oracleのみでテスト。</li>
+	 * <li>allocationSizeに100を指定。</li>
+	 * </ul>
+	 * 
+	 * <h4>検証結果</h4>
+	 * <ul>
+	 * <li>期待値DDLファイルと同一であること。</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@TestDBPattern(testCase = "allocationSize", testDb = { TestDB.oracle })
+	public void testAllocationSize() throws Exception {
+
+		// 指定されたケース及びテスト対象のDBだけループ
+		for (MojoTestFixture mf : mojoTestFixtureList) {
+
+			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+			GenerateDdlMojo mojo = this.lookupConfiguredMojo(pom, GENERATE_DDL, mf.testDb);
+			mojo.execute();
+
+			// 検証
+			String actualPath = mojo.outputDirectory.getAbsolutePath();
+			Entry actualFiles = DirUtil.collectEntry(actualPath);
+			Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "ddl");
+			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
 		}
 	}
 }
