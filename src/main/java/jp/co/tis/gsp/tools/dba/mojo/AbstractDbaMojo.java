@@ -162,4 +162,17 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
      * @throws MojoFailureException @{@link org.apache.maven.plugin.Mojo#execute()}
      */
     protected abstract void executeMojoSpec() throws MojoExecutionException, MojoFailureException;
+    
+    protected void copyParameter(AbstractDbaMojo mojo) {
+        mojo.adminPassword = adminPassword;
+        mojo.adminUser = adminUser;
+        mojo.driver = driver;
+        mojo.password = password;
+        mojo.schema = schema;
+        mojo.user = user;
+        mojo.url = url;
+        mojo.onError = onError;
+        mojo.dmpFile = dmpFile;
+        mojo.optionalDialects = optionalDialects;
+    }
 }
