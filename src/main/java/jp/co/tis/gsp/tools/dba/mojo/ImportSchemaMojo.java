@@ -18,12 +18,13 @@ package jp.co.tis.gsp.tools.dba.mojo;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Map;
+import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -50,7 +51,7 @@ import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 @Mojo(name = "import-schema", requiresProject = true)
 public class ImportSchemaMojo extends AbstractDbaMojo {
     @Parameter(defaultValue = "target/dump")
-    protected File inputDirectory;
+	protected File inputDirectory;
 
     @Component
     private MavenProject project;
@@ -69,22 +70,12 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
     @Parameter(defaultValue = "${project.version}")
     protected String version;
-    
-    /*** LoadData Param **/
-    @Parameter
-    @SuppressWarnings("rawtypes")
-    protected Map specifiedEncodingFiles;
-
-    /*** jar内のディレクトリ構造 **/
-    private final String DDL_DIR_NAME = "ddlDirectory";
-    private final String EXTRADDL_DIR_NAME = "extraDdlDirecotry";
-    private final String DATA_DIR_NAME = "dataDirectory";
 
     @Override
-    protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-        Dialect dialect = DialectFactory.getDialect(url, driver);
-        dialect.createUser(user, password, adminUser, adminPassword);
-        dialect.dropAll(user, password, adminUser, adminPassword, schema);
+	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
+		Dialect dialect = DialectFactory.getDialect(url, driver);
+		dialect.createUser(user, password, adminUser, adminPassword);
+		dialect.dropAll(user, password, adminUser, adminPassword, schema);
 
         Artifact artifact = repositorySystem.createArtifact(groupId, artifactId, version, "jar");
         ArtifactResolutionRequest schemaArtifactRequest = new ArtifactResolutionRequest()
@@ -96,69 +87,27 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
                 getLog().error("インポートするダンプファイルの取得に失敗しました。", e);
             }
         }
-        
-        // ddl及びdataディレクトリの取り出し
+
+        JarFile jarFile = JarFileUtil.create(new File(localRepository.getBasedir(),
+                localRepository.pathOf(artifact)));
+        String importFilename = StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp");
+        InputStream is = null;
+        File importFile = new File(inputDirectory, importFilename);
+        JarEntry jarEntry = jarFile.getJarEntry(importFilename);
+        if (jarEntry == null)
+            throw new MojoExecutionException(importFilename + " is not found?");
         try {
-            if (!inputDirectory.exists()) {
-                try {
-                    FileUtils.forceMkdir(inputDirectory);
-                } catch (IOException e) {
-                    throw new MojoExecutionException("Can't create dump output directory." + inputDirectory, e);
-                }
-            }
-
-            JarFile jarFile = JarFileUtil
-                    .create(new File(localRepository.getBasedir(), localRepository.pathOf(artifact)));
-            allExtract(jarFile, inputDirectory.getPath());
-        } catch (IOException e) {
+            is = jarFile.getInputStream(jarEntry);
+            FileUtils.copyInputStreamToFile(is, importFile);
+        } catch(IOException e) {
             throw new MojoExecutionException("", e);
+        } finally {
+            IOUtils.closeQuietly(is);
         }
 
-        getLog().info("スキーマのインポートを開始します。:");
-        createExecuteDdlMojo().executeMojoSpec();
-        createLoadDataMojo().executeMojoSpec();
-        getLog().info("スキーマのインポートを終了しました");
-    }
-
-    private ExecuteDdlMojo createExecuteDdlMojo() {
-        ExecuteDdlMojo mojo = new ExecuteDdlMojo();
-        copyParameter(mojo);
-
-        mojo.setLog(getLog());
-        mojo.ddlDirectory = new File(inputDirectory, DDL_DIR_NAME);
-        mojo.extraDdlDirectory = new File(inputDirectory, EXTRADDL_DIR_NAME);
-
-        return mojo;
-    }
-
-    private LoadDataMojo createLoadDataMojo() {
-        LoadDataMojo mojo = new LoadDataMojo();
-        copyParameter(mojo);
-
-        mojo.setLog(getLog());
-        mojo.dataDirectory = new File(inputDirectory, DATA_DIR_NAME);
-        mojo.specifiedEncodingFiles = specifiedEncodingFiles;
-
-        return mojo;
-    }
-
-    private void allExtract(JarFile jar, String destDir) throws IOException {
-        Enumeration<JarEntry> enumEntries = jar.entries();
-        while (enumEntries.hasMoreElements()) {
-            java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
-            java.io.File f = new java.io.File(destDir + java.io.File.separator + file.getName());
-            if (file.isDirectory()) {
-                f.mkdir();
-                continue;
-            }
-            java.io.InputStream is = jar.getInputStream(file);
-            java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            while (is.available() > 0) {
-                fos.write(is.read());
-            }
-            fos.close();
-            is.close();
-        }
-    }
+		getLog().info("スキーマのインポートを開始します。:" + importFile);
+		dialect.importSchema(adminUser, adminPassword, schema, importFile);
+		getLog().info("スキーマのインポートを終了しました");
+	}
 
 }
