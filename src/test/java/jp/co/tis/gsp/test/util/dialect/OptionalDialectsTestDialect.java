@@ -6,6 +6,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 
 public class OptionalDialectsTestDialect extends Dialect {
 
@@ -15,12 +17,12 @@ public class OptionalDialectsTestDialect extends Dialect {
 	}
 
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public void exportSchema(String user, String password, String schema, ExportParams expParams) throws MojoExecutionException {
 
 	}
 
 	@Override
-	public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public void importSchema(String user, String password, String schema, ImportParams impParams) throws MojoExecutionException {
 	}
 
 	@Override

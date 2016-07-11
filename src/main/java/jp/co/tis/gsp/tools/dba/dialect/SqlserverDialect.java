@@ -81,14 +81,6 @@ public class SqlserverDialect extends Dialect {
         );
     }
     
-    /**
-     * SqlServer2008ではdmpファイルのエクスポートがサポートされていないため実装しない。
-     */
-    @Override
-    public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
-        throw new UnsupportedOperationException("Sqlserverを用いたexport-schemaはサポートしていません。");
-    }
-
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
@@ -147,14 +139,6 @@ public class SqlserverDialect extends Dialect {
             StatementUtil.close(stmt);
             ConnectionUtil.close(conn);
         }
-    }
-
-    /**
-     * SqlServer2008ではdmpファイルのインポートがサポートされていないため実装しない。
-     */
-    @Override
-    public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
-        throw new UnsupportedOperationException("Sqlserverを用いたimport-schemaはサポートしていません。");
     }
 
     @Override

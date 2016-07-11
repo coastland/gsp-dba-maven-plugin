@@ -43,6 +43,8 @@ import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class PostgresqlDialect extends Dialect {
@@ -77,10 +79,12 @@ public class PostgresqlDialect extends Dialect {
 
     @Override
     public void exportSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+            ExportParams expFileParam) throws MojoExecutionException {
         BufferedInputStream in = null;
         FileOutputStream out = null;
         try {
+            File dumpFile = expFileParam.getDumpFile();
+            
             ProcessBuilder pb = new ProcessBuilder(
                     "pg_dump",
                     "--host=" + getHost(),
@@ -174,7 +178,7 @@ public class PostgresqlDialect extends Dialect {
 
     @Override
     public void importSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+            ImportParams params) throws MojoExecutionException {
 
         Map<String, String> environment = new HashMap<String, String>();
         if (StringUtils.isNotEmpty(password)) {
@@ -182,6 +186,7 @@ public class PostgresqlDialect extends Dialect {
         }
         
         try {
+            File dumpFile = params.getDumpFile();
             String[] args = new String[]{
                     "psql",
                     "--host", getHost(),

@@ -19,9 +19,6 @@ package jp.co.tis.gsp.tools.dba.mojo;
 import java.io.File;
 import java.io.IOException;
 
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -32,6 +29,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
+
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
 
 /**
  * export-schema.
@@ -51,7 +52,13 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
     @Component
     private MavenProject project;
+    
+    @Parameter(defaultValue = "target/ddl")
+    protected File ddlDirectory;
 
+    @Parameter
+    protected File extraDdlDirectory;
+    
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
 		Dialect dialect = DialectFactory.getDialect(url, driver);
@@ -62,22 +69,38 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 				throw new MojoExecutionException("Can't create dump output directory." + outputDirectory, e);
 			}
 		}
-		File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
-		getLog().info(schema+"スキーマのExportを開始します。:" + exportFile);
+		
+		getLog().info(schema+"スキーマのExportを開始します。");
+
 		try {
-			dialect.exportSchema(adminUser, adminPassword, schema, exportFile);
+		    ExportParams expParams = createExportParams();
+			dialect.exportSchema(adminUser, adminPassword, schema, expParams);
 
 		} catch (Exception e) {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);
 		}
-        jarArchiver.addFile(exportFile, exportFile.getName());
+        
+        jarArchiver.addDirectory(outputDirectory);
         jarArchiver.setDestFile(new File(outputDirectory, jarName()));
+        
         try {
             jarArchiver.createArchive();
         } catch(IOException e) {
             throw new MojoExecutionException("アーカイブに失敗しました。", e);
         }
 		getLog().info(schema+"スキーマのExport完了 ");
+	}
+	
+	private ExportParams createExportParams() {
+	    ExportParams param = new ExportParams();
+	    File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
+	    
+	    param.setDumpFile(exportFile);
+	    param.setDdlDirectory(ddlDirectory);
+	    param.setExtraDdlDirectory(extraDdlDirectory);
+	    param.setOutputDirectory(outputDirectory);
+	    
+	    return param;
 	}
 
 
