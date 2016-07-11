@@ -79,11 +79,11 @@ public class PostgresqlDialect extends Dialect {
 
     @Override
     public void exportSchema(String user, String password, String schema,
-            ExportParams expFileParam) throws MojoExecutionException {
+            ExportParams params) throws MojoExecutionException {
         BufferedInputStream in = null;
         FileOutputStream out = null;
         try {
-            File dumpFile = expFileParam.getDumpFile();
+            File dumpFile = params.getDumpFile();
             
             ProcessBuilder pb = new ProcessBuilder(
                     "pg_dump",
