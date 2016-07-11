@@ -9,10 +9,10 @@ public class ExportParams {
     private File ddlDirectory;
 
     private File extraDdlDirectory;
-    
+
     private File dataDirectory;
 
-	private File outputDirectory;
+    private File outputDirectory;
 
     public File getDumpFile() {
         return dumpFile;
