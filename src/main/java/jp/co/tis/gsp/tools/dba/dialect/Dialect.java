@@ -82,15 +82,15 @@ public abstract class Dialect {
     private final String EXTRADDL_DIR_NAME = "extraDdlDirecotry";
     private final String DATA_DIR_NAME = "dataDirectory";
     
-	public void exportSchema(String user, String password, String schema, ExportParams expParams) throws MojoExecutionException {
+	public void exportSchema(String user, String password, String schema, ExportParams params) throws MojoExecutionException {
 
 	    // CSVデータ出力
-	    exportCsv(user, password, schema, new File(expParams.getOutputDirectory(), DATA_DIR_NAME), UTF8);
+	    exportCsv(user, password, schema, new File(params.getOutputDirectory(), DATA_DIR_NAME), UTF8);
 	    
 	    // DDL & extraDDLの収集
 	    try {
-	        FileUtils.copyDirectory(expParams.getDdlDirectory(), new File(expParams.getOutputDirectory(), DDL_DIR_NAME));
-	        FileUtils.copyDirectory(expParams.getExtraDdlDirectory(), new File(expParams.getOutputDirectory(), EXTRADDL_DIR_NAME));
+	        FileUtils.copyDirectory(params.getDdlDirectory(), new File(params.getOutputDirectory(), DDL_DIR_NAME));
+	        FileUtils.copyDirectory(params.getExtraDdlDirectory(), new File(params.getOutputDirectory(), EXTRADDL_DIR_NAME));
         } catch (IOException e) {
 	        throw new MojoExecutionException("DDLとデータファイルのコピーに失敗しました。", e);
         }
@@ -111,17 +111,17 @@ public abstract class Dialect {
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
 
-	public void importSchema(String user, String password, String schema, ImportParams impParams) throws MojoExecutionException {
-	    File inputDir = impParams.getInputDirectory();
+	public void importSchema(String user, String password, String schema, ImportParams params) throws MojoExecutionException {
+	    File inputDir = params.getInputDirectory();
 	    
 	    // DDLの実行
 	    SqlExecutor sqlExecutor = new SqlExecutor(schema, user, password, new File(inputDir, DDL_DIR_NAME), new File(inputDir, EXTRADDL_DIR_NAME), 
-	            impParams.getDelimiter(), impParams.getOnError(), impParams.getLogger());
+	            params.getDelimiter(), params.getOnError(), params.getLogger());
 	    sqlExecutor.execute();
 	    
 	    // LoadDataの実行
         CsvDataLoader dataLoader = new CsvDataLoader(url, driver, schema, user, password, new File(inputDir, DATA_DIR_NAME), UTF8,
-                null, impParams.getOnError(), impParams.getLogger());
+                null, params.getOnError(), params.getLogger());
         dataLoader.execute();
 	    
 	}
