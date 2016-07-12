@@ -43,6 +43,8 @@ import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 
 public class OracleDialect extends Dialect {
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
@@ -97,9 +99,14 @@ public class OracleDialect extends Dialect {
     }
 
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public void exportSchema(ExportParams params) throws MojoExecutionException {
 		BufferedReader reader = null;
 		try {
+		    File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
+		    
             createDirectory(user, password, dumpFile.getParentFile());
 			ProcessBuilder pb = new ProcessBuilder(
 					"expdp",
@@ -136,10 +143,14 @@ public class OracleDialect extends Dialect {
 	}
 
 	@Override
-	public void importSchema(String user, String password, String schema,
-			File dumpFile) throws MojoExecutionException{
+	public void importSchema(ImportParams params) throws MojoExecutionException{
 		BufferedReader reader = null;
 		try {
+			File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
+
             createDirectory(user, password, dumpFile.getParentFile());
             
             // Oracleの場合はオブジェクトのドロップをする

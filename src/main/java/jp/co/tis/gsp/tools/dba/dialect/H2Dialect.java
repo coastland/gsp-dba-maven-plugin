@@ -14,6 +14,8 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.StatementUtil;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 
 public class H2Dialect extends Dialect {
     
@@ -28,10 +30,13 @@ public class H2Dialect extends Dialect {
     }
 
     @Override
-    public void exportSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+    public void exportSchema(ExportParams params) throws MojoExecutionException {
         Connection conn = null;
         try {
+            File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+
             conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement();
             stmt.execute("SCRIPT DROP TO '" + dumpFile.getAbsolutePath()+ "'");
@@ -85,10 +90,13 @@ public class H2Dialect extends Dialect {
 	}
 
     @Override
-    public void importSchema(String user, String password, String schema,
-            File dumpFile) throws MojoExecutionException {
+    public void importSchema(ImportParams params) throws MojoExecutionException {
         Connection conn = null;
         try {
+            File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+
             conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement();
             stmt.execute("RUNSCRIPT FROM '" + dumpFile.getAbsolutePath()+ "'");

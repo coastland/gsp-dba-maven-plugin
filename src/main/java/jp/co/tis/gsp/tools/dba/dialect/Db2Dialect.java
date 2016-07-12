@@ -68,14 +68,6 @@ public class Db2Dialect extends Dialect {
         );
     }
 
-    /**
-     * DB2ではスキーマ構造をエクスポートできないため、export-schemaをサポートしない。
-     */
-    @Override
-    public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
-        throw new UnsupportedOperationException("db2を用いたexport-schemaはサポートしていません。");
-    }
-
     @Override
     public void dropAll(String user, String password, String adminUser,
             String adminPassword, String schema) throws MojoExecutionException {
@@ -124,14 +116,6 @@ public class Db2Dialect extends Dialect {
         } finally {
             StatementUtil.close(stmt);
         }
-    }
-
-    /**
-     * DB2ではスキーマ構造をエクスポートできないため、import-schemaをサポートしない。
-     */
-    @Override
-    public void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
-        throw new UnsupportedOperationException("db2を用いたimport-schemaはサポートしていません。");
     }
 
     /**

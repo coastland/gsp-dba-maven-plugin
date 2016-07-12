@@ -322,7 +322,10 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 ### export-schema
 
-指定したスキーマのダンプファイルをエクスポートします。
+指定したスキーマのダンプファイルをエクスポートします。  
+DBMS固有のエクスポート機能を内部で呼び出すことで実現しています。
+ただし、DB2とSqlServerに関してはDBMS固有のエクスポート機能を用いることが出来ないため、DDLファイルとCSVファイルをパッケージングする汎用モードで代替します。  
+※[汎用モードの詳細](#exportSchemaGeneral)
 
     maven-install-pluginやmaven-deploy-pluginと組み合わせることで、
     ローカル環境へのインストールやリモートリポジトリへのデプロイが可能になります。
@@ -364,9 +367,27 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | 設定値                 | 必須  | 説明                                                                                  |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
 | outputDirectory        | ×     | データベーススキーマをエクスポートするディレクトリのパス。デフォルトは”target/dump”。 |
+| ddlDirectory           | ×     | [汎用モード](#汎用モード)で利用。 DDLディレクトリを指定する。                                  |
+| extraDdlDirectory      | ×     | [汎用モード](#汎用モード)で利用。 追加DDLディレクトリを指定する。                              |
 
-export-schemaはDB2とSQLServerには対応しておりません。  
-これらのDBを使用する際は、上記の`<execution>~</execution>`をコメントアウト、もしくは削除してください。
+#### <a name="exportSchemaGeneral"> 汎用モード
+- DB2とSQLServerの場合に動作するエクスポート処理の挙動で、DBMS固有のエクスポート機能を使用しません。
+- CSVデータとDDLファイルをパッケージングすることで、スキーマのエクスポート処理を代替します。
+- CSVデータはgsp-dba-maven-pluginで出力します。DDL及び追加DDLは予め用意しておき、上記パラメータの`ddlDirectory`、`extraDdlDirectory`で場所を指定して下さい。
+- 出力されるCSVデータの文字エンコーディングはUTF-8です。
+- 以下に処理の流れを記載します。
+    1. 指定スキーマのテーブルデータをCSVデータとして出力(to dataDirectory)。
+    2. 上記パラメータ`ddlDirectory`配下のDDLファイルを収集します。
+    3. 上記パラメータ`extraDdlDirectory`配下のDDLファイルを収集します。
+    4. 上記３つのリソースをjarファイルにパッケージングします。
+    ```
+    ex.) export-schema.jar
+           ├─ META-INF/
+           ├─ dataDirectory/
+           ├─ ddlDirectory/
+           └─ extraDdlDirectory/
+    ```
+
 
 ### import-schema
 
@@ -398,7 +419,12 @@ export-schemaはDB2とSQLServerには対応しておりません。
 | artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
 | version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
 
-import-schemaはDB2とSQLServerには対応しておりません。
+#### <a name="importSchemaGeneral"> 汎用モード
+- DB2とSQLServerの場合は汎用モードのエクスポートとなるため、それを取り込むことでスキーマのインポートとなります。
+- 以下に処理の流れを記載します。
+    1. 汎用モードで出力されたエクスポートjarファイルを取得、展開します。
+    2. `ddlDirectory`及び`extraDdlDirectory`のDDLファイルを実行します。
+    3. `dataDirectory`内のCSVデータをロードします。
 
 ### データベースごとの対応状況
 
@@ -429,20 +455,26 @@ import-schemaはDB2とSQLServerには対応しておりません。
 #### export-schema
 
 * 全データベース共通<br />
-  gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。
+  gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。  
+
+  ただし、[汎用モード](#exportSchemaGeneral)で動作させることで実現可能です。  
+  既存Dialectのexport-schemaの汎用モード化に関しては、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
 * MS SQL Server<br />
-  使用できません。
+  [汎用モード](#exportSchemaGeneral)で動作します。
 * DB2<br />
-  使用できません。
+  [汎用モード](#exportSchemaGeneral)で動作します。
 
 #### import-schema
 
 * 全データベース共通<br />
   gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。
+
+  ただし、[汎用モード](#importSchemaGeneral)で動作させることで実現可能です。  
+  既存Dialectのimport-schemaの汎用モード化に関して、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
 * MS SQL Server<br />
-  使用できません。
+  [汎用モード](#importSchemaGeneral)で動作します。
 * DB2<br />
-  使用できません。
+  [汎用モード](#importSchemaGeneral)で動作します。
 
 ## License
 

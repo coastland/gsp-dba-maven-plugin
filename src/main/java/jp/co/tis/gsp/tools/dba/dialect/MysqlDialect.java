@@ -40,6 +40,8 @@ import org.seasar.framework.util.StatementUtil;
 import org.seasar.framework.util.tiger.Maps;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class MysqlDialect extends Dialect {	
@@ -72,10 +74,15 @@ public class MysqlDialect extends Dialect {
 
 
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public void exportSchema(ExportParams params) throws MojoExecutionException {
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
 		try {
+		    File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
+		    
 			ProcessBuilder pb = new ProcessBuilder(
 					"mysqldump",
 					schema,
@@ -220,11 +227,14 @@ public class MysqlDialect extends Dialect {
 	}
 	
 	@Override
-	public void importSchema(String user, String password, String schema,
-			File dumpFile) throws MojoExecutionException {
+	public void importSchema(ImportParams params) throws MojoExecutionException {
 		
 		try {
-			
+			File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
+
             String[] args = new String[]{
 					"mysql",
 					"--default-character-set=utf8",
