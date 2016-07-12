@@ -78,12 +78,14 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void exportSchema(String user, String password, String schema,
-            ExportParams params) throws MojoExecutionException {
+    public void exportSchema(ExportParams params) throws MojoExecutionException {
         BufferedInputStream in = null;
         FileOutputStream out = null;
         try {
             File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
             
             ProcessBuilder pb = new ProcessBuilder(
                     "pg_dump",
@@ -177,8 +179,10 @@ public class PostgresqlDialect extends Dialect {
     }
 
     @Override
-    public void importSchema(String user, String password, String schema,
-            ImportParams params) throws MojoExecutionException {
+    public void importSchema(ImportParams params) throws MojoExecutionException {
+
+	    String user = params.getUser();
+	    String password = params.getPassword();
 
         Map<String, String> environment = new HashMap<String, String>();
         if (StringUtils.isNotEmpty(password)) {

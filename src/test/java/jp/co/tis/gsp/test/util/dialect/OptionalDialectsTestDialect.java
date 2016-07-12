@@ -17,12 +17,12 @@ public class OptionalDialectsTestDialect extends Dialect {
 	}
 
 	@Override
-	public void exportSchema(String user, String password, String schema, ExportParams expParams) throws MojoExecutionException {
+	public void exportSchema(ExportParams expParams) throws MojoExecutionException {
 
 	}
 
 	@Override
-	public void importSchema(String user, String password, String schema, ImportParams impParams) throws MojoExecutionException {
+	public void importSchema(ImportParams impParams) throws MojoExecutionException {
 	}
 
 	@Override

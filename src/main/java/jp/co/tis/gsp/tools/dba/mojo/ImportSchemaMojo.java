@@ -115,7 +115,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
         }
 
 		getLog().info("スキーマのインポートを開始します。");
-		dialect.importSchema(adminUser, adminPassword, schema, params);
+		dialect.importSchema(params);
 		getLog().info("スキーマのインポートを終了しました");
 	}
     
@@ -125,6 +125,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
 	    ImportParams param = new ImportParams();
 	    
+	    param.setUser(adminUser);
+	    param.setPassword(adminPassword);
+	    param.setSchema(schema);
 	    param.setDelimiter(delimiter);
 	    param.setCharset(UTF8);
 	    param.setOnError(onError);

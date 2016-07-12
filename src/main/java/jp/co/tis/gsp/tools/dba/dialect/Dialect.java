@@ -64,9 +64,10 @@ public abstract class Dialect {
     protected final String EXTRADDL_DIR_NAME = "extraDdlDirecotry";
     protected final String DATA_DIR_NAME = "dataDirectory";
     
-	public void exportSchema(String user, String password, String schema, ExportParams params) throws MojoExecutionException {
+	public void exportSchema(ExportParams params) throws MojoExecutionException {
        // CSVデータ出力
-	    CsvExporter exporter = new CsvExporter(url, driver, schema, user, password,  new File(params.getOutputDirectory(), DATA_DIR_NAME), UTF8);
+	    CsvExporter exporter = new CsvExporter(url, driver, params.getSchema(), params.getUser(), params.getPassword(),  
+	            new File(params.getOutputDirectory(), DATA_DIR_NAME), UTF8);
 	    try {
             exporter.execute();
         } catch (Exception e1) {
@@ -97,12 +98,13 @@ public abstract class Dialect {
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
 
-	public void importSchema(String user, String password, String schema, ImportParams params) throws MojoExecutionException {
+	public void importSchema(ImportParams params) throws MojoExecutionException {
 	    
 	    File inputDir = params.getInputDirectory();
 	    
         // DDLの実行
-        SqlExecutor sqlExecutor = new SqlExecutor(schema, user, password, new File(inputDir, DDL_DIR_NAME), new File(inputDir, EXTRADDL_DIR_NAME), 
+        SqlExecutor sqlExecutor = new SqlExecutor(params.getSchema(), params.getUser(), params.getPassword(), 
+                new File(inputDir, DDL_DIR_NAME), new File(inputDir, EXTRADDL_DIR_NAME), 
                 params.getDelimiter(), params.getOnError(), params.getLogger());
         try {
             sqlExecutor.execute();
@@ -111,8 +113,8 @@ public abstract class Dialect {
         }
 
         // LoadDataの実行
-        CsvLoader dataLoader = new CsvLoader(url, driver, schema, user, password, new File(inputDir, DATA_DIR_NAME), UTF8,
-                null, params.getOnError(), params.getLogger());
+        CsvLoader dataLoader = new CsvLoader(url, driver, params.getSchema(), params.getUser(), params.getPassword(), 
+                new File(inputDir, DATA_DIR_NAME), UTF8, null, params.getOnError(), params.getLogger());
         try {
             dataLoader.execute();
         } catch (Exception e) {

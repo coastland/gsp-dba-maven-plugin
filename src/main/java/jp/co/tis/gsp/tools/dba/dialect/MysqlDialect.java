@@ -74,11 +74,14 @@ public class MysqlDialect extends Dialect {
 
 
 	@Override
-	public void exportSchema(String user, String password, String schema, ExportParams params) throws MojoExecutionException {
+	public void exportSchema(ExportParams params) throws MojoExecutionException {
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
 		try {
 		    File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
 		    
 			ProcessBuilder pb = new ProcessBuilder(
 					"mysqldump",
@@ -224,11 +227,14 @@ public class MysqlDialect extends Dialect {
 	}
 	
 	@Override
-	public void importSchema(String user, String password, String schema,
-			ImportParams params) throws MojoExecutionException {
+	public void importSchema(ImportParams params) throws MojoExecutionException {
 		
 		try {
 			File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
+
             String[] args = new String[]{
 					"mysql",
 					"--default-character-set=utf8",
