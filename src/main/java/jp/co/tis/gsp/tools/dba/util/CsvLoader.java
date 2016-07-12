@@ -30,7 +30,7 @@ import jp.co.tis.gsp.tools.dba.CsvInsertHandler;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
-public class CsvDataLoader {
+public class CsvLoader {
 
     private String url;
     private String driver;
@@ -44,7 +44,7 @@ public class CsvDataLoader {
     private String onError;
     private Log logger;
 
-    public CsvDataLoader(String url, String driver, String schema, String user, String password, File dataDirectory,
+    public CsvLoader(String url, String driver, String schema, String user, String password, File dataDirectory,
             Charset charset, Map specifiedEncodingFiles, String onError, Log logger) {
         this.url = url;
         this.driver = driver;
@@ -58,7 +58,7 @@ public class CsvDataLoader {
         this.logger = logger;
     }
 
-    public void execute() throws MojoExecutionException {
+    public void execute() throws SQLException, IOException {
         List<File> files = CollectionsUtil
                 .newArrayList(FileUtils.listFiles(dataDirectory, new String[] { "csv" }, true));
         DriverManagerUtil.registerDriver(driver);
@@ -68,7 +68,7 @@ public class CsvDataLoader {
             conn.setAutoCommit(false);
         } catch (SQLException e) {
             logger.error("DBに接続できませんでした。driverおよびurlの設定が正しいか確認してください");
-            throw new MojoExecutionException("", e);
+            throw e;
         }
 
         // 依存関係を考慮し読み込むファイル順をソートする
@@ -127,11 +127,11 @@ public class CsvDataLoader {
                 } catch (IOException e) {
                     logger.warn("ファイルがオープンできません:" + file, e);
                     if (onError.equals("abort"))
-                        throw new MojoExecutionException("", e);
+                        throw e;
                 } catch (SQLException e) {
                     logger.warn("SQL実行中にエラーが発生しました:" + file, e);
                     if (onError.equals("abort"))
-                        throw new MojoExecutionException("", e);
+                        throw e;
                 } finally {
                     if (reader != null)
                         reader.close();

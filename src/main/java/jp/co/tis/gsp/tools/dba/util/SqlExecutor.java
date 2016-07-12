@@ -17,7 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.sql.SqlSplitter;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
@@ -26,7 +25,7 @@ import org.seasar.framework.util.StatementUtil;
 public class SqlExecutor {
 
     private Connection conn;
-    
+
     private String url;
     private String user;
     private String password;
@@ -39,10 +38,11 @@ public class SqlExecutor {
 
     private int successfulStatements = 0;
     private int totalStatements = 0;
-    
+
     private Log logger;
 
-    public SqlExecutor(String url, String user, String password, File ddlDirectory, File extraDdlDirectory, String delimiter, String onError, Log logger){
+    public SqlExecutor(String url, String user, String password, File ddlDirectory, File extraDdlDirectory,
+            String delimiter, String onError, Log logger) {
         this.url = url;
         this.user = user;
         this.password = password;
@@ -53,7 +53,7 @@ public class SqlExecutor {
         this.logger = logger;
     }
 
-    public void execute() throws MojoExecutionException {
+    public void execute() throws SQLException {
 
         FilenameFilter sqlFileFilter = new FilenameFilter() {
             @Override
@@ -80,7 +80,7 @@ public class SqlExecutor {
             executeBySqlFiles(files.toArray(new File[files.size()]));
         } catch (Exception e) {
             logger.error(e);
-            throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
+            throw new SQLException("SQL実行中にエラーが発生しました:", e);
         }
 
         // コネクション解放
@@ -126,24 +126,27 @@ public class SqlExecutor {
 
     }
 
-    private void executeBySqlFiles(File... sqlFiles) throws SQLException, IOException, MojoExecutionException {
+    private void executeBySqlFiles(File... sqlFiles) throws SQLException, IOException {
         if (conn == null || conn.isClosed()) {
             conn = DriverManager.getConnection(url, user, password);
         }
 
         successfulStatements = 0;
         totalStatements = 0;
+        
         for (File sqlFile : sqlFiles) {
             Reader reader = null;
             try {
                 reader = new FileReader(sqlFile);
                 runStatements(reader);
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 logger.warn(e);
-
                 if (onError.equals("abort"))
-                    throw new MojoExecutionException("SQL実行中にエラーが発生しました:", e);
-
+                    throw new SQLException("SQL実行中にエラーが発生しました:", e);
+            } catch (IOException e) {
+                logger.warn(e);
+                if (onError.equals("abort"))
+                    throw new IOException("DDLファイルの読み込み中にエラーが発生しました:", e);
             } finally {
                 IOUtils.closeQuietly(reader);
             }

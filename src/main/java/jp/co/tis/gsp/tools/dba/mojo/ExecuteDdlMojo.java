@@ -18,6 +18,7 @@ package jp.co.tis.gsp.tools.dba.mojo;
 
 
 import java.io.File;
+import java.sql.SQLException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -64,7 +65,11 @@ public class ExecuteDdlMojo extends AbstractDbaMojo {
 		
 		// DDLの実行
 		SqlExecutor sqlExecutor = new SqlExecutor(url, user, password, ddlDirectory, extraDdlDirectory, delimiter, onError, getLog());
-		sqlExecutor.execute();
+		try {
+            sqlExecutor.execute();
+        } catch (SQLException e) {
+            throw new MojoExecutionException("DDLの実行に失敗しました:", e);
+        }
 	}
 
 
