@@ -174,7 +174,7 @@ public abstract class AbstractDdlMojoTest<E> extends AbstractMojoTestCase {
 	protected String getTestCaseDBPath(MojoTestFixture mf) throws Exception {
 		Class<?> mojoClass = Class.forName(mojoType.getName());
 		String mojoSimpleName = mojoClass.getSimpleName();
-		return getMojoTestRoot() + FS + mojoSimpleName + FS + mf.caseName + FS + mf.testDb;
+		return getMojoTestRoot() + FS + mojoSimpleName + "_test" + FS + mf.caseName + FS + mf.testDb;
 	}
 
 	/**

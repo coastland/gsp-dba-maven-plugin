@@ -13,7 +13,7 @@ public class DirUtilTest {
 
 	@Test
 	public void testEqualCase() {
-		String path = this.getClass().getResource("DirUtil/Equal").getPath();
+		String path = this.getClass().getResource("DirUtil_test/test/Equal").getPath();
 
 	
 		File rootDir = new File(path);
@@ -29,7 +29,7 @@ public class DirUtilTest {
 
 	@Test
 	public void testDifferentCase() {
-		String path = this.getClass().getResource("DirUtil/Different").getPath();
+		String path = this.getClass().getResource("DirUtil_test/test/Different").getPath();
 
 		File rootDir = new File(path);
 		File[] list = rootDir.listFiles();
