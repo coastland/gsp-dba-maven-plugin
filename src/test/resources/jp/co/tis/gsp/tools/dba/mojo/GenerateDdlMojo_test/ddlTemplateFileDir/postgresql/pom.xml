@@ -24,7 +24,7 @@
 					<outputDirectory>target/ddl</outputDirectory>
 					<lengthSemantics>CHAR</lengthSemantics>
 					<erdFile>${dba.useDB}.edm</erdFile>
-					<ddlTemplateFileDir>src\test\resources\jp\co\tis\gsp\tools\dba\mojo\GenerateDdlMojo\ddlTemplateFileDir\test_template</ddlTemplateFileDir>
+					<ddlTemplateFileDir>src\test\resources\jp\co\tis\gsp\tools\dba\mojo\GenerateDdlMojo_test\ddlTemplateFileDir\test_template</ddlTemplateFileDir>
 				</configuration>
 			</plugin>
 		</plugins>

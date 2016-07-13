@@ -205,7 +205,7 @@ public class DBTestUtil {
 
 				ProcessBuilder pb = new ProcessBuilder("cmd","/c","sqlcmd", "-S", url.split("/")[2].split(":")[0], "-U", adminUser,
 						"-P", adminPassword, "-d", conn.getCatalog(), "-i",
-						new File(DBTestUtil.class.getResource(DBTestUtil.class.getSimpleName() + "/dropAll.sql")
+						new File(DBTestUtil.class.getResource(DBTestUtil.class.getSimpleName() + "_test" + "/dropAll.sql")
 								.getPath()).getAbsolutePath(),
 						"-v", "SCHEMA=" + dropSchema);
 
