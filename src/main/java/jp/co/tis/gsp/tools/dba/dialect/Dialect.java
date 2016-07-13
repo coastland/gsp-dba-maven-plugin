@@ -32,6 +32,7 @@ import java.util.List;
 import javax.persistence.GenerationType;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.framework.util.DriverManagerUtil;
@@ -54,10 +55,10 @@ public abstract class Dialect {
 	}
 
 	protected DatabaseMetaData metaData = null;
-	protected static final int UN_USABLE_TYPE = -999;
+	public static final int UN_USABLE_TYPE = -999;
 	
 
-    final Charset UTF8 = Charset.forName("UTF-8");
+    protected final Charset UTF8 = Charset.forName("UTF-8");
     
     /*** jar内のディレクトリ構造 **/
     protected final String DDL_DIR_NAME = "ddlDirectory";
@@ -65,19 +66,43 @@ public abstract class Dialect {
     protected final String DATA_DIR_NAME = "dataDirectory";
     
 	public void exportSchema(ExportParams params) throws MojoExecutionException {
+	    exportSchemaGeneral(params);
+	}
+	
+	protected void exportSchemaGeneral(ExportParams params) throws MojoExecutionException {
        // CSVデータ出力
-	    CsvExporter exporter = new CsvExporter(url, driver, params.getSchema(), params.getUser(), params.getPassword(),  
-	            new File(params.getOutputDirectory(), DATA_DIR_NAME), UTF8);
 	    try {
+	        File dataDir = new File(params.getOutputDirectory(), DATA_DIR_NAME);
+	        FileUtils.forceMkdir(dataDir);
+	        
+	        CsvExporter exporter = new CsvExporter(url, driver, params.getSchema(), params.getAdminUser(), 
+	                params.getAdminPassword(), dataDir, UTF8);
+	        
             exporter.execute();
         } catch (Exception e1) {
-            new MojoExecutionException("CSVデータ出力処理でエラーが発生しました:", e1);
+            throw new MojoExecutionException("CSVデータ出力処理でエラーが発生しました:", e1);
         }
         
         // DDL & extraDDLの収集
         try {
-            FileUtils.copyDirectory(params.getDdlDirectory(), new File(params.getOutputDirectory(), DDL_DIR_NAME));
-            FileUtils.copyDirectory(params.getExtraDdlDirectory(), new File(params.getOutputDirectory(), EXTRADDL_DIR_NAME));
+            File ddlDir = params.getDdlDirectory();
+            File extraDdlDir = params.getExtraDdlDirectory();
+           
+            // 少なくとも ddlDirectoryの指定は必要。
+            if(ddlDir != null && ddlDir.exists()) {
+                FileUtils.copyDirectory(params.getDdlDirectory(), new File(params.getOutputDirectory(), DDL_DIR_NAME));
+            } else {
+                throw new MojoExecutionException("DDLディレクトリの指定が誤っています");
+            }
+
+            // 追加ディレクトリの指定がある場合
+            if(extraDdlDir != null) {
+                if(!extraDdlDir.exists())
+                    throw new MojoExecutionException("extraDDLディレクトリの指定が誤っています");
+                    
+                FileUtils.copyDirectory(params.getExtraDdlDirectory(), new File(params.getOutputDirectory(), EXTRADDL_DIR_NAME));
+            }
+
         } catch (IOException e) {
             throw new MojoExecutionException("DDLとデータファイルのコピーに失敗しました:", e);
         }
@@ -99,11 +124,15 @@ public abstract class Dialect {
 			String adminPassword, String schema) throws MojoExecutionException;
 
 	public void importSchema(ImportParams params) throws MojoExecutionException {
+	    importSchemaGeneral(params);
+	}
+	
+	protected void importSchemaGeneral(ImportParams params) throws MojoExecutionException {
 	    
 	    File inputDir = params.getInputDirectory();
 	    
         // DDLの実行
-        SqlExecutor sqlExecutor = new SqlExecutor(params.getSchema(), params.getUser(), params.getPassword(), 
+        SqlExecutor sqlExecutor = new SqlExecutor(url, params.getUser(), params.getPassword(), 
                 new File(inputDir, DDL_DIR_NAME), new File(inputDir, EXTRADDL_DIR_NAME), 
                 params.getDelimiter(), params.getOnError(), params.getLogger());
         try {
@@ -356,5 +385,26 @@ public abstract class Dialect {
         } finally {
             StatementUtil.close(stmt);
         }
+    }
+    
+    /**
+     * load-dataで取り込み可能な文字列表現に変換します。
+     * 
+     * @param resultSet
+     * @param columnIndex
+     * @param columnLabel
+     * @param sqlType
+     * @return
+     * @throws SQLException
+     */
+    public String convertLoadData(ResultSet resultSet, int columnIndex, String columnLabel, int sqlType) 
+            throws SQLException {
+
+        String value = resultSet.getString(columnLabel);
+
+        // null to blank.
+        value = StringUtils.defaultIfEmpty(value, "");
+        
+        return value;
     }
 }

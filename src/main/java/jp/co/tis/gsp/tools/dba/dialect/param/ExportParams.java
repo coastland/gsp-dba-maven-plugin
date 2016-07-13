@@ -4,6 +4,10 @@ import java.io.File;
 
 public class ExportParams {
 
+    private String adminUser;
+
+    private String adminPassword;
+
     private String user;
 
     private String password;
@@ -22,6 +26,22 @@ public class ExportParams {
 
     public String getUser() {
         return user;
+    }
+
+    public String getAdminUser() {
+        return adminUser;
+    }
+
+    public void setAdminUser(String adminUser) {
+        this.adminUser = adminUser;
+    }
+
+    public String getAdminPassword() {
+        return adminPassword;
+    }
+
+    public void setAdminPassword(String adminPassword) {
+        this.adminPassword = adminPassword;
     }
 
     public void setUser(String user) {

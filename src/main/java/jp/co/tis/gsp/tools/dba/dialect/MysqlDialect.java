@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.tiger.Maps;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
@@ -231,8 +233,12 @@ public class MysqlDialect extends Dialect {
 		
 		try {
 			File dumpFile = params.getDumpFile();
-		    String user = params.getUser();
-		    String password = params.getPassword();
+			
+		    if (!dumpFile.exists())
+		        throw new MojoExecutionException(dumpFile.getName() + " is not found?");
+		    
+		    String user = params.getAdminUser();
+		    String password = params.getAdminPassword();
 		    String schema = params.getSchema();
 
             String[] args = new String[]{
@@ -303,5 +309,18 @@ public class MysqlDialect extends Dialect {
             StatementUtil.close(stmt);
         }
         return null;
+    }
+
+    @Override
+    public void setObjectInStmt(PreparedStatement stmt, int parameterIndex, String value, int sqlType) throws SQLException {
+        if(sqlType == UN_USABLE_TYPE) {
+            stmt.setNull(parameterIndex, Types.NULL);
+        } else if(StringUtil.isBlank(value) || "　".equals(value)) {
+            stmt.setNull(parameterIndex, sqlType);
+        } else if(sqlType == Types.TIMESTAMP) {
+            stmt.setTimestamp(parameterIndex, Timestamp.valueOf(value));
+        } else {
+            stmt.setObject(parameterIndex, value, sqlType);
+        }
     }
 }

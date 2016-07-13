@@ -7,6 +7,10 @@ import org.apache.maven.plugin.logging.Log;
 
 public class ImportParams {
 
+    private String adminUser;
+
+    private String adminPassword;
+
     private String user;
 
     private String password;
@@ -24,6 +28,22 @@ public class ImportParams {
     private String onError;
 
     private Log logger;
+
+    public String getAdminUser() {
+        return adminUser;
+    }
+
+    public void setAdminUser(String adminUser) {
+        this.adminUser = adminUser;
+    }
+
+    public String getAdminPassword() {
+        return adminPassword;
+    }
+
+    public void setAdminPassword(String adminPassword) {
+        this.adminPassword = adminPassword;
+    }
 
     public String getUser() {
         return user;

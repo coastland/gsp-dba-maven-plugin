@@ -369,9 +369,6 @@ public class LoadDataMojoTest extends AbstractDdlMojoTest<LoadDataMojo> {
 		// 指定されたケース及びテスト対象のDBだけループ
 		for (MojoTestFixture mf : mojoTestFixtureList) {
 
-			expected.expect(GspToolsException.class);
-			expected.expectMessage("ルートとなるテーブルが見つかりません。循環参照になっていると思います！");
-
 			// テストケース対象プロジェクトのpom.xmlを取得
 			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
 
@@ -382,8 +379,14 @@ public class LoadDataMojoTest extends AbstractDdlMojoTest<LoadDataMojo> {
 
 			// pom.xmlより指定ゴールのMojoを取得し実行
 			LoadDataMojo mojo = this.lookupConfiguredMojo(pom, LOAD_DATA, mf.testDb);
-			mojo.execute();
 			
+	         try {
+	                mojo.execute();
+	                fail("期待した例外が発生しませんでした。");
+	         } catch (Exception e) {
+	             assertThat(e.getCause().getClass().equals(GspToolsException.class), is(true));
+	             assertThat(e.getCause().getMessage().equals("ルートとなるテーブルが見つかりません。循環参照になっていると思います！"), is(true));
+	         }
 		}
 	}
 }

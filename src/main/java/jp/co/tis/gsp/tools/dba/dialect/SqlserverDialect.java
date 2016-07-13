@@ -16,13 +16,16 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,11 +35,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
 
 import jp.co.tis.gsp.tools.db.EntityDependencyParser;
 import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class SqlserverDialect extends Dialect {
+    protected final SimpleDateFormat sdfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 
     static {
@@ -263,5 +268,18 @@ public class SqlserverDialect extends Dialect {
             return "VIEW"; 
         }
         return null;
+    }
+
+    @Override
+    public void setObjectInStmt(PreparedStatement stmt, int parameterIndex, String value, int sqlType) throws SQLException {
+        if(sqlType == UN_USABLE_TYPE) {
+            stmt.setNull(parameterIndex, Types.NULL);
+        } else if(StringUtil.isBlank(value) || "　".equals(value)) {
+            stmt.setNull(parameterIndex, sqlType);
+        } else if(sqlType == Types.TIME) {
+            stmt.setTimestamp(parameterIndex, Timestamp.valueOf("1970-01-01 " + value));
+        } else {
+            stmt.setObject(parameterIndex, value, sqlType);
+        }
     }
 }

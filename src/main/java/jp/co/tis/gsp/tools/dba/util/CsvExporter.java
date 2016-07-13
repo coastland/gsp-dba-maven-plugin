@@ -1,23 +1,19 @@
 package jp.co.tis.gsp.tools.dba.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,11 +28,10 @@ import org.seasar.framework.util.StatementUtil;
 import com.csvreader.CsvWriter;
 
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 public class CsvExporter {
 
-    protected final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
-    protected final SimpleDateFormat sdfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private String url;
     private String driver;
@@ -46,6 +41,8 @@ public class CsvExporter {
 
     private File outputDir;
     private Charset charset;
+    
+    private Dialect dialect;
 
     public CsvExporter(String url, String driver, String schema, String user, String password, File outputDir,
             Charset charset) {
@@ -56,9 +53,11 @@ public class CsvExporter {
         this.password = password;
         this.outputDir = outputDir;
         this.charset = charset;
+
+        dialect = DialectFactory.getDialect(url, driver);
     }
 
-    public void execute() throws SQLException, IOException  {
+    public void execute() throws SQLException, IOException {
         exportCsv(url, user, password, schema, outputDir, charset);
     }
 
@@ -134,40 +133,52 @@ public class CsvExporter {
     protected void writeToCSV(Connection conn, String schema, String tableName, File csvFile, Charset charset)
             throws SQLException, IOException {
 
-        Dialect dialect = DialectUtil.getDialect();
+        
         Statement stmt = null;
         ResultSet resultSet = null;
 
         OutputStream out = new FileOutputStream(csvFile);
-        String[] columnHeaders;
         String[] values = null;
         CsvWriter csvWriter = null;
 
         try {
             stmt = conn.createStatement();
-            resultSet = stmt
-                    .executeQuery("SELECT * FROM " + tableName + getOrderString(conn.getMetaData(), schema, tableName));
+            resultSet = stmt.executeQuery("SELECT * FROM " + schema + "." + tableName
+                    + getOrderString(conn.getMetaData(), schema, tableName));
             ResultSetMetaData meta = resultSet.getMetaData();
 
             csvWriter = new CsvWriter(out, ',', charset);
             csvWriter.setForceQualifier(true);
             csvWriter.setRecordDelimiter('\n');
 
-            // カラムヘッダーの出力
+            // 出力対象カラムの絞り込みとヘッダー出力
             int columnCount = meta.getColumnCount();
-            columnHeaders = new String[columnCount];
+            Map<String, Integer> columnTypeMap = new LinkedHashMap<String, Integer>();
+
             for (int i = 1; i <= columnCount; i++) {
-                columnHeaders[i - 1] = meta.getColumnName(i);
+                String columnName = meta.getColumnName(i);
+                int sqlType = dialect.guessType(conn, schema, tableName, columnName);
+                if (sqlType == Dialect.UN_USABLE_TYPE)
+                    continue;
+
+                if (meta.isAutoIncrement(i))
+                    continue;
+
+                columnTypeMap.put(columnName, sqlType);
             }
-            csvWriter.writeRecord(columnHeaders);
+
+            List<String> columnList = new ArrayList<String>(columnTypeMap.keySet());
+            csvWriter.writeRecord((String[]) columnList.toArray(new String[0]));
 
             // データの出力
             while (resultSet.next()) {
-                values = new String[columnCount];
-                for (int i = 1; i <= columnCount; i++) {
-                    resultSet.getString(i);
-                    int sqlType = dialect.guessType(conn, schema, tableName, meta.getColumnName(i));
-                    values[i - 1] = convert(resultSet, i, sqlType);
+                values = new String[columnList.size()];
+
+                int i = 0;
+                for (String columnName : columnList) {
+                    values[i] = dialect.convertLoadData(resultSet, i + 1, columnName, 
+                                                            columnTypeMap.get(columnName));
+                    i++;
                 }
                 csvWriter.writeRecord(values);
             }
@@ -179,39 +190,6 @@ public class CsvExporter {
             StatementUtil.close(stmt);
             OutputStreamUtil.close(out);
         }
-    }
-
-    /**
-     * SQLのタイプに応じて値の書式を変換します。
-     * 
-     * @param resultSet
-     * @param meta
-     * @param index
-     * @return
-     * @throws SQLException
-     */
-    protected String convert(ResultSet resultSet, int index, int sqlType) throws SQLException {
-
-        String value = "";
-        switch (sqlType) {
-        case Types.DATE:
-            Date date = resultSet.getDate(index);
-            if (date != null) {
-                value = sdfDate.format(date);
-            }
-            break;
-        case Types.TIMESTAMP:
-            Timestamp timestamp = resultSet.getTimestamp(index);
-            if (timestamp != null) {
-                value = sdfTimestamp.format(timestamp);
-            }
-            break;
-        default:
-            value = resultSet.getString(index);
-            break;
-        }
-
-        return value;
     }
 
     /**

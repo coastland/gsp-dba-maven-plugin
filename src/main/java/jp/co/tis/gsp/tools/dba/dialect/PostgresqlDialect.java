@@ -17,11 +17,9 @@
 package jp.co.tis.gsp.tools.dba.dialect;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -181,8 +179,8 @@ public class PostgresqlDialect extends Dialect {
     @Override
     public void importSchema(ImportParams params) throws MojoExecutionException {
 
-	    String user = params.getUser();
-	    String password = params.getPassword();
+	    String user = params.getAdminUser();
+	    String password = params.getAdminPassword();
 
         Map<String, String> environment = new HashMap<String, String>();
         if (StringUtils.isNotEmpty(password)) {
@@ -191,6 +189,10 @@ public class PostgresqlDialect extends Dialect {
         
         try {
             File dumpFile = params.getDumpFile();
+
+		    if (!dumpFile.exists())
+		        throw new MojoExecutionException(dumpFile.getName() + " is not found?");
+
             String[] args = new String[]{
                     "psql",
                     "--host", getHost(),

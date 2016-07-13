@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>jp.co.tis.gsp</groupId>
+		<artifactId>gsp-test-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../../../testParentPom.xml</relativePath>
+	</parent>
+
+
+	<groupId>jp.co.tis.gsp</groupId>
+	<artifactId>gsp-test</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>jp.co.tis.gsp</groupId>
+				<artifactId>gsp-dba-maven-plugin</artifactId>
+				<configuration>
+					<optionalDialects>
+						<mysql>jp.co.tis.gsp.test.util.dialect.MysqlGeneralTestDialect</mysql>
+					</optionalDialects>
+
+					<groupId>jp.co.tis.gsp</groupId>
+					<artifactId>gsp-testdata</artifactId>
+					<version>1.0.0</version>
+
+					<dataDirectory>data</dataDirectory>
+					<outputDirectory>dump</outputDirectory>
+					<inputDirectory>input</inputDirectory>
+					<ddlDirectory>ddl</ddlDirectory>
+
+					<specifiedEncodingFiles>
+						<typetest.csv>UTF-8</typetest.csv>
+					</specifiedEncodingFiles>
+
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
