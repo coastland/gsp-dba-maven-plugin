@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
@@ -41,7 +40,6 @@ import jp.co.tis.gsp.tools.db.EntityDependencyParser;
 import jp.co.tis.gsp.tools.db.TypeMapper;
 
 public class SqlserverDialect extends Dialect {
-    protected final SimpleDateFormat sdfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 
     static {

@@ -27,7 +27,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 
 public class OracleDialect extends Dialect {
     protected final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
-    protected final SimpleDateFormat sdfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
