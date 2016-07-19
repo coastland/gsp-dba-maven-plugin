@@ -468,12 +468,6 @@ public class OracleDialect extends Dialect {
                 value = sdfDate.format(date);
             }
             break;
-        case Types.TIMESTAMP:
-            Timestamp timestamp = resultSet.getTimestamp(columnLabel);
-            if (timestamp != null) {
-                value = sdfTimestamp.format(timestamp);
-            }
-            break;
         default:
             value = super.convertLoadData(resultSet, columnIndex, columnLabel, sqlType);
             break;
