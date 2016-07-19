@@ -375,6 +375,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 - CSVデータとDDLファイルをパッケージングすることで、スキーマのエクスポート処理を代替します。
 - CSVデータはgsp-dba-maven-pluginで出力します。DDL及び追加DDLは予め用意しておき、上記パラメータの`ddlDirectory`、`extraDdlDirectory`で場所を指定して下さい。
 - 出力されるCSVデータの文字エンコーディングはUTF-8です。
+- 扱えるデータ型及び制限事項は[こちら](doc/db-status.md#汎用exportschemaimportschemaの制限事項)を参照して下さい。
 - 以下に処理の流れを記載します。
     1. 指定スキーマのテーブルデータをCSVデータとして出力(to dataDirectory)。
     2. 上記パラメータ`ddlDirectory`配下のDDLファイルを収集します。
@@ -421,6 +422,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 
 #### <a name="importSchemaGeneral"> 汎用モード
 - DB2とSQLServerの場合は汎用モードのエクスポートとなるため、それを取り込むことでスキーマのインポートとなります。
+- 扱えるデータ型及び制限事項は[こちら](doc/db-status.md#汎用exportschemaimportschemaの制限事項)を参照して下さい。
 - 以下に処理の流れを記載します。
     1. 汎用モードで出力されたエクスポートjarファイルを取得、展開します。
     2. `ddlDirectory`及び`extraDdlDirectory`のDDLファイルを実行します。
