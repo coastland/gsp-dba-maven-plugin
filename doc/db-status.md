@@ -49,7 +49,7 @@
 | CHAR          | ○       | text                                                | - |
 | CLOB          | ×       | -                                                  | - |
 | DATE          | ○       | 1990-08-08                                          | - |
-| LONG          | ○       | 1234567890                                          | - |
+| LONG          | ×       | -                                                  | - |
 | LONG ROW      | ×       | -                                                  | - |
 | NCHAR         | ○       | text                                                | - |
 | NCLOB         | ×       | -                                                  | - |
@@ -167,3 +167,17 @@ IDENTITYを指定したカラムは使用できません。<br />
 | VARCHAR | ○ | text | - |
 | VARGRAPHIC | ○ | text | - |
 | XML | × | - | - |
+
+### 汎用ExportSchema/ImportSchemaの制限事項
+
+**H2**
+- OTHER型
+    - 利用不可。
+    
+**Oracle**
+- DATE型
+    - load-dataの制約上、OracleがDATE型で持つ時刻以下のデータは対象外となります。
+
+**SqlServer**
+- BINARY型
+    - 利用不可。
