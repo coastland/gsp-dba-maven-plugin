@@ -21,12 +21,14 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +37,8 @@ import java.util.Properties;
 import javax.persistence.GenerationType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.StringUtils;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.StatementUtil;
@@ -47,6 +49,8 @@ import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
 import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 
 public class OracleDialect extends Dialect {
+    protected final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
+
 	private static final List<String> USABLE_TYPE_NAMES = new ArrayList<String>();
 	
 	static {
@@ -145,10 +149,15 @@ public class OracleDialect extends Dialect {
 	@Override
 	public void importSchema(ImportParams params) throws MojoExecutionException{
 		BufferedReader reader = null;
+
 		try {
 			File dumpFile = params.getDumpFile();
-		    String user = params.getUser();
-		    String password = params.getPassword();
+
+		    if (!dumpFile.exists())
+		        throw new MojoExecutionException(dumpFile.getName() + " is not found?");
+
+		    String user = params.getAdminUser();
+		    String password = params.getAdminPassword();
 		    String schema = params.getSchema();
 
             createDirectory(user, password, dumpFile.getParentFile());
@@ -441,4 +450,30 @@ public class OracleDialect extends Dialect {
 			ConnectionUtil.close(conn);
 		}
 	}
+
+	/**
+	 * OracleでDate型・Timestamp型の時にgetString()した文字表現は、load-dataで取り込み <br />
+	 * 不可能なフォーマットだったため変換する。
+	 */
+	@Override
+    public String convertLoadData(ResultSet resultSet, int columnIndex, String columnLabel, int sqlType) 
+            throws SQLException {
+        String value = null;
+        switch (sqlType) {
+        case Types.DATE:
+            Date date = resultSet.getDate(columnLabel);
+            if (date != null) {
+                value = sdfDate.format(date);
+            }
+            break;
+        default:
+            value = super.convertLoadData(resultSet, columnIndex, columnLabel, sqlType);
+            break;
+        }
+
+        // null to blank.
+        value = StringUtils.defaultIfEmpty(value, "");
+        
+        return value;
+    }
 }

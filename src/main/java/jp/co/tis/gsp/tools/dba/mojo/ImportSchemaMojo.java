@@ -92,18 +92,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
         }
         
         ImportParams params = createImportParams();
-        
-        File importFile = params.getDumpFile();
-        String importFilename = importFile.getName();
 
         JarFile jarFile = JarFileUtil.create(new File(localRepository.getBasedir(),
                 localRepository.pathOf(artifact)));
-
-        // パラメータ：dmpFileが指定されているのに、jar内に見つからない場合はエラー
-        JarEntry jarEntry = jarFile.getJarEntry(importFilename);
-
-        if (!StringUtils.isEmpty(dmpFile) && jarEntry == null)
-            throw new MojoExecutionException(importFilename + " is not found?");
 
         try {
             
@@ -125,12 +116,15 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
 	    ImportParams param = new ImportParams();
 	    
-	    param.setUser(adminUser);
-	    param.setPassword(adminPassword);
+	    param.setUser(user);
+	    param.setPassword(password);
+	    param.setAdminUser(adminUser);
+	    param.setAdminPassword(adminPassword);
 	    param.setSchema(schema);
 	    param.setDelimiter(delimiter);
 	    param.setCharset(UTF8);
 	    param.setOnError(onError);
+	    param.setInputDirectory(inputDirectory);
 	    param.setDumpFile(importFile);
 	    param.setLogger(getLog());
 	    

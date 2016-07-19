@@ -94,14 +94,18 @@ public class H2Dialect extends Dialect {
         Connection conn = null;
         try {
             File dumpFile = params.getDumpFile();
-		    String user = params.getUser();
-		    String password = params.getPassword();
+			
+		    if (!dumpFile.exists())
+		        throw new MojoExecutionException(dumpFile.getName() + " is not found?");
+		    
+		    String user = params.getAdminUser();
+		    String password = params.getAdminPassword();
 
             conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement();
             stmt.execute("RUNSCRIPT FROM '" + dumpFile.getAbsolutePath()+ "'");
             StatementUtil.close(stmt);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("Schema import実行中にエラー", e);
         } finally {
             ConnectionUtil.close(conn);

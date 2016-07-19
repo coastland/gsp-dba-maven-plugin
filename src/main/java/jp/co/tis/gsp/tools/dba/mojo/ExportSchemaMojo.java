@@ -33,6 +33,7 @@ import org.codehaus.plexus.archiver.jar.JarArchiver;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 /**
  * export-schema.
@@ -62,7 +63,15 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
 		Dialect dialect = DialectFactory.getDialect(url, driver);
-		if (!outputDirectory.exists()) {
+		DialectUtil.setDialect(dialect);
+		
+		if (outputDirectory.exists()) {
+			try {
+				FileUtils.cleanDirectory(outputDirectory);
+			} catch (IOException e) {
+				throw new MojoExecutionException("Can't clean outputDirectory:" + outputDirectory);
+			}
+		} else {
 			try {
 				FileUtils.forceMkdir(outputDirectory);
 			} catch (IOException e) {
@@ -95,8 +104,10 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	    ExportParams param = new ExportParams();
 	    File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
 	    
-	    param.setUser(adminUser);
-	    param.setPassword(adminPassword);
+	    param.setUser(user);
+	    param.setPassword(password);
+	    param.setAdminUser(adminUser);
+	    param.setAdminPassword(adminPassword);
 	    param.setSchema(schema);
 	    param.setDumpFile(exportFile);
 	    param.setDdlDirectory(ddlDirectory);

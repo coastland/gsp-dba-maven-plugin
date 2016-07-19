@@ -16,7 +16,6 @@
 
 package jp.co.tis.gsp.tools.dba.dialect;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
