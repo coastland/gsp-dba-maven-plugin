@@ -64,13 +64,14 @@ public class CsvExporter {
     /**
      * 指定スキーマのテーブルデータをcsvで出力します。
      * 
-     * @param adminUser
-     * @param adminPassword
-     * @param schema
-     * @param outputDir
-     * @param charset
-     * @throws SQLException
-     * @throws IOException
+     * @param url url
+     * @param adminUser 管理者ユーザ
+     * @param adminPassword 管理者パスワード
+     * @param schema スキーマ
+     * @param outputDir 出力フォルダ
+     * @param charset 文字セット
+     * @throws SQLException 例外
+     * @throws IOException 例外
      */
     protected void exportCsv(String url, String adminUser, String adminPassword, String schema, File outputDir,
             Charset charset) throws SQLException, IOException {
@@ -97,11 +98,11 @@ public class CsvExporter {
     /**
      * 指定スキーマに属するテーブル名のリストを取得します。
      * 
-     * @param metaData
-     * @param normalizedSchemaName
-     * @param types
-     * @return
-     * @throws SQLException
+     * @param metaData コネクションメタデータ
+     * @param normalizedSchemaName スキーマ
+     * @param types データベースオブジェクトタイプ
+     * @return テーブル名のリスト
+     * @throws SQLException 例外
      */
     protected List<String> getTableNames(DatabaseMetaData metaData, String normalizedSchemaName, String[] types)
             throws SQLException {
@@ -123,12 +124,13 @@ public class CsvExporter {
     /**
      * SELECT文の結果をCSVファイルにカラム名ヘッダー付きで出力します。
      * 
-     * @param metaData
-     * @param resultSet
-     * @param csvFile
-     * @param charset
-     * @throws SQLException
-     * @throws IOException
+     * @param conn コネクション
+     * @param schema スキーマ
+     * @param tableName テーブル名
+     * @param csvFile CSVファイル
+     * @param charset 文字セット
+     * @throws SQLException 例外
+     * @throws IOException 例外
      */
     protected void writeToCSV(Connection conn, String schema, String tableName, File csvFile, Charset charset)
             throws SQLException, IOException {
@@ -195,10 +197,10 @@ public class CsvExporter {
     /**
      * 主キー項目でソートをかけるorderBy文字列を生成します。
      * 
-     * @param meta
-     * @param tableName
-     * @return
-     * @throws SQLException
+     * @param meta コネクションメタデータ
+     * @param tableName テーブル名
+     * @return orderby文字列
+     * @throws SQLException 例外
      */
     protected String getOrderString(DatabaseMetaData meta, String schema, String tableName) throws SQLException {
         String orderByString = "";
