@@ -113,12 +113,12 @@ public abstract class Dialect {
 	 * 
 	 * 指定したスキーマが存在しない場合はスキーマを作成します。
 	 * 
-	 * @param user
-	 * @param password
-	 * @param adminUser
-	 * @param adminPassword
-	 * @param schema
-	 * @throws MojoExecutionException
+	 * @param user ユーザ名
+	 * @param password パスワード
+	 * @param adminUser 管理者ユーザ
+	 * @param adminPassword 管理者パスワード
+	 * @param schema スキーマ
+	 * @throws MojoExecutionException 例外
 	 */
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
@@ -156,11 +156,11 @@ public abstract class Dialect {
 	 * 
 	 * 既にユーザが存在する場合はそのユーザを削除します。
 	 * 
-	 * @param user
-	 * @param password
-	 * @param adminUser
-	 * @param adminPassword
-	 * @throws MojoExecutionException
+	 * @param user　ユーザ名
+	 * @param password パスワード
+	 * @param adminUser 管理者ユーザ
+	 * @param adminPassword 管理者パスワード
+	 * @throws MojoExecutionException 例外
 	 */
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
@@ -230,7 +230,13 @@ public abstract class Dialect {
 
     /**
      * 指定されたスキーマの指定されたテーブルの指定されたカラムの型に合うsqlTypeを返す。
-     * @return sqlType
+     * 
+     * @param conn コネクション
+     * @param schema スキーマ
+     * @param tableName テーブル名
+     * @param colName カラ無名
+     * @return sqlType sqlType
+     * @throws SQLException
      */
     public int guessType(Connection conn, String schema, String tableName, String colName) throws SQLException {
         if (metaData == null) {
@@ -394,7 +400,7 @@ public abstract class Dialect {
      * @param columnIndex
      * @param columnLabel
      * @param sqlType
-     * @return
+     * @return 文字列データ
      * @throws SQLException
      */
     public String convertLoadData(ResultSet resultSet, int columnIndex, String columnLabel, int sqlType) 

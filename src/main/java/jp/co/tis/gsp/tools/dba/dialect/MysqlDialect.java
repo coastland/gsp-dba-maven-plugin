@@ -118,12 +118,12 @@ public class MysqlDialect extends Dialect {
 	 * 
 	 * MySQLでは予めスキーマ（＝ＤＢ）が存在している前提のため、スキーマ存在確認・生成処理は行いません。
 	 * 
-	 * @param user
-	 * @param password
-	 * @param adminUser
-	 * @param adminPassword
-	 * @param schema
-	 * @throws MojoExecutionException
+	 * @param user ユーザ名
+	 * @param password パスワード
+	 * @param adminUser 管理者ユーザ
+	 * @param adminPassword 管理者パスワード
+	 * @param schema スキーマ
+	 * @throws MojoExecutionException 例外
 	 */
 	public void dropAll(String user, String password,
 			String adminUser, String adminPassword,

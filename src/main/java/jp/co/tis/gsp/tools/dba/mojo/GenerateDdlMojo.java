@@ -65,8 +65,8 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
     /**
      * Generate DDL.
      *
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException 例外
+     * @throws MojoFailureException 例外
      */
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
