@@ -63,11 +63,11 @@
     
     <distributionManagement>
         <snapshotRepository>
-            <id>gsp-dba-maven</id>
+            <id>ossrh-snapshot</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>gsp-dba-maven</id>
+            <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
