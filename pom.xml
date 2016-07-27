@@ -29,6 +29,30 @@
             <organization>coastland</organization>
             <organizationUrl>https://github.com/coastland</organizationUrl>
         </developer>
+        <developer>
+            <name>Hideo Ariyoshi</name>
+            <email>hariyoshi0427@gmail.com</email>
+            <organization>coastland</organization>
+            <organizationUrl>https://github.com/coastland</organizationUrl>
+        </developer>
+        <developer>
+            <name>Satoshi Kurokawa</name>
+            <email></email>
+            <organization>coastland</organization>
+            <organizationUrl>https://github.com/coastland</organizationUrl>
+        </developer>
+        <developer>
+            <name>morimoto-kenta</name>
+            <email>moriken_judo@yahoo.co.jp</email>
+            <organization>coastland</organization>
+            <organizationUrl>https://github.com/coastland</organizationUrl>
+        </developer>
+        <developer>
+            <name>Naoki Tamura</name>
+            <email>tamu.0.0.tamu@gmail.com</email>
+            <organization>coastland</organization>
+            <organizationUrl>https://github.com/coastland</organizationUrl>
+        </developer>
     </developers>
     
     <scm>
