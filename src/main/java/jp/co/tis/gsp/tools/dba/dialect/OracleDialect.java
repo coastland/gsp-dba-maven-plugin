@@ -346,7 +346,7 @@ public class OracleDialect extends Dialect {
             }
             String type = rs.getString("TYPE_NAME");
             if (!isUsableType(type)) {
-                System.err.println(type + "型はサポートしていません。");
+                System.err.println("[WARN] " + tableName + "." + colName + "  " + type + "型はサポートしていません。");
                 return UN_USABLE_TYPE;
             } else if ("VARCHAR2".equals(type) || "NVARCHAR2".equals(type) || "NCHAR".equals(type)) {
                 return Types.VARCHAR;
