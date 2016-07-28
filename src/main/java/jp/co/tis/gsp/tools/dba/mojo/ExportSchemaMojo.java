@@ -107,7 +107,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	
 	private ExportParams createExportParams() {
 	    ExportParams param = new ExportParams();
-	    File exportFile = new File(outputDirectory, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
+	    File exportFile = new File(outputDirectoryTemp, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
 	    
 	    param.setUser(user);
 	    param.setPassword(password);
