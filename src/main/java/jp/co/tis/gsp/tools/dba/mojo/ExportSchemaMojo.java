@@ -60,22 +60,27 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
     @Parameter
     protected File extraDdlDirectory;
     
+    /** エクスポートファイル構築用一時フォルダ */
+    File outputDirectoryTemp;
+   
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
 		Dialect dialect = DialectFactory.getDialect(url, driver);
 		DialectUtil.setDialect(dialect);
 		
-		if (outputDirectory.exists()) {
+		outputDirectoryTemp = new File(outputDirectory.getParentFile(), "_exptmp");
+		
+		if (outputDirectoryTemp.exists()) {
 			try {
-				FileUtils.cleanDirectory(outputDirectory);
+				FileUtils.cleanDirectory(outputDirectoryTemp);
 			} catch (IOException e) {
-				throw new MojoExecutionException("Can't clean outputDirectory:" + outputDirectory);
+				throw new MojoExecutionException("Can't clean outputDirectory:" + outputDirectoryTemp);
 			}
 		} else {
 			try {
-				FileUtils.forceMkdir(outputDirectory);
+				FileUtils.forceMkdir(outputDirectoryTemp);
 			} catch (IOException e) {
-				throw new MojoExecutionException("Can't create dump output directory." + outputDirectory, e);
+				throw new MojoExecutionException("Can't create dump output directory." + outputDirectoryTemp, e);
 			}
 		}
 		
@@ -89,7 +94,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);
 		}
         
-        jarArchiver.addDirectory(outputDirectory);
+        jarArchiver.addDirectory(outputDirectoryTemp);
         jarArchiver.setDestFile(new File(outputDirectory, jarName()));
         
         try {
@@ -112,7 +117,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	    param.setDumpFile(exportFile);
 	    param.setDdlDirectory(ddlDirectory);
 	    param.setExtraDdlDirectory(extraDdlDirectory);
-	    param.setOutputDirectory(outputDirectory);
+	    param.setOutputDirectory(outputDirectoryTemp);
 	    
 	    return param;
 	}
