@@ -255,7 +255,7 @@ public abstract class Dialect {
 
             String type = rs.getString("TYPE_NAME");
             if (!isUsableType(type)) {
-                System.err.println(type + "型はサポートしていません。");
+                System.err.println("[WARN] " + tableName + "." + colName + "  " + type + "型はサポートしていません。");
                 return UN_USABLE_TYPE;
             }
             return rs.getInt("DATA_TYPE");

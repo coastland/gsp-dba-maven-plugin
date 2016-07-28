@@ -170,6 +170,11 @@ IDENTITYを指定したカラムは使用できません。<br />
 
 ### 汎用ExportSchema/ImportSchemaの制限事項
 
+扱えるデータ型は[load-dataの対応状況](#load-dataの対応状況)に準拠します。  
+扱えないデータ型に関しては、ExportSchemaでそのカラムは出力されません。そのため、ImportSchemaをするとそのカラムはNULL値となります。
+
+また汎用ExportSchema/ImportSchema固有の制約として下記のものが存在します。
+
 **H2**
 - OTHER型
     - 利用不可。
