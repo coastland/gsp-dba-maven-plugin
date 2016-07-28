@@ -838,9 +838,9 @@ public class ImportSchemaMojoTest extends AbstractDdlMojoTest<ImportSchemaMojo> 
 			exportTest.setUp();
 			ExportSchemaMojo exportMojo = exportTest.lookupConfiguredMojo(pom, EXPORT_SCHEMA, mf.testDb);
 
-			File exportDir = exportMojo.outputDirectory;
-
 			exportMojo.execute();
+			
+			File exportDir = exportMojo.outputDirectoryTemp;
 
 			// currentProjectのセットアップ。 ImportSchemaMojoのセットアップ。
 			ImportSchemaMojo mojo = this.lookupConfiguredMojo(pom, IMPORT_SCHEMA, mf.testDb);
