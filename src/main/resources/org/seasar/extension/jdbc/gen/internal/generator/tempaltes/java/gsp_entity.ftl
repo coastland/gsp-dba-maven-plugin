@@ -140,7 +140,7 @@ public class ${shortClassName}<#if shortSuperclassName??> extends ${shortSupercl
     <#if useAccessor>
     <@printAttrAnnotations tableName attr/>
     </#if>
-    public ${attr.attributeClass.simpleName} <#if attr.attributeClass.getSimpleName()?matches("[bB]oolean")>is<#else>get</#if>${attr.name?cap_first}() {
+    public ${attr.attributeClass.simpleName} <#if attr.attributeClass.getSimpleName()?matches("boolean")>is<#else>get</#if>${attr.name?cap_first}() {
         return ${attr.name};
     }
 
