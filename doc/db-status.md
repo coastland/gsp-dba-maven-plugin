@@ -26,8 +26,8 @@
 | H2                 | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
 | MySql              | ◎           | ◎          | ○        | ◎              | ◎            | ◎            |
 | Postgresql         | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| MS SQL Server 2008 | ◎           | ◎          | ◎        | ◎              | ×            | ×            |
-| DB2 10.5           | ◎           | ◎          | ◎        | ◎              | ×            | ×            |
+| MS SQL Server 2008 | ◎           | ◎          | ◎        | ◎              |◎|   ◎| 
+| DB2 10.5           | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
 
 
 ### load-dataの対応状況
@@ -49,7 +49,7 @@
 | CHAR          | ○       | text                                                | - |
 | CLOB          | ×       | -                                                  | - |
 | DATE          | ○       | 1990-08-08                                          | - |
-| LONG          | ○       | 1234567890                                          | - |
+| LONG          | ×       | -                                                  | - |
 | LONG ROW      | ×       | -                                                  | - |
 | NCHAR         | ○       | text                                                | - |
 | NCLOB         | ×       | -                                                  | - |
@@ -167,3 +167,22 @@ IDENTITYを指定したカラムは使用できません。<br />
 | VARCHAR | ○ | text | - |
 | VARGRAPHIC | ○ | text | - |
 | XML | × | - | - |
+
+### 汎用ExportSchema/ImportSchemaの制限事項
+
+扱えるデータ型は[load-dataの対応状況](#load-dataの対応状況)に準拠します。  
+扱えないデータ型に関しては、ExportSchemaでそのカラムは出力されません。そのため、ImportSchemaをするとそのカラムはNULL値となります。
+
+また汎用ExportSchema/ImportSchema固有の制約として下記のものが存在します。
+
+**H2**
+- OTHER型
+    - 利用不可。
+    
+**Oracle**
+- DATE型
+    - load-dataの制約上、OracleがDATE型で持つ時刻以下のデータは対象外となります。
+
+**SqlServer**
+- BINARY型
+    - 利用不可。

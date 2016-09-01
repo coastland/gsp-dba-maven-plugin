@@ -16,18 +16,20 @@
 
 package jp.co.tis.gsp.tools.dba.mojo;
 
-import jp.co.tis.gsp.tools.db.LengthSemantics;
-import jp.co.tis.gsp.tools.db.ObjectBrowserErParser;
-import jp.co.tis.gsp.tools.dba.dialect.Dialect;
-import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.File;
-import java.io.IOException;
+import jp.co.tis.gsp.tools.db.LengthSemantics;
+import jp.co.tis.gsp.tools.db.ObjectBrowserErParser;
+import jp.co.tis.gsp.tools.dba.dialect.Dialect;
+import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 
 /**
  * generate-ddl.
@@ -57,11 +59,14 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
     @Parameter
     protected String ddlTemplateFileDir;
 
+    @Parameter(defaultValue = "1")
+    protected int allocationSize;
+
     /**
      * Generate DDL.
      *
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException 例外
+     * @throws MojoFailureException 例外
      */
 	@Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
@@ -93,6 +98,7 @@ public class GenerateDdlMojo extends AbstractDbaMojo {
         parser.setPrintForeignKey(dialect.canPrintForeignKey());
         parser.setPrintView(dialect.canPrintView());
         parser.setLengthSemantics(lengthSemantics);
+        parser.setAllocationSize(allocationSize);;
 		try {
 			parser.parse(erdFile);
 		} catch (Exception e) {

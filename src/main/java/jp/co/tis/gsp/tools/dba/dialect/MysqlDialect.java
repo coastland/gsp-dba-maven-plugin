@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
 
@@ -37,9 +38,12 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.FileOutputStreamUtil;
 import org.seasar.framework.util.ResultSetUtil;
 import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.tiger.Maps;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
 import jp.co.tis.gsp.tools.dba.util.ProcessUtil;
 
 public class MysqlDialect extends Dialect {	
@@ -72,10 +76,15 @@ public class MysqlDialect extends Dialect {
 
 
 	@Override
-	public void exportSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException {
+	public void exportSchema(ExportParams params) throws MojoExecutionException {
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
 		try {
+		    File dumpFile = params.getDumpFile();
+		    String user = params.getUser();
+		    String password = params.getPassword();
+		    String schema = params.getSchema();
+		    
 			ProcessBuilder pb = new ProcessBuilder(
 					"mysqldump",
 					schema,
@@ -109,12 +118,12 @@ public class MysqlDialect extends Dialect {
 	 * 
 	 * MySQLでは予めスキーマ（＝ＤＢ）が存在している前提のため、スキーマ存在確認・生成処理は行いません。
 	 * 
-	 * @param user
-	 * @param password
-	 * @param adminUser
-	 * @param adminPassword
-	 * @param schema
-	 * @throws MojoExecutionException
+	 * @param user ユーザ名
+	 * @param password パスワード
+	 * @param adminUser 管理者ユーザ
+	 * @param adminPassword 管理者パスワード
+	 * @param schema スキーマ
+	 * @throws MojoExecutionException 例外
 	 */
 	public void dropAll(String user, String password,
 			String adminUser, String adminPassword,
@@ -220,11 +229,18 @@ public class MysqlDialect extends Dialect {
 	}
 	
 	@Override
-	public void importSchema(String user, String password, String schema,
-			File dumpFile) throws MojoExecutionException {
+	public void importSchema(ImportParams params) throws MojoExecutionException {
 		
 		try {
+			File dumpFile = params.getDumpFile();
 			
+		    if (!dumpFile.exists())
+		        throw new MojoExecutionException(dumpFile.getName() + " is not found?");
+		    
+		    String user = params.getAdminUser();
+		    String password = params.getAdminPassword();
+		    String schema = params.getSchema();
+
             String[] args = new String[]{
 					"mysql",
 					"--default-character-set=utf8",
@@ -293,5 +309,18 @@ public class MysqlDialect extends Dialect {
             StatementUtil.close(stmt);
         }
         return null;
+    }
+
+    @Override
+    public void setObjectInStmt(PreparedStatement stmt, int parameterIndex, String value, int sqlType) throws SQLException {
+        if(sqlType == UN_USABLE_TYPE) {
+            stmt.setNull(parameterIndex, Types.NULL);
+        } else if(StringUtil.isBlank(value) || "　".equals(value)) {
+            stmt.setNull(parameterIndex, sqlType);
+        } else if(sqlType == Types.TIMESTAMP) {
+            stmt.setTimestamp(parameterIndex, Timestamp.valueOf(value));
+        } else {
+            stmt.setObject(parameterIndex, value, sqlType);
+        }
     }
 }

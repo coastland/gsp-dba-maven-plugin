@@ -17,6 +17,8 @@
 package jp.co.tis.gsp.tools.dba.dialect;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -29,6 +31,8 @@ import java.util.List;
 
 import javax.persistence.GenerationType;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.meta.DbTableMeta;
 import org.seasar.framework.util.DriverManagerUtil;
@@ -38,6 +42,11 @@ import org.seasar.framework.util.StringUtil;
 
 import jp.co.tis.gsp.tools.db.AlternativeGenerator;
 import jp.co.tis.gsp.tools.db.TypeMapper;
+import jp.co.tis.gsp.tools.dba.dialect.param.ExportParams;
+import jp.co.tis.gsp.tools.dba.dialect.param.ImportParams;
+import jp.co.tis.gsp.tools.dba.util.CsvExporter;
+import jp.co.tis.gsp.tools.dba.util.CsvLoader;
+import jp.co.tis.gsp.tools.dba.util.SqlExecutor;
 
 public abstract class Dialect {
 	
@@ -46,38 +55,112 @@ public abstract class Dialect {
 	}
 
 	protected DatabaseMetaData metaData = null;
-	protected static final int UN_USABLE_TYPE = -999;
+	public static final int UN_USABLE_TYPE = -999;
+	
 
-	public abstract void exportSchema(String user, String password, String schema, File dumpFile)
-			throws MojoExecutionException;
+    protected final Charset UTF8 = Charset.forName("UTF-8");
+    
+    /*** jar内のディレクトリ構造 **/
+    protected final String DDL_DIR_NAME = "ddlDirectory";
+    protected final String EXTRADDL_DIR_NAME = "extraDdlDirecotry";
+    protected final String DATA_DIR_NAME = "dataDirectory";
+    
+	public void exportSchema(ExportParams params) throws MojoExecutionException {
+	    exportSchemaGeneral(params);
+	}
+	
+	protected void exportSchemaGeneral(ExportParams params) throws MojoExecutionException {
+       // CSVデータ出力
+	    try {
+	        File dataDir = new File(params.getOutputDirectory(), DATA_DIR_NAME);
+	        FileUtils.forceMkdir(dataDir);
+	        
+	        CsvExporter exporter = new CsvExporter(url, driver, params.getSchema(), params.getAdminUser(), 
+	                params.getAdminPassword(), dataDir, UTF8);
+	        
+            exporter.execute();
+        } catch (Exception e1) {
+            throw new MojoExecutionException("CSVデータ出力処理でエラーが発生しました:", e1);
+        }
+        
+        // DDL & extraDDLの収集
+        try {
+            File ddlDir = params.getDdlDirectory();
+            File extraDdlDir = params.getExtraDdlDirectory();
+           
+            // 少なくとも ddlDirectoryの指定は必要。
+            if(ddlDir != null && ddlDir.exists()) {
+                FileUtils.copyDirectory(params.getDdlDirectory(), new File(params.getOutputDirectory(), DDL_DIR_NAME));
+            } else {
+                throw new MojoExecutionException("DDLディレクトリの指定が誤っています");
+            }
 
+            // 追加ディレクトリの指定がある場合
+            if(extraDdlDir != null) {
+                if(!extraDdlDir.exists())
+                    throw new MojoExecutionException("extraDDLディレクトリの指定が誤っています");
+                    
+                FileUtils.copyDirectory(params.getExtraDdlDirectory(), new File(params.getOutputDirectory(), EXTRADDL_DIR_NAME));
+            }
+
+        } catch (IOException e) {
+            throw new MojoExecutionException("DDLとデータファイルのコピーに失敗しました:", e);
+        }
+	}
+	
 	/**
 	 * 指定したスキーマ内の全テーブル・ビュー・シーケンスを削除します。
 	 * 
 	 * 指定したスキーマが存在しない場合はスキーマを作成します。
 	 * 
-	 * @param user
-	 * @param password
-	 * @param adminUser
-	 * @param adminPassword
-	 * @param schema
-	 * @throws MojoExecutionException
+	 * @param user ユーザ名
+	 * @param password パスワード
+	 * @param adminUser 管理者ユーザ
+	 * @param adminPassword 管理者パスワード
+	 * @param schema スキーマ
+	 * @throws MojoExecutionException 例外
 	 */
 	public abstract void dropAll(String user, String password, String adminUser,
 			String adminPassword, String schema) throws MojoExecutionException;
 
-	public abstract void importSchema(String user, String password, String schema, File dumpFile) throws MojoExecutionException;
+	public void importSchema(ImportParams params) throws MojoExecutionException {
+	    importSchemaGeneral(params);
+	}
+	
+	protected void importSchemaGeneral(ImportParams params) throws MojoExecutionException {
+	    
+	    File inputDir = params.getInputDirectory();
+	    
+        // DDLの実行
+        SqlExecutor sqlExecutor = new SqlExecutor(url, params.getUser(), params.getPassword(), 
+                new File(inputDir, DDL_DIR_NAME), new File(inputDir, EXTRADDL_DIR_NAME), 
+                params.getDelimiter(), params.getOnError(), params.getLogger());
+        try {
+            sqlExecutor.execute();
+        } catch (SQLException e) {
+            throw new MojoExecutionException("DDLの実行に失敗しました:", e);
+        }
+
+        // LoadDataの実行
+        CsvLoader dataLoader = new CsvLoader(url, driver, params.getSchema(), params.getUser(), params.getPassword(), 
+                new File(inputDir, DATA_DIR_NAME), UTF8, null, params.getOnError(), params.getLogger());
+        try {
+            dataLoader.execute();
+        } catch (Exception e) {
+            throw new MojoExecutionException("CSVデータのロード処理で失敗しました:", e);
+        }
+	}
 
 	/**
 	 * ユーザを作成します。
 	 * 
 	 * 既にユーザが存在する場合はそのユーザを削除します。
 	 * 
-	 * @param user
-	 * @param password
-	 * @param adminUser
-	 * @param adminPassword
-	 * @throws MojoExecutionException
+	 * @param user　ユーザ名
+	 * @param password パスワード
+	 * @param adminUser 管理者ユーザ
+	 * @param adminPassword 管理者パスワード
+	 * @throws MojoExecutionException 例外
 	 */
 	public abstract void createUser(String user, String password, String adminUser,
 			String adminPassword) throws MojoExecutionException;
@@ -147,7 +230,13 @@ public abstract class Dialect {
 
     /**
      * 指定されたスキーマの指定されたテーブルの指定されたカラムの型に合うsqlTypeを返す。
-     * @return sqlType
+     * 
+     * @param conn コネクション
+     * @param schema スキーマ
+     * @param tableName テーブル名
+     * @param colName カラ無名
+     * @return sqlType sqlType
+     * @throws SQLException
      */
     public int guessType(Connection conn, String schema, String tableName, String colName) throws SQLException {
         if (metaData == null) {
@@ -166,7 +255,7 @@ public abstract class Dialect {
 
             String type = rs.getString("TYPE_NAME");
             if (!isUsableType(type)) {
-                System.err.println(type + "型はサポートしていません。");
+                System.err.println("[WARN] " + tableName + "." + colName + "  " + type + "型はサポートしていません。");
                 return UN_USABLE_TYPE;
             }
             return rs.getInt("DATA_TYPE");
@@ -302,5 +391,26 @@ public abstract class Dialect {
         } finally {
             StatementUtil.close(stmt);
         }
+    }
+    
+    /**
+     * load-dataで取り込み可能な文字列表現に変換します。
+     * 
+     * @param resultSet
+     * @param columnIndex
+     * @param columnLabel
+     * @param sqlType
+     * @return 文字列データ
+     * @throws SQLException
+     */
+    public String convertLoadData(ResultSet resultSet, int columnIndex, String columnLabel, int sqlType) 
+            throws SQLException {
+
+        String value = resultSet.getString(columnLabel);
+
+        // null to blank.
+        value = StringUtils.defaultIfEmpty(value, "");
+        
+        return value;
     }
 }

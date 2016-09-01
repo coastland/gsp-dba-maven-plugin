@@ -585,7 +585,7 @@ public class ExecuteDdlMojoTest extends AbstractDdlMojoTest<ExecuteDdlMojo> {
 		for (MojoTestFixture mf : mojoTestFixtureList) {
 
 			expected.expect(MojoExecutionException.class);
-			expected.expectMessage("SQL実行中にエラーが発生しました:");
+			expected.expectMessage("DDLの実行に失敗しました:");
 
 			// テストケース対象プロジェクトのpom.xmlを取得
 			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");

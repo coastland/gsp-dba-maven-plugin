@@ -12,7 +12,8 @@ gsp-dba-maven-pluginは、DBAのルーチンワークを自動化し、本来の
 * リポジトリ上のダンプファイルをローカル環境へ反映する。
 
 > * ER図からDDLを生成するには、モデリングツールとして[SI Object Browser ER](http://www.sint.co.jp/siob/er/)を使用する必要があります。
-> それ以外のツールを使用する場合、DDL生成機能は使用できません。
+> それ以外のツールを使用する場合、DDL生成機能は使用できません。また、DDL実行機能の利用もお勧めしません。
+> 別の方法でDDLを実行しておけば、DDL生成機能、DDL実行機能以外は問題なく利用できます。
 
 > * gsp-dba-maven-pluginは開発フェーズで用いることを想定しています。開発者のローカルDBを主ターゲットとしたツールです。  
 本番環境での使用は推奨しません。  
@@ -152,6 +153,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | outputDirectory            | ×     | DDLの出力ディレクトリ。デフォルトは、"target/ddl"。             |
 | lengthSemantics            | ×     | 長さセマンティクス。デフォルトはバイト。                        |
 | ddlTemplateFileDir         | ×     | プロジェクト固有のDDLテンプレートの配置ディレクトリをワークディレクトリからの相対パスで指定する。 |
+| allocationSize            | ×     | シーケンス生成SQLの増分値(INCREMENT BY)。デフォルトは"1"。<br /> allocationSizeと[generate-entity](#generate-entity)のallocationSizeの値はは一致させるようにして下さい。<br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG)  |
 テンプレートをカスタマイズする際は、[generate-ddlで使用するテンプレートのカスタマイズ例](./recipe/custom-DdlTemplate.md)を参照してください。
 
 
@@ -309,17 +311,22 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
 | genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。<br>カスタマイズする際は[GenDialectクラスのカスタマイズ例](./recipe/custom-genDialect.md)を参照してください。<br> |
-| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。                        |
+| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。<br />gsp-dba-maven-plugin で用意しているExtendedGenDialectクラスの登録キークラスと異なるクラス名を指定すると、ExtendedGenDialectクラスが利用されなくなるので指定の際には注意が必要です。|
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
 | entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"                                           |
 |javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
 |templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
+| allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。 <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
 テンプレートをカスタマイズする際は、[generate-entityで使用するテンプレートのカスタマイズ例](./recipe/custom-EntityTemplate.md)を参照してください。
+
 
 ### export-schema
 
-指定したスキーマのダンプファイルをエクスポートします。
+指定したスキーマのダンプファイルをエクスポートします。  
+DBMS固有のエクスポート機能を内部で呼び出すことで実現しています。
+ただし、DB2とSqlServerに関してはDBMS固有のエクスポート機能を用いることが出来ないため、DDLファイルとCSVファイルをパッケージングする汎用モードで代替します。  
+※[汎用モードの詳細](#exportSchemaGeneral)
 
     maven-install-pluginやmaven-deploy-pluginと組み合わせることで、
     ローカル環境へのインストールやリモートリポジトリへのデプロイが可能になります。
@@ -361,9 +368,28 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | 設定値                 | 必須  | 説明                                                                                  |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
 | outputDirectory        | ×     | データベーススキーマをエクスポートするディレクトリのパス。デフォルトは”target/dump”。 |
+| ddlDirectory           | ×     | [汎用モード](#汎用モード)で利用。 DDLディレクトリを指定する。                                  |
+| extraDdlDirectory      | ×     | [汎用モード](#汎用モード)で利用。 追加DDLディレクトリを指定する。                              |
 
-export-schemaはDB2とSQLServerには対応しておりません。  
-これらのDBを使用する際は、上記の`<execution>~</execution>`をコメントアウト、もしくは削除してください。
+#### <a name="exportSchemaGeneral"> 汎用モード
+- DB2とSQLServerの場合に動作するエクスポート処理の挙動で、DBMS固有のエクスポート機能を使用しません。
+- CSVデータとDDLファイルをパッケージングすることで、スキーマのエクスポート処理を代替します。
+- CSVデータはgsp-dba-maven-pluginで出力します。DDL及び追加DDLは予め用意しておき、上記パラメータの`ddlDirectory`、`extraDdlDirectory`で場所を指定して下さい。
+- 出力されるCSVデータの文字エンコーディングはUTF-8です。
+- 扱えるデータ型及び制限事項は[こちら](doc/db-status.md#汎用exportschemaimportschemaの制限事項)を参照して下さい。
+- 以下に処理の流れを記載します。
+    1. 指定スキーマのテーブルデータをCSVデータとして出力(to dataDirectory)。
+    2. 上記パラメータ`ddlDirectory`配下のDDLファイルを収集します。
+    3. 上記パラメータ`extraDdlDirectory`配下のDDLファイルを収集します。
+    4. 上記３つのリソースをjarファイルにパッケージングします。
+    ```
+    ex.) export-schema.jar
+           ├─ META-INF/
+           ├─ dataDirectory/
+           ├─ ddlDirectory/
+           └─ extraDdlDirectory/
+    ```
+
 
 ### import-schema
 
@@ -395,7 +421,13 @@ export-schemaはDB2とSQLServerには対応しておりません。
 | artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
 | version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
 
-import-schemaはDB2とSQLServerには対応しておりません。
+#### <a name="importSchemaGeneral"> 汎用モード
+- DB2とSQLServerの場合は汎用モードのエクスポートとなるため、それを取り込むことでスキーマのインポートとなります。
+- 扱えるデータ型及び制限事項は[こちら](doc/db-status.md#汎用exportschemaimportschemaの制限事項)を参照して下さい。
+- 以下に処理の流れを記載します。
+    1. 汎用モードで出力されたエクスポートjarファイルを取得、展開します。
+    2. `ddlDirectory`及び`extraDdlDirectory`のDDLファイルを実行します。
+    3. `dataDirectory`内のCSVデータをロードします。
 
 ### データベースごとの対応状況
 
@@ -426,20 +458,26 @@ import-schemaはDB2とSQLServerには対応しておりません。
 #### export-schema
 
 * 全データベース共通<br />
-  gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。
+  gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。  
+
+  ただし、[汎用モード](#exportSchemaGeneral)で動作させることで実現可能です。  
+  既存Dialectのexport-schemaの汎用モード化に関しては、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
 * MS SQL Server<br />
-  使用できません。
+  [汎用モード](#exportSchemaGeneral)で動作します。
 * DB2<br />
-  使用できません。
+  [汎用モード](#exportSchemaGeneral)で動作します。
 
 #### import-schema
 
 * 全データベース共通<br />
   gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。
+
+  ただし、[汎用モード](#importSchemaGeneral)で動作させることで実現可能です。  
+  既存Dialectのimport-schemaの汎用モード化に関して、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
 * MS SQL Server<br />
-  使用できません。
+  [汎用モード](#importSchemaGeneral)で動作します。
 * DB2<br />
-  使用できません。
+  [汎用モード](#importSchemaGeneral)で動作します。
 
 ## License
 

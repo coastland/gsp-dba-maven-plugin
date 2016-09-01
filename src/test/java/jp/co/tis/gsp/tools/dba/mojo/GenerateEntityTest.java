@@ -37,7 +37,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "type", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
-			TestDB.sqlserver, TestDB.mysql })
+	        TestDB.sqlserver, TestDB.mysql })
 	public void testType() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
@@ -91,7 +91,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "basic", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
-			TestDB.sqlserver, TestDB.mysql })
+	        TestDB.sqlserver, TestDB.mysql })
 	public void testBasic() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
@@ -134,7 +134,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "another_schema", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2,
-			TestDB.sqlserver })
+	        TestDB.sqlserver })
 	public void testAnotherSchema() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
@@ -439,7 +439,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 			mojo.execute();
 		}
 	}
-	
+
 	/**
 	 * パラメータ：templateFilePrimaryDirのテスト。
 	 * 
@@ -500,7 +500,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 	 */
 	@Test
 	@TestDBPattern(testCase = "view", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.sqlserver,
-			TestDB.mysql })
+	        TestDB.mysql })
 	public void testView() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
@@ -545,6 +545,51 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 	@Test
 	@TestDBPattern(testCase = "extra", testDb = { TestDB.oracle })
 	public void testExtra() throws Exception {
+
+		// 指定されたケース及びテスト対象のDBだけループ
+		for (MojoTestFixture mf : mojoTestFixtureList) {
+
+			// テストケース対象プロジェクトのpom.xmlを取得
+			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+			// 先にインプットになるテーブル定義を作成するためexecute-ddl
+			ExecuteDdlMojoTest ddlTest = new ExecuteDdlMojoTest();
+			ddlTest.setUp();
+			ExecuteDdlMojo ddlMojo = ddlTest.lookupConfiguredMojo(pom, EXECUTE_DDL, mf.testDb);
+			ddlMojo.execute();
+
+			// pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+			GenerateEntity mojo = this.lookupConfiguredMojo(pom, GENERATE_ENTITY, mf.testDb);
+			mojo.execute();
+
+			// 検証
+			String actualPath = mojo.javaFileDestDir.getAbsolutePath();
+			Entry actualFiles = DirUtil.collectEntry(actualPath);
+			Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "output");
+			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+
+		}
+	}
+
+	/**
+	 * allocationSizeを指定した場合のテスト。
+	 * 
+	 * <h4>検証内容</h4>
+	 * <ul>
+	 * <li>oracleのみでテスト。</li>
+	 * <li>allocationSizeに100を指定。</li>
+	 * </ul>
+	 * 
+	 * <h4>検証結果</h4>
+	 * <ul>
+	 * <li>期待値Entityファイルと同一であること。</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@TestDBPattern(testCase = "allocationSize", testDb = { TestDB.oracle })
+	public void testAllocationSize() throws Exception {
 
 		// 指定されたケース及びテスト対象のDBだけループ
 		for (MojoTestFixture mf : mojoTestFixtureList) {
