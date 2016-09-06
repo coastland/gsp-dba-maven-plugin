@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -98,6 +99,14 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 
         try {
             
+		    if(!inputDirectory.exists()) {
+		    	try {
+			    	FileUtils.forceMkdir(inputDirectory);
+    			} catch (IOException e) {
+	    			throw new MojoExecutionException("Can't create outputDirectory:" + inputDirectory);
+		    	}
+	    	}
+        	
             // jarの解凍
             extractJarAll(jarFile, inputDirectory.getAbsolutePath());
             
