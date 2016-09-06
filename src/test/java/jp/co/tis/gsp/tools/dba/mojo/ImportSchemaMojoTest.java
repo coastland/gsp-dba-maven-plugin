@@ -866,4 +866,71 @@ public class ImportSchemaMojoTest extends AbstractDdlMojoTest<ImportSchemaMojo> 
 			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
 		}
 	}
+
+
+	/**
+	 * パラメータ:inputDirectoryが存在しない時のテスト。 
+	 * 
+	 * <h4>検証内容</h4>
+	 * <ul>
+	 * <li>inputDirectoryで指定されたディレクトリが存在しない状況で行う。</li>
+	 * <li>export-schemaを実行する。</li>
+	 * </ul>
+	 * 
+	 * <h4>検証結果</h4>
+	 * <ul>
+	 * <li>export-schema(汎用)を実行し、出力されたCSVデータファイルがインプットのデータファイルと同一である。</li>
+	 * </ul>
+	 */
+	@Test
+	@TestDBPattern(testCase = "not_exist_inputDirectory", testDb = { TestDB.h2})
+	public void testNotExistInputDirectory() throws Exception {
+		
+		// 指定されたケース及びテスト対象のDBだけループ
+		for (MojoTestFixture mf : mojoTestFixtureList) {
+
+			// テストケース対象プロジェクトのpom.xmlを取得
+			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+			// currentProjectのセットアップ。 ImportSchemaMojoのセットアップ。
+			ImportSchemaMojo mojo = this.lookupConfiguredMojo(pom, IMPORT_SCHEMA, mf.testDb);
+
+			// テスト用ダンプjarをインストール
+			RepositorySystem rs = this.lookup(RepositorySystem.class);
+			Artifact artifact = rs.createArtifact("jp.co.tis.gsp", "gsp-testdata", "1.0.0", "jar");
+			artifact.setFile(new File(getTestCaseDBPath(mf) + "/gsp-test-testdata-1.0.0.jar"));
+			installArtifactToTestRepo(artifact, currentProject.getProjectBuildingRequest().getLocalRepository());
+
+			// スキーマのドロップ
+			DBTestUtil.dropSchema(mojo.schema, mojo.user, mojo.password, mojo.adminUser, mojo.adminPassword, mojo.url,
+					mojo.driver, mf.testDb);
+			
+			// ユーザのドロップ
+			DBTestUtil.dropUser(mojo.schema, mojo.user, mojo.password, mojo.adminUser, mojo.adminPassword, mojo.url,
+					mojo.driver, mf.testDb);
+			
+			// スキーマが存在しない状態で。
+			mojo.execute();
+
+			// 検証
+			String sql = "SELECT COUNT(*) FROM TEST_TBL1";
+			int cnt = 0;
+			cnt = DBTestUtil.getCount(sql, mojo.url, mojo.user, mojo.password);
+			assertThat(mf.testDb + ": ", cnt, is(1000));
+
+			sql = "SELECT COUNT(*) FROM TEST_TBL2";
+			cnt = DBTestUtil.getCount(sql, mojo.url, mojo.user, mojo.password);
+			assertThat(mf.testDb + ": ", cnt, is(1000));
+
+			sql = "SELECT COUNT(*) FROM TEST_TBL3";
+			cnt = DBTestUtil.getCount(sql, mojo.url, mojo.user, mojo.password);
+			assertThat(mf.testDb + ": ", cnt, is(1000));
+
+			sql = "SELECT COUNT(*) FROM FILE_TBL";
+			cnt = DBTestUtil.getCount(sql, mojo.url, mojo.user, mojo.password);
+			assertThat(mf.testDb + ": ", cnt, is(20));
+
+		}
+		
+	}
 }
