@@ -184,7 +184,9 @@ public class ViewAnalyzer implements SelectVisitor, SelectItemVisitor,
 		if (columnParser.isSimple()) {
 			String columnName = columnParser.getColumnName();
 			simpleColumnNames.add(columnName);
-			aliases.put(columnName, StringUtils.strip(item.getAlias().getName(), "`").toUpperCase());
+			if(item.getAlias() != null){
+			    aliases.put(columnName, StringUtils.strip(item.getAlias().getName(), "`").toUpperCase());
+			}
 		}
 	}
 
