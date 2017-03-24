@@ -5,16 +5,16 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import jp.co.tis.gsp.test.util.DirUtil;
 import jp.co.tis.gsp.test.util.Entry;
 import jp.co.tis.gsp.test.util.MojoTestFixture;
 import jp.co.tis.gsp.test.util.TestDB;
 import jp.co.tis.gsp.test.util.TestDBPattern;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 
@@ -64,6 +64,49 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 
 		}
 	}
+
+    /**
+     * テーブルのデータ型を網羅するDoma用のEntity生成テスト。
+     *
+     * <h4>検証内容</h4>
+     * <ul>
+     * <li>各DBごとにサポートするデータ型を網羅したテーブルを元にEntityを生成するテスト。</li>
+     * </ul>
+     * <h4>検証結果</h4>
+     * <ul>
+     * <li>期待値Entityフォルダと同一であること。</li>
+     * </ul>
+     *
+     * @throws Exception
+     */
+    @Test
+    @TestDBPattern(testCase = "typeWithDoma", testDb = { TestDB.h2 })
+    public void testTypeWithDoma() throws Exception {
+
+        // 指定されたケース及びテスト対象のDBだけループ
+        for (MojoTestFixture mf : mojoTestFixtureList) {
+
+            // テストケース対象プロジェクトのpom.xmlを取得
+            File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+            // 先にインプットになるテーブル定義を作成するためexecute-ddl
+            ExecuteDdlMojoTest ddlTest = new ExecuteDdlMojoTest();
+            ddlTest.setUp();
+            ExecuteDdlMojo ddlMojo = ddlTest.lookupConfiguredMojo(pom, EXECUTE_DDL, mf.testDb);
+            ddlMojo.execute();
+
+            // pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+            GenerateEntity mojo = this.lookupConfiguredMojo(pom, GENERATE_ENTITY, mf.testDb);
+            mojo.execute();
+
+            // 検証
+            String actualPath = mojo.javaFileDestDir.getAbsolutePath();
+            Entry actualFiles = DirUtil.collectEntry(actualPath);
+            Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "output");
+            assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+
+        }
+    }
 
 	/**
 	 * ＤＢの基本機能を生成するＤＤＬの実行テスト。
@@ -117,6 +160,58 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
 		}
 	}
+
+    /**
+     * ＤＢの基本機能を生成するＤＤＬの実行テスト。
+     *
+     * <h4>検証内容</h4>
+     * <ul>
+     * <li>下記のＤＢ基本機能を元にDomaのEntityを生成するテスト。</li>
+     * </ul>
+     * <ul>
+     * <li>主キー</li>
+     * <li>関連・外部キー</li>
+     * <li>制約</li>
+     * <li>シーケンス</li>
+     * <li>ビュー</li>
+     * </ul>
+     *
+     * <sub>h2はビュー未対応なので除く</sub>
+     *
+     * <h4>検証結果</h4>
+     * <ul>
+     * <li>期待値Entityフォルダと同一であること。</li>
+     * </ul>
+     *
+     * @throws Exception
+     */
+    @Test
+    @TestDBPattern(testCase = "basicWithDoma", testDb = { TestDB.h2 })
+    public void testBasicWithDoma() throws Exception {
+
+        // 指定されたケース及びテスト対象のDBだけループ
+        for (MojoTestFixture mf : mojoTestFixtureList) {
+
+            // テストケース対象プロジェクトのpom.xmlを取得
+            File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+            // 先にインプットになるテーブル定義を作成するためexecute-ddl
+            ExecuteDdlMojoTest ddlTest = new ExecuteDdlMojoTest();
+            ddlTest.setUp();
+            ExecuteDdlMojo ddlMojo = ddlTest.lookupConfiguredMojo(pom, EXECUTE_DDL, mf.testDb);
+            ddlMojo.execute();
+
+            // pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+            GenerateEntity mojo = this.lookupConfiguredMojo(pom, GENERATE_ENTITY, mf.testDb);
+            mojo.execute();
+
+            // 検証
+            String actualPath = mojo.javaFileDestDir.getAbsolutePath();
+            Entry actualFiles = DirUtil.collectEntry(actualPath);
+            Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "output");
+            assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+        }
+    }
 
 	/**
 	 * ユーザ名≠スキーマ名のテスト。
