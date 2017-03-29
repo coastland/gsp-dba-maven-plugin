@@ -615,4 +615,99 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 
 		}
 	}
+	
+
+	/**
+	 * @Versionアノテーションの付与テスト
+	 * 
+	 * <h4>検証内容</h4>
+	 * <ul>
+	 * <li>VersionColumnNamePatternが未指定の場合。カラム名「VERSION_NO」に@Versionアノテーションが付与されるかを検証。</li>
+	 * </ul>
+	 * 
+	 * <h4>検証結果</h4>
+	 * <ul>
+	 * <li>期待値Entityファイルと同一であること。</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@TestDBPattern(testCase = "nonVersionColumnNamePattern", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
+	        TestDB.sqlserver, TestDB.mysql })
+	public void testNonVersionColumnNamePattern() throws Exception {
+
+		// 指定されたケース及びテスト対象のDBだけループ
+		for (MojoTestFixture mf : mojoTestFixtureList) {
+
+			// テストケース対象プロジェクトのpom.xmlを取得
+			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+			// 先にインプットになるテーブル定義を作成するためexecute-ddl
+			ExecuteDdlMojoTest ddlTest = new ExecuteDdlMojoTest();
+			ddlTest.setUp();
+			ExecuteDdlMojo ddlMojo = ddlTest.lookupConfiguredMojo(pom, EXECUTE_DDL, mf.testDb);
+			ddlMojo.execute();
+
+			// pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+			GenerateEntity mojo = this.lookupConfiguredMojo(pom, GENERATE_ENTITY, mf.testDb);
+			mojo.execute();
+			
+			// 検証
+			String actualPath = mojo.javaFileDestDir.getAbsolutePath();
+			Entry actualFiles = DirUtil.collectEntry(actualPath);
+			Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "output");
+			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+
+		}
+	}
+	
+
+	/**
+	 * @Versionアノテーションの付与テスト
+	 * 
+	 * <h4>検証内容</h4>
+	 * <ul>
+	 * <li>versionColumnNamePatternに「HOG.」を指定した場合</li>
+	 * <li>カラム名「HOGE」に@Versionアノテーションが付与されるかを検証。</li>
+	 * </ul>
+	 * 
+	 * <h4>検証結果</h4>
+	 * <ul>
+	 * <li>期待値Entityファイルと同一であること。</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@TestDBPattern(testCase = "customVersionColumnNamePattern", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
+	        TestDB.sqlserver, TestDB.mysql })
+	public void testCustomVersionColumnNamePattern() throws Exception {
+
+		// 指定されたケース及びテスト対象のDBだけループ
+		for (MojoTestFixture mf : mojoTestFixtureList) {
+
+			// テストケース対象プロジェクトのpom.xmlを取得
+			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+			// 先にインプットになるテーブル定義を作成するためexecute-ddl
+			ExecuteDdlMojoTest ddlTest = new ExecuteDdlMojoTest();
+			ddlTest.setUp();
+			ExecuteDdlMojo ddlMojo = ddlTest.lookupConfiguredMojo(pom, EXECUTE_DDL, mf.testDb);
+			ddlMojo.execute();
+
+			// pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+			GenerateEntity mojo = this.lookupConfiguredMojo(pom, GENERATE_ENTITY, mf.testDb);
+			mojo.execute();
+			
+			assertTrue(true);
+
+			// 検証
+			String actualPath = mojo.javaFileDestDir.getAbsolutePath();
+			Entry actualFiles = DirUtil.collectEntry(actualPath);
+			Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "output");
+			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+
+		}
+	}
 }

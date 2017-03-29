@@ -125,6 +125,9 @@ public class GenerateEntity extends AbstractDbaMojo {
     @Parameter(defaultValue = "1")
     protected int allocationSize;
     
+    @Parameter
+    protected String versionColumnNamePattern; 
+    
     /** 実行時に生成するdiconのテンプレート名 */
     private static final String[] templateNames = {"convention", "jdbc", "s2jdbc"};
 
@@ -208,6 +211,10 @@ public class GenerateEntity extends AbstractDbaMojo {
         command.setJavaFileDestDir(javaFileDestDir);
         command.setTemplateFilePrimaryDir(templateFilePrimaryDir);
         command.setAllocationSize(allocationSize);
+        
+        if (!StringUtil.isBlank(versionColumnNamePattern)) {
+          command.setVersionColumnNamePattern(versionColumnNamePattern);
+        }
 
         final List<URL> urlList = new ArrayList<URL>();
         try {

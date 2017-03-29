@@ -309,6 +309,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | 設定値                 | 必須  | 説明                                                                      |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------|
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
+| versionColumnNamePattern | ×    | @Versionアノテーション付与対象になるカラム名を正規表現で指定する。                      |
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
 | genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。<br>カスタマイズする際は[GenDialectクラスのカスタマイズ例](./recipe/custom-genDialect.md)を参照してください。<br> |
 | dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。<br />gsp-dba-maven-plugin で用意しているExtendedGenDialectクラスの登録キークラスと異なるクラス名を指定すると、ExtendedGenDialectクラスが利用されなくなるので指定の際には注意が必要です。|
