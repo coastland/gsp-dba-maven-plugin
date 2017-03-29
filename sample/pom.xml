@@ -17,6 +17,7 @@
         <db.password>SAMPLE</db.password>
         <db.schema>PUBLIC</db.schema>
         <input.erdFile>src/main/resources/entity/model.edm</input.erdFile>
+        <output.rootPackage>${project.groupId}</output.rootPackage>
     </properties>
 
     <build>
@@ -33,6 +34,7 @@
                             <goals>
                                 <goal>generate-ddl</goal>
                                 <goal>execute-ddl</goal>
+                                <goal>generate-entity</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -45,6 +47,7 @@
                         <password>${db.password}</password>
                         <schema>${db.schema}</schema>
                         <erdFile>${input.erdFile}</erdFile>
+                        <rootPackage>${output.rootPackage}</rootPackage>
                     </configuration>
                     <dependencies>
                         <dependency>
