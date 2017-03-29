@@ -32,6 +32,7 @@
                             <phase>generate-sources</phase>
                             <goals>
                                 <goal>generate-ddl</goal>
+                                <goal>execute-ddl</goal>
                             </goals>
                         </execution>
                     </executions>

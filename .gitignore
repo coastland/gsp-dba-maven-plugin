@@ -12,3 +12,4 @@ src/it/simple-jpa-test/build.log
 
 sample/.idea
 sample/target
+sample/h2
