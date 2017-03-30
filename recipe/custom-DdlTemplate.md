@@ -80,7 +80,7 @@ CREATE SEQUENCE BANK_DATA_RECORD_DATA_RECORD_ID_SEQ increment by 1 start with 1;
 
 ### generate-entityテンプレートの変更
 
-前述のとおり、生成されるシーケンス名のネーミングルールが変更したのでgenerate-entityテンプレートもカスタマイズする必要があります。
+前述のとおり、生成されるシーケンス名のネーミングルールを変更したのでgenerate-entityテンプレートもカスタマイズする必要があります。
 上記のシーケンス名変更に伴うgenerate-entityテンプレートのカスタマイズは以下のようになります。
 
 [gsp_entity.ftl](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)をコピー新規で作成し、変更を加える例です。
