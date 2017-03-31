@@ -10,6 +10,6 @@ src/test/gsp_test.trace.db
 src/it/simple-jpa-test/src/main/java/jp/co/tis/gsptest/entity
 src/it/simple-jpa-test/build.log
 
-sample/.idea
-sample/target
-sample/h2
+samples/**/.idea
+samples/**/target
+samples/**/h2
