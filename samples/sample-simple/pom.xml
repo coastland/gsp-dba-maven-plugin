@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>gsp.sample</groupId>
+    <artifactId>gsp-sample</artifactId>
+    <version>0.0.1</version>
+
+    <properties>
+        <db.jdbcDriver>org.h2.Driver</db.jdbcDriver>
+        <db.url>jdbc:h2:./h2/db/SAMPLE</db.url>
+        <db.adminUser>SAMPLE</db.adminUser>
+        <db.adminPassword>SAMPLE</db.adminPassword>
+        <db.user>SAMPLE</db.user>
+        <db.password>SAMPLE</db.password>
+        <db.schema>PUBLIC</db.schema>
+        <input.erdFile>src/main/resources/entity/model.edm</input.erdFile>
+        <output.rootPackage>${project.groupId}</output.rootPackage>
+        <input.dataDirectory>src/test/resources/testdata</input.dataDirectory>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>jp.co.tis.gsp</groupId>
+                    <artifactId>gsp-dba-maven-plugin</artifactId>
+                    <version>4.1.0</version>
+                    <executions>
+                        <execution>
+                            <id>generate-ddl</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>generate-ddl</goal>
+                                <goal>execute-ddl</goal>
+                                <goal>generate-entity</goal>
+                                <goal>load-data</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <driver>${db.jdbcDriver}</driver>
+                        <url>${db.url}</url>
+                        <adminUser>${db.adminUser}</adminUser>
+                        <adminPassword>${db.adminPassword}</adminPassword>
+                        <user>${db.user}</user>
+                        <password>${db.password}</password>
+                        <schema>${db.schema}</schema>
+                        <erdFile>${input.erdFile}</erdFile>
+                        <rootPackage>${output.rootPackage}</rootPackage>
+                        <dataDirectory>${input.dataDirectory}</dataDirectory>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.h2database</groupId>
+                            <artifactId>h2</artifactId>
+                            <version>1.4.192</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+</project>
