@@ -25,7 +25,7 @@ public class TestTbl1 implements Serializable {
     /** TEST_TBL1_ID */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "TEST_TBL1_ID_SEQ", sequenceName = "TEST_TBL1_ID_SEQ", initialValue = 1, allocationSize = 1)
+    @SequenceGenerator(sequence = "TEST_TBL1_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "TEST_TBL1_ID")
     private BigDecimal testTbl1Id;
 

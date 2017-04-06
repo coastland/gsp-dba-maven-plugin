@@ -24,7 +24,7 @@ public class IndexTest2 implements Serializable {
     /** INDEX_TEST2_ID */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "INDEX_TEST2_ID_SEQ", sequenceName = "INDEX_TEST2_ID_SEQ", initialValue = 1, allocationSize = 1)
+    @SequenceGenerator(sequence = "INDEX_TEST2_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "INDEX_TEST2_ID")
     private Long indexTest2Id;
 
