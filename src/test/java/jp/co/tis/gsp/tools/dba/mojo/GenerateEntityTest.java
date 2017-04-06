@@ -80,7 +80,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
      * @throws Exception
      */
     @Test
-    @TestDBPattern(testCase = "typeWithDoma", testDb = { TestDB.h2 })
+    @TestDBPattern(testCase = "typeWithDoma", testDb = { TestDB.h2, TestDB.oracle })
     public void testTypeWithDoma() throws Exception {
 
         // 指定されたケース及びテスト対象のDBだけループ
@@ -186,7 +186,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
      * @throws Exception
      */
     @Test
-    @TestDBPattern(testCase = "basicWithDoma", testDb = { TestDB.h2 })
+    @TestDBPattern(testCase = "basicWithDoma", testDb = { TestDB.h2, TestDB.oracle })
     public void testBasicWithDoma() throws Exception {
 
         // 指定されたケース及びテスト対象のDBだけループ

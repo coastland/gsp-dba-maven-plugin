@@ -3,7 +3,7 @@
     @Id
     <#if attr.generationType??>
       <#if attr.generationType == "SEQUENCE">
-    @GeneratedValue(generator = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", sequenceName = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
       <#else>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
