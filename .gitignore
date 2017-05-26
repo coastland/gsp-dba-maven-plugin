@@ -9,3 +9,7 @@ src/test/gsp_test.mv.db
 src/test/gsp_test.trace.db
 src/it/simple-jpa-test/src/main/java/jp/co/tis/gsptest/entity
 src/it/simple-jpa-test/build.log
+
+samples/**/.idea
+samples/**/target
+samples/**/h2

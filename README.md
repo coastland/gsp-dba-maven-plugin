@@ -309,12 +309,14 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 | 設定値                 | 必須  | 説明                                                                      |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------|
 | ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
+| versionColumnNamePattern | ×    | @Versionアノテーション付与対象になるカラム名を正規表現で指定する。デフォルトは”VERSION([_]?NO)?”。<br />その他の付与条件に関しては[spec-generatedEntity.md](recipe/spec-generatedEntity.md)を参照。|
 | entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
 | genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。<br>カスタマイズする際は[GenDialectクラスのカスタマイズ例](./recipe/custom-genDialect.md)を参照してください。<br> |
 | dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。<br />gsp-dba-maven-plugin で用意しているExtendedGenDialectクラスの登録キークラスと異なるクラス名を指定すると、ExtendedGenDialectクラスが利用されなくなるので指定の際には注意が必要です。|
 | rootPackage            | ○    | ルートパッケージ名。                                                      |
 | useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
-| entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"                                           |
+| entityType             | ×    | 生成するEntityのタイプ。jpaとdomaが選択可能。デフォルトは、"jpa"。 <br />domaを指定する場合はentityTemplateに「java/gsp_doma_entity.ftl」を指定すること。|
+| entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"。|
 |javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
 |templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
 | allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。 <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |

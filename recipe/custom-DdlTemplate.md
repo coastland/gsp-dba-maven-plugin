@@ -4,11 +4,12 @@ generate-ddlゴールで使用するテンプレートのカスタマイズ方�
 
 gsp-dba-maven-pluginでは、DDL生成時のテンプレートエンジンとしてFreeMakerを使用しています。
 ですので、カスタマイズする際はFreeMakerのルールに従いテンプレートを作成してください。<br />
-**ただし、独自のテンプレートを使用する際は必ず、`generate-entity`のテンプレートへの影響確認を行ってください。**
 
 例としてシーケンスの命名を「テーブル名_カラム名_SEQ」とする場合を以下に記載しています。
-本例の場合はエンティティクラスの`@SequenceGenerator`に変更が必要なので、`generate-entity`ゴールのテンプレートも修正が必要です。
-修正方法は[generate-entityで使用するテンプレートのカスタマイズ例](./custom-EntityTemplate.md)を参照してください。
+
+> **独自のテンプレートを使用する際は必ず、`generate-entity`のテンプレートへの影響確認を行ってください。** <br />
+> 本例の場合はエンティティクラスの`@SequenceGenerator`に変更が必要なので、`generate-entity`ゴールのテンプレートも修正が必要です。
+> 修正方法は下記の [generate-entityテンプレートの変更](#generate-entityテンプレートの変更) を参照してください。
 
 ```diff
 CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
@@ -77,3 +78,22 @@ CREATE SEQUENCE BANK_DATA_RECORD_DATA_RECORD_ID_SEQ increment by 1 start with 1;
 </plugin>
 ```
 
+### generate-entityテンプレートの変更
+
+前述のとおり、生成されるシーケンス名のネーミングルールを変更したのでgenerate-entityテンプレートもカスタマイズする必要があります。
+上記のシーケンス名変更に伴うgenerate-entityテンプレートのカスタマイズは以下のようになります。
+
+[gsp_entity.ftl](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)をコピー新規で作成し、変更を加える例です。
+```diff
+<#macro printAttrAnnotations tableName attr>
+  <#if attr.id>
+    @Id
+    <#if attr.generationType??>
+      <#if attr.generationType == "SEQUENCE">
+-    @GeneratedValue(generator = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", strategy = GenerationType.AUTO)
++    @GeneratedValue(generator = "<#if schemaName??>${schemaName}.</#if>${tableName}_${attr.columnName}_SEQ", strategy = GenerationType.AUTO)
+-    @SequenceGenerator(name = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", sequenceName = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
++    @SequenceGenerator(name = "<#if schemaName??>${schemaName}.</#if>${tableName}_${attr.columnName}_SEQ", sequenceName = "<#if schemaName??>${schemaName}.</#if>${tableName}_${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
+```
+
+変更したgenerate-entityテンプレートの利用方法については[generate-entityで使用するテンプレートのカスタマイズ例](./custom-EntityTemplate.md)を参照して下さい。

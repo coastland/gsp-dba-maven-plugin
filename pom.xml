@@ -8,7 +8,7 @@
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>4.1.0</version>
+    <version>4.2.0</version>
     <name>GSP Maven Mojo for DBA</name>
     <description>
       To automate the routine work of the DBA, it is a tool to be able to concentrate on the data modeling work.
@@ -189,6 +189,12 @@
     </repositories>
 
     <dependencies>
+      <dependency>
+        <groupId>org.seasar.doma</groupId>
+        <artifactId>doma</artifactId>
+        <version>2.16.0</version>
+        <scope>provided</scope>
+      </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
