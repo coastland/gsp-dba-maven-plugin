@@ -46,7 +46,7 @@ public class ExtendedPostgreGenDialect extends PostgreGenDialect {
                 "timestamptz", Timestamp.class, false, TemporalType.TIMESTAMP);
         
         private static ExtendedPostgreColumnType BOOL = new ExtendedPostgreColumnType(
-                "bool", boolean.class);
+                "bool", Boolean.class);
         
         public ExtendedPostgreColumnType(String dataType, Class<?> attributeClass) {
             super(dataType, attributeClass);
