@@ -65,7 +65,7 @@ public class DomaGspFactoryImpl extends FactoryImpl {
                 useComment, showCatalogName, showSchemaName, showTableName);
     }
 
-    private static class DomaEntityModelFactory extends EntityModelFactoryImpl {
+    protected static class DomaEntityModelFactory extends EntityModelFactoryImpl {
 
         public DomaEntityModelFactory(final String packageName, final Class<?> superclass,
                 final AttributeModelFactory attributeModelFactory,

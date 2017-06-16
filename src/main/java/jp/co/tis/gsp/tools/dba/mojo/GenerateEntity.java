@@ -32,6 +32,8 @@ import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
 import jp.co.tis.gsp.tools.dba.s2jdbc.gen.DomaGspFactoryImpl;
 import jp.co.tis.gsp.tools.dba.s2jdbc.gen.GspFactoryImpl;
+import jp.co.tis.gsp.tools.dba.s2jdbc.gen.JSR310DomaGspFactoryImpl;
+import jp.co.tis.gsp.tools.dba.s2jdbc.gen.JSR310GspFactoryImpl;
 import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 import org.apache.commons.io.FileUtils;
@@ -130,8 +132,14 @@ public class GenerateEntity extends AbstractDbaMojo {
     protected String entityType;
     
     @Parameter
-    protected String versionColumnNamePattern; 
-    
+    protected String versionColumnNamePattern;
+
+    /**
+     * use JSR310.
+     */
+    @Parameter(defaultValue = "false")
+    private Boolean useJSR310;
+
     /** 実行時に生成するdiconのテンプレート名 */
     private static final String[] templateNames = {"convention", "jdbc", "s2jdbc"};
 
@@ -210,16 +218,20 @@ public class GenerateEntity extends AbstractDbaMojo {
         }
         command.setGenerationType(dialect.getGenerationType());
         if ("doma".equals(entityType)) {
-            command.setFactoryClassName(DomaGspFactoryImpl.class.getName());
+            command.setFactoryClassName((useJSR310) ?
+                    JSR310DomaGspFactoryImpl.class.getName() :
+                    DomaGspFactoryImpl.class.getName());
         } else {
-            command.setFactoryClassName(GspFactoryImpl.class.getName());
+            command.setFactoryClassName((useJSR310) ?
+                    JSR310GspFactoryImpl.class.getName() :
+                    GspFactoryImpl.class.getName());
         }
         command.setUseAccessor(useAccessor);
         command.setShowColumnName(true);
         command.setJavaFileDestDir(javaFileDestDir);
         command.setTemplateFilePrimaryDir(templateFilePrimaryDir);
         command.setAllocationSize(allocationSize);
-        
+
         if (!StringUtil.isBlank(versionColumnNamePattern)) {
           command.setVersionColumnNamePattern(versionColumnNamePattern);
         }

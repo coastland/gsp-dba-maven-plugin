@@ -31,7 +31,7 @@
 					<javaFileDestDir>output</javaFileDestDir>
 					<entityTemplate>java/gsp_doma_entity.ftl</entityTemplate>
 					<templateFilePrimaryDir></templateFilePrimaryDir>
-          <entityType>doma</entityType>
+          			<entityType>doma</entityType>
 
 					<ddlDirectory>ddl</ddlDirectory>
 				</configuration>
