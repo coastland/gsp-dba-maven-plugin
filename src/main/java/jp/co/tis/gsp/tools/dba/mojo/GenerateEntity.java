@@ -30,6 +30,8 @@ import java.util.Map;
 import jp.co.tis.gsp.tools.db.beans.Erd;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
+import jp.co.tis.gsp.tools.dba.s2jdbc.gen.DomaGspFactoryImpl;
+import jp.co.tis.gsp.tools.dba.s2jdbc.gen.GspFactoryImpl;
 import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 import org.apache.commons.io.FileUtils;
@@ -213,7 +215,11 @@ public class GenerateEntity extends AbstractDbaMojo {
         }
         command.setGenerationType(dialect.getGenerationType());
         command.setUseJSR310(useJSR310);
-        command.setEntityType(entityType);
+        if ("doma".equals(entityType)) {
+            command.setFactoryClassName(DomaGspFactoryImpl.class.getName());
+        } else {
+            command.setFactoryClassName(GspFactoryImpl.class.getName());
+        }
         command.setUseAccessor(useAccessor);
         command.setShowColumnName(true);
         command.setJavaFileDestDir(javaFileDestDir);
