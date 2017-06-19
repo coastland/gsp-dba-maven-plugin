@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 coastland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
 import org.seasar.extension.jdbc.gen.desc.AttributeDesc;
@@ -10,12 +26,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-/**
- * @author MAENO Daisuke
- */
 public class JSR310AttributeModelFactoryImpl extends AttributeModelFactoryImpl {
 
-    public JSR310AttributeModelFactoryImpl(boolean showColumnName, boolean showColumnDefinition, boolean useTemporalType, PersistenceConvention persistenceConvention) {
+    public JSR310AttributeModelFactoryImpl(boolean showColumnName, boolean showColumnDefinition,
+                                           boolean useTemporalType, PersistenceConvention persistenceConvention) {
         super(showColumnName, showColumnDefinition, useTemporalType, persistenceConvention);
     }
 
@@ -27,7 +41,6 @@ public class JSR310AttributeModelFactoryImpl extends AttributeModelFactoryImpl {
             attributeModel.setTemporalType(primaryTemporalType);
         } else if (useTemporalType && attributeDesc.isTemporal()) {
             attributeModel.setTemporalType(attributeDesc.getTemporalType());
-            attributeModel.setAttributeClass(LocalDate.class);
         }
 
         if (attributeClass == java.sql.Date.class) {

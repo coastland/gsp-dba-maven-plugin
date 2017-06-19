@@ -30,10 +30,6 @@ import java.util.Map;
 import jp.co.tis.gsp.tools.db.beans.Erd;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
-import jp.co.tis.gsp.tools.dba.s2jdbc.gen.DomaGspFactoryImpl;
-import jp.co.tis.gsp.tools.dba.s2jdbc.gen.GspFactoryImpl;
-import jp.co.tis.gsp.tools.dba.s2jdbc.gen.JSR310DomaGspFactoryImpl;
-import jp.co.tis.gsp.tools.dba.s2jdbc.gen.JSR310GspFactoryImpl;
 import jp.co.tis.gsp.tools.dba.util.DialectUtil;
 
 import org.apache.commons.io.FileUtils;
@@ -44,7 +40,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.seasar.extension.jdbc.gen.command.CommandInvoker;
 import org.seasar.extension.jdbc.gen.internal.command.CommandInvokerImpl;
-import org.seasar.extension.jdbc.gen.internal.command.GenerateEntityCommand;
 import org.seasar.extension.jdbc.gen.internal.util.ReflectUtil;
 import org.seasar.framework.util.StringUtil;
 
@@ -204,7 +199,7 @@ public class GenerateEntity extends AbstractDbaMojo {
     private void executeGenerateEntity() {
         Dialect dialect = DialectFactory.getDialect(url, driver);
         DialectUtil.setDialect(dialect);
-        final GenerateEntityCommand command = new GenerateEntityCommand();
+        final ExtendedGenerateEntityCommand command = new ExtendedGenerateEntityCommand();
         command.setSchemaName(schema);
         command.setOverwrite(true);
         command.setApplyDbCommentToJava(true);
@@ -217,15 +212,8 @@ public class GenerateEntity extends AbstractDbaMojo {
             command.setShowSchemaName(true);
         }
         command.setGenerationType(dialect.getGenerationType());
-        if ("doma".equals(entityType)) {
-            command.setFactoryClassName((useJSR310) ?
-                    JSR310DomaGspFactoryImpl.class.getName() :
-                    DomaGspFactoryImpl.class.getName());
-        } else {
-            command.setFactoryClassName((useJSR310) ?
-                    JSR310GspFactoryImpl.class.getName() :
-                    GspFactoryImpl.class.getName());
-        }
+        command.setUseJSR310(useJSR310);
+        command.setEntityType(entityType);
         command.setUseAccessor(useAccessor);
         command.setShowColumnName(true);
         command.setJavaFileDestDir(javaFileDestDir);
