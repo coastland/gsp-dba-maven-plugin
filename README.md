@@ -320,6 +320,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 |javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
 |templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
 | allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。 <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
+| useJSR310         | ×     |JSR301に対応したEntityを生成するかどうか。デフォルトは、”false”。                   |
 テンプレートをカスタマイズする際は、[generate-entityで使用するテンプレートのカスタマイズ例](./recipe/custom-EntityTemplate.md)を参照してください。
 
 

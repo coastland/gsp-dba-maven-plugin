@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import javax.annotation.Generated;
 
+import jp.co.tis.gsp.tools.dba.mojo.ExtendedGenerateEntityCommand;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.GeneratedValue;
@@ -56,16 +57,25 @@ public class DomaGspFactoryImpl extends FactoryImpl {
             final boolean showColumnDefinition,
             final boolean showJoinColumn, final PersistenceConvention persistenceConvention) {
 
+        ExtendedGenerateEntityCommand generateEntityCommand = (ExtendedGenerateEntityCommand) command;
+        AttributeModelFactory attributeModelFactory = null;
+        if (generateEntityCommand.isUseJSR310()) {
+            attributeModelFactory = new JSR310AttributeModelFactoryImpl(showColumnName,
+                    showColumnDefinition, useTemporalType,
+                    persistenceConvention);
+        } else {
+            attributeModelFactory = new AttributeModelFactoryImpl(showColumnName,
+                    showColumnDefinition, useTemporalType,
+                    persistenceConvention);
+        }
         return new DomaEntityModelFactory(packageName, superclass,
-                new AttributeModelFactoryImpl(showColumnName,
-                        showColumnDefinition, useTemporalType,
-                        persistenceConvention),
+                attributeModelFactory,
                 new AssociationModelFactoryImpl(showJoinColumn),
                 new CompositeUniqueConstraintModelFactoryImpl(), useAccessor,
                 useComment, showCatalogName, showSchemaName, showTableName);
     }
 
-    private static class DomaEntityModelFactory extends EntityModelFactoryImpl {
+    protected static class DomaEntityModelFactory extends EntityModelFactoryImpl {
 
         public DomaEntityModelFactory(final String packageName, final Class<?> superclass,
                 final AttributeModelFactory attributeModelFactory,

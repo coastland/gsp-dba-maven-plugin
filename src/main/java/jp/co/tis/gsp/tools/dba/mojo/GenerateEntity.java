@@ -42,7 +42,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.seasar.extension.jdbc.gen.command.CommandInvoker;
 import org.seasar.extension.jdbc.gen.internal.command.CommandInvokerImpl;
-import org.seasar.extension.jdbc.gen.internal.command.GenerateEntityCommand;
 import org.seasar.extension.jdbc.gen.internal.util.ReflectUtil;
 import org.seasar.framework.util.StringUtil;
 
@@ -130,8 +129,14 @@ public class GenerateEntity extends AbstractDbaMojo {
     protected String entityType;
     
     @Parameter
-    protected String versionColumnNamePattern; 
-    
+    protected String versionColumnNamePattern;
+
+    /**
+     * use JSR310.
+     */
+    @Parameter(defaultValue = "false")
+    private Boolean useJSR310;
+
     /** 実行時に生成するdiconのテンプレート名 */
     private static final String[] templateNames = {"convention", "jdbc", "s2jdbc"};
 
@@ -196,7 +201,7 @@ public class GenerateEntity extends AbstractDbaMojo {
     private void executeGenerateEntity() {
         Dialect dialect = DialectFactory.getDialect(url, driver);
         DialectUtil.setDialect(dialect);
-        final GenerateEntityCommand command = new GenerateEntityCommand();
+        final ExtendedGenerateEntityCommand command = new ExtendedGenerateEntityCommand();
         command.setSchemaName(schema);
         command.setOverwrite(true);
         command.setApplyDbCommentToJava(true);
@@ -209,6 +214,7 @@ public class GenerateEntity extends AbstractDbaMojo {
             command.setShowSchemaName(true);
         }
         command.setGenerationType(dialect.getGenerationType());
+        command.setUseJSR310(useJSR310);
         if ("doma".equals(entityType)) {
             command.setFactoryClassName(DomaGspFactoryImpl.class.getName());
         } else {
@@ -219,7 +225,7 @@ public class GenerateEntity extends AbstractDbaMojo {
         command.setJavaFileDestDir(javaFileDestDir);
         command.setTemplateFilePrimaryDir(templateFilePrimaryDir);
         command.setAllocationSize(allocationSize);
-        
+
         if (!StringUtil.isBlank(versionColumnNamePattern)) {
           command.setVersionColumnNamePattern(versionColumnNamePattern);
         }
