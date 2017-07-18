@@ -135,6 +135,41 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 	}
 
 	/**
+	 * パラメータ：ddlTemplateFileDirのテスト。
+	 *
+	 * <h4>検証内容</h4>
+	 * <ul>
+	 * <li>カスタマイズしたテンプレートとEDMファイル(スキーマ情報あり)の組み合わせテスト</li>
+	 * </ul>
+	 * <h4>検証結果</h4>
+	 * <ul>
+	 * <li>期待値DDLファイルと同一であること。</li>
+	 * </ul>
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	@TestDBPattern(testCase = "ddlTemplateFileDirWithSchemaName", testDb = { TestDB.oracle, TestDB.postgresql, TestDB.db2, TestDB.h2,
+			TestDB.sqlserver, TestDB.mysql })
+	public void testDdlTemplateFileDirWithSchemaName() throws Exception {
+		for (MojoTestFixture mf : mojoTestFixtureList) {
+
+			// テストケース対象プロジェクトのpom.xmlを取得
+			File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+			// pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+			GenerateDdlMojo mojo = this.lookupConfiguredMojo(pom, GENERATE_DDL, mf.testDb);
+			mojo.execute();
+
+			// 検証
+			String actualPath = mojo.outputDirectory.getAbsolutePath();
+			Entry actualFiles = DirUtil.collectEntry(actualPath);
+			Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "ddl");
+			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+		}
+	}
+
+	/**
 	 * パラメータ：lengthSemanticsのテスト。
 	 * 
 	 * <h4>検証内容</h4>
