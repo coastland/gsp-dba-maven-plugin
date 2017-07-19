@@ -469,7 +469,9 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
   [汎用モード](#exportSchemaGeneral)で動作します。
 * DB2<br />
   [汎用モード](#exportSchemaGeneral)で動作します。
-
+* スキーマ<br />
+  スキーマはパラメータschemaで指定されたものを参照します。<br />
+  erdファイルに指定したスキーマは参照しません。
 #### import-schema
 
 * 全データベース共通<br />
@@ -481,7 +483,15 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
   [汎用モード](#importSchemaGeneral)で動作します。
 * DB2<br />
   [汎用モード](#importSchemaGeneral)で動作します。
+* スキーマ<br />
+  スキーマはパラメータschemaで指定されたものを参照します。<br />
+  erdファイルに指定したスキーマは参照しません。
 
+#### load-data
+* スキーマ<br />
+  スキーマはパラメータschemaで指定されたものを参照します。<br />
+  erdファイルに指定したスキーマは参照しません。
+  
 ## License
 
 gsp-dba-maven-plugin はApache License 2.0 の元に配布されます。
