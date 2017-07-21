@@ -65,7 +65,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 </pluginManagement>
 ```
 
-### <a name="params">ゴール共通のパラメータ</a>
+### ゴール共通のパラメータ
 
 以下のパラメータは全てのゴールで共通です。
 対応する値を設定してください。
@@ -201,10 +201,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 
 ### load-data
 
-CSV形式で定義したデータを、データベースに登録します。
-
-* パラメータschemaにスキーマを指定している場合は、そのスキーマに含まれるデータベースに登録します。
-  パラメータschemaについては、[ゴール共通のパラメータ](#params)を参照してください。
+CSV形式で定義したデータを、データベースの指定したスキーマに登録します。
 
 使用する場合、pom.xmlに以下を追加してください。
 
@@ -225,14 +222,13 @@ CSV形式で定義したデータを、データベースに登録します。
         </goals>
         <configuration>
           <!-- 設定を追加 -->
-          <!-- 特定のスキーマに対して行う場合は、スキーマを指定する -->
-          <schema>SCHEMA</schema>
         </configuration>
       </execution>
     </executions>
   </plugin>
 </plugins>
 ```
+
 
 #### 使用可能なパラメータ
 
@@ -276,13 +272,60 @@ CSV形式で定義したデータを、データベースに登録します。
 登録可能なデータ型はデータベースごとに異なります。
 詳細は、 [load-dataの対応状況](./doc/db-status.md#load-dataの対応状況) を参照してください。
 
+#### 異なるスキーマにデータをロードする
+
+異なるスキーマにデータをロードする場合は、以下のようにpom.xmlを記載します。
+
+* executionタグを複数定義します。以下の例では、executionタグを識別する情報としてload-data-without-schemaとload-data-with-schemaのidを定義しています。
+* load-data-without-schemaでは、schemaパラメータを指定していません。
+* load-data-with-schemaでは、schemaパラメータにSCHEMA_TESTを指定しています。
+
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>load-data-without-schema</id>
+        <phase>pre-integration-test</phase>
+        <goals>
+          <goal>load-data</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+      <execution>
+        <id>load-data-with-schema</id>
+        <phase>pre-integration-test</phase>
+        <goals>
+          <goal>load-data</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+          <!-- ここではスキーマ名にSCHEMA_TESTを指定 -->
+          <schema>SCHEMA_TEST</schema>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
+
+次の実行コマンドでそれぞれのexecutionを実行します。
+
+````
+  mvn gsp-dba:load-data@load-data-without-schema gsp-dba:load-data@load-data-with-schema
+````
+
 ### generate-entity
 
 データベースのメタデータから、テーブルに対応するエンティティを生成します。自動生成時に付与される各種アノテーションに関しては、[エンティティで使用されるアノテーション](recipe/spec-generatedEntity.md)をご確認ください。
 生成処理はカスタマイズしたS2JDBC-Genを使用しています。
-
-* パラメータschemaにスキーマを指定している場合は、そのスキーマに含まれるデータベースのメタデータから生成します。
-  パラメータschemaについては、[ゴール共通のパラメータ](#params)を参照してください。
 
 使用する場合、pom.xmlに以下を追加してください。
 
@@ -303,8 +346,6 @@ CSV形式で定義したデータを、データベースに登録します。
         </goals>
         <configuration>
           <!-- 設定を追加 -->
-          <!-- 特定のスキーマに対して行う場合は、スキーマを指定する -->
-          <schema>SCHEMA</schema>
         </configuration>
       </execution>
     </executions>
@@ -336,10 +377,6 @@ CSV形式で定義したデータを、データベースに登録します。
 ### export-schema
 
 指定したスキーマのダンプファイルをエクスポートします。  
-
-* パラメータschemaにスキーマを指定している場合は、そのスキーマのダンプファイルをエクスポートします。
-  パラメータschemaについては、[ゴール共通のパラメータ](#params)を参照してください。
-
 DBMS固有のエクスポート機能を内部で呼び出すことで実現しています。
 ただし、DB2とSqlServerに関してはDBMS固有のエクスポート機能を用いることが出来ないため、DDLファイルとCSVファイルをパッケージングする汎用モードで代替します。  
 ※[汎用モードの詳細](#exportSchemaGeneral)
@@ -350,6 +387,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 ダンプファイルのファイル名は以下の形式です。
 
     プロジェクトのアーティファクトId + "-testdata-" + プロジェクトのバージョン + ".jar"
+
 
 使用する場合、pom.xmlに以下を追加してください。
 
@@ -370,8 +408,6 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
         </goals>
         <configuration>
           <!-- 設定を追加 -->
-          <!-- 特定のスキーマに対して行う場合は、スキーマを指定する -->
-          <schema>SCHEMA</schema>
         </configuration>
       </execution>
     </executions>
@@ -412,9 +448,6 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 
 リポジトリからダンプファイルを取得し、ローカルのデータベースにインポートする。
 
-* パラメータschemaにスキーマを指定している場合は、そのスキーマにダンプファイルをインポートします。
-  パラメータschemaについては、[ゴール共通のパラメータ](#params)を参照してください。
-
 使用する場合、pom.xmlに以下を追加してください。
 
 ```xml
@@ -427,8 +460,6 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
     </version>
     <configuration>
     <!-- 設定を追加 -->
-    <!-- 特定のスキーマに対して行う場合は、スキーマを指定する -->
-    <schema>SCHEMA</schema>
     </configuration>
   </plugin>
 </plugins>
