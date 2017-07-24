@@ -1,6 +1,6 @@
 <#-- ObjectBrowserにおいてMySQLの場合にindexタイプ=2が選択不可能なためcreate unique index生成はしない -->
 <#if index.isPrimaryKey()>
-ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD
+ALTER TABLE <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name} ADD
 PRIMARY KEY ${index.name!}
 (
 <#foreach column in index.columnList>
@@ -15,9 +15,9 @@ PRIMARY KEY ${index.name!}
 
 <#if index.type=1 || index.type=3>
 <#if index.type=1>
-ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD UNIQUE
+ALTER TABLE <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name} ADD UNIQUE
 <#elseif index.type=3>
-CREATE INDEX ${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
+CREATE INDEX ${index.name} ON <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name}
 </#if>
 (
 <#foreach column in index.columnList>

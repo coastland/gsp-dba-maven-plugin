@@ -272,6 +272,56 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 登録可能なデータ型はデータベースごとに異なります。
 詳細は、 [load-dataの対応状況](./doc/db-status.md#load-dataの対応状況) を参照してください。
 
+#### 異なるスキーマにデータをロードする
+
+異なるスキーマにデータをロードする場合は、以下のようにpom.xmlを記載します。
+
+* executionタグを複数定義します。以下の例では、executionタグを識別する情報としてload-data-without-schemaとload-data-with-schemaのidを定義しています。
+* load-data-without-schemaでは、schemaパラメータを指定していません。
+* load-data-with-schemaでは、schemaパラメータにSCHEMA_TESTを指定しています。
+
+```xml
+<plugins>
+  <plugin>
+    <groupId>jp.co.tis.gsp</groupId>
+    <artifactId>gsp-dba-maven-plugin</artifactId>
+    <version>
+      使用するgsp-dba-maven-pluginのバージョン
+    </version>
+    <executions>
+      <execution>
+        <id>load-data-without-schema</id>
+        <phase>pre-integration-test</phase>
+        <goals>
+          <goal>load-data</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+        </configuration>
+      </execution>
+      <execution>
+        <id>load-data-with-schema</id>
+        <phase>pre-integration-test</phase>
+        <goals>
+          <goal>load-data</goal>
+        </goals>
+        <configuration>
+          <!-- 設定を追加 -->
+          <!-- ここではスキーマ名にSCHEMA_TESTを指定 -->
+          <schema>SCHEMA_TEST</schema>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+```
+
+次の実行コマンドでそれぞれのexecutionを実行します。
+
+````
+  mvn gsp-dba:load-data@load-data-without-schema gsp-dba:load-data@load-data-with-schema
+````
+
 ### generate-entity
 
 データベースのメタデータから、テーブルに対応するエンティティを生成します。自動生成時に付与される各種アノテーションに関しては、[エンティティで使用されるアノテーション](recipe/spec-generatedEntity.md)をご確認ください。
@@ -465,6 +515,10 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 
   ただし、[汎用モード](#exportSchemaGeneral)で動作させることで実現可能です。  
   既存Dialectのexport-schemaの汎用モード化に関しては、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
+  
+  スキーマはパラメータschemaで指定されたものを参照します。<br />
+  erdファイルに指定したスキーマは参照しません。
+  
 * MS SQL Server<br />
   [汎用モード](#exportSchemaGeneral)で動作します。
 * DB2<br />
@@ -477,11 +531,20 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 
   ただし、[汎用モード](#importSchemaGeneral)で動作させることで実現可能です。  
   既存Dialectのimport-schemaの汎用モード化に関して、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
+  
+  スキーマはパラメータschemaで指定されたものを参照します。<br />
+  erdファイルに指定したスキーマは参照しません。
+    
 * MS SQL Server<br />
   [汎用モード](#importSchemaGeneral)で動作します。
 * DB2<br />
   [汎用モード](#importSchemaGeneral)で動作します。
 
+#### load-data
+* 全データベース共通<br />
+  スキーマはパラメータschemaで指定されたものを参照します。<br />
+  erdファイルに指定したスキーマは参照しません。
+  
 ## License
 
 gsp-dba-maven-plugin はApache License 2.0 の元に配布されます。

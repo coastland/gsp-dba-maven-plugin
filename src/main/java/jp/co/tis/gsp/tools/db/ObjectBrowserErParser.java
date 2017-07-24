@@ -79,8 +79,7 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 		    
 		    //スキーマ != ユーザの場合、スキーマ名をセットする
 		    if(!user.equals(schema)){
-		      //ftlで.(ピリオド)が常に表示されるため、ここで設定しておく
-		        entity.setSchema(schema + ".");
+		        entity.setSchema(schema);
 		    }
 		    
 		    
@@ -147,8 +146,7 @@ public class ObjectBrowserErParser extends AbstractDbObjectParser {
 			    
 	            //スキーマ != ユーザの場合、スキーマ名をセットする
 	            if(!user.equals(schema)){
-	                //ftlで.(ピリオド)が常に表示されるため、ここで設定しておく
-	                view.setSchema(schema + ".");
+	                view.setSchema(schema);
 	            }
 			    
 				if (!printView || view.getShowType() != 0) {

@@ -2,7 +2,7 @@
 <#-- NULLを許容する場合は"NULL"句を、NULLを許容しない場合は"NOT NULL"句を使用する。 -->
 <#-- IDENTITYを指定するのはsmallint、int、bigint、decimal、numeric型で自動生成されるもののみ。 -->
 <#-- IDENTITYが指定できるのは1テーブルに1つであるため、シングル主キーでない自動インクリメントのカラムにはIDENTITYは設定しない。 -->
-CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
+CREATE TABLE <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name} (
 <#foreach column in entity.columnList>
   ${column.name} ${column.dataType}<#if column.length != 0>(${column.length}<#if column.scale != 0 && (column.dataType = 'DECIMAL' || column.dataType = 'NUMERIC')>,${column.scale}</#if>)</#if><#if column.isArray()> ARRAY</#if><#if column.isAutoIncrement()> IDENTITY</#if><#if !column.isNullable()> NOT</#if> NULL <#if column.defaultValue?has_content> DEFAULT ${column.defaultValue} </#if><#if column_has_next>,</#if>
 </#foreach>

@@ -1,10 +1,10 @@
 <#-- postgresqlではindexは常に指定テーブルと同じスキーマに作成されるためスキーマ修飾はなし -->
 <#if index.isPrimaryKey()>
-ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD CONSTRAINT ${index.name!} PRIMARY KEY
+ALTER TABLE <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name} ADD CONSTRAINT ${index.name!} PRIMARY KEY
 <#elseif index.type=1>
-ALTER TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} ADD CONSTRAINT ${index.name!} UNIQUE
+ALTER TABLE <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name} ADD CONSTRAINT ${index.name!} UNIQUE
 <#elseif index.type=2 || index.type=3>
-CREATE <#if index.type=2>UNIQUE </#if>INDEX ${index.name} ON <#if entity.schema??>${entity.schema}</#if>${entity.name}
+CREATE <#if index.type=2>UNIQUE </#if>INDEX ${index.name} ON <#if entity.schema?has_content>${entity.schema}.</#if>${entity.name}
 </#if>
 (
 <#foreach column in index.columnList>
