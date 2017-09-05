@@ -19,18 +19,23 @@ package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 import javax.persistence.GenerationType;
 import javax.sql.DataSource;
 
+import jp.co.tis.gsp.tools.dba.mojo.ExtendedGenerateEntityCommand;
 import org.seasar.extension.jdbc.gen.command.Command;
 import org.seasar.extension.jdbc.gen.desc.AttributeDescFactory;
 import org.seasar.extension.jdbc.gen.desc.CompositeUniqueConstraintDescFactory;
 import org.seasar.extension.jdbc.gen.desc.EntityDescFactory;
 import org.seasar.extension.jdbc.gen.desc.EntitySetDescFactory;
 import org.seasar.extension.jdbc.gen.dialect.GenDialect;
-import org.seasar.extension.jdbc.gen.internal.desc.AttributeDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.desc.CompositeUniqueConstraintDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.desc.EntityDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.desc.EntitySetDescFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.factory.FactoryImpl;
+import org.seasar.extension.jdbc.gen.internal.model.AssociationModelFactoryImpl;
+import org.seasar.extension.jdbc.gen.internal.model.AttributeModelFactoryImpl;
+import org.seasar.extension.jdbc.gen.internal.model.CompositeUniqueConstraintModelFactoryImpl;
+import org.seasar.extension.jdbc.gen.internal.model.EntityModelFactoryImpl;
 import org.seasar.extension.jdbc.gen.meta.DbTableMetaReader;
+import org.seasar.extension.jdbc.gen.model.EntityModelFactory;
 import org.seasar.framework.convention.PersistenceConvention;
 
 import java.io.File;
@@ -68,5 +73,32 @@ public class GspFactoryImpl extends FactoryImpl {
             }
 
         };
+    }
+
+    @Override
+    public EntityModelFactory createEntityModelFactory(final Command command, final String packageName,
+                                                       final Class<?> superclass, final boolean useTemporalType,
+                                                       final boolean useAccessor, final boolean useComment,
+                                                       final boolean showCatalogName, final boolean showSchemaName,
+                                                       final boolean showTableName, final boolean showColumnName,
+                                                       final boolean showColumnDefinition, final boolean showJoinColumn,
+                                                       final PersistenceConvention persistenceConvention) {
+
+        ExtendedGenerateEntityCommand generateEntityCommand = (ExtendedGenerateEntityCommand)command;
+        AttributeModelFactoryImpl attributeModelFactory = null;
+        if (generateEntityCommand.isUseJSR310()) {
+            attributeModelFactory = new JSR310AttributeModelFactoryImpl(showColumnName,
+                    showColumnDefinition, useTemporalType,
+                    persistenceConvention);
+        } else {
+            attributeModelFactory = new AttributeModelFactoryImpl(showColumnName,
+                    showColumnDefinition, useTemporalType,
+                    persistenceConvention);
+        }
+        return new EntityModelFactoryImpl(packageName, superclass,
+                attributeModelFactory,
+                new AssociationModelFactoryImpl(showJoinColumn),
+                new CompositeUniqueConstraintModelFactoryImpl(), useAccessor,
+                useComment, showCatalogName, showSchemaName, showTableName);
     }
 }

@@ -386,4 +386,36 @@ public class GenerateDdlMojoTest extends AbstractDdlMojoTest<GenerateDdlMojo> {
 			assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
 		}
 	}
+
+    /**
+     * EDMファイルにSCHEMAを指定したときのテスト
+     *
+     * <h4>検証内容</h4>
+     * <ul>
+     * <li>EDMファイルにSCHEMAを指定し、generate-ddlで生成されたDDLにSCHEMAが付与されているか確認する。</li>
+     * </ul>
+     *
+     * <h4>検証結果</h4>
+     * <ul>
+     * <li>期待値DDLファイルと同一であること。</li>
+     * </ul>
+     * @throws Exception
+     */
+    @Test
+    @TestDBPattern(testCase = "specifiedSchemaInEdm", testDb = {TestDB.oracle, TestDB.db2,
+            TestDB.postgresql, TestDB.sqlserver, TestDB.mysql, TestDB.h2})
+    public void testSpecifiedSchemaInEdm() throws Exception {
+        for (MojoTestFixture mojoTestFixture : mojoTestFixtureList) {
+            final File file = new File(getTestCaseDBPath(mojoTestFixture) + "/pom.xml");
+
+            GenerateDdlMojo mojo = this.lookupConfiguredMojo(file, GENERATE_DDL, mojoTestFixture.testDb);
+            mojo.execute();
+
+            // 検証
+            final String actualPath = mojo.outputDirectory.getAbsolutePath();
+            final Entry actualFiles = DirUtil.collectEntry(actualPath);
+            final Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mojoTestFixture) + FS + "ddl");
+            assertThat("TestDb:" + mojoTestFixture.testDb, actualFiles.equals(expectedFiles), is(true));
+        }
+    }
 }
