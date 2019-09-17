@@ -65,6 +65,57 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 </pluginManagement>
 ```
 
+### Java11での設定
+
+Java11で使用する場合pom.xmlに以下の設定を追加してください。。
+
+```xml
+<pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>jp.co.tis.gsp</groupId>
+      <artifactId>gsp-dba-maven-plugin</artifactId>
+      <!-- Java11で使用できるgsp-dba-maven-pluginのバージョンは4.4.0以降です。 -->
+      <version>4.4.0</version>
+      <dependencies>
+        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
+        <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <version>11.2.0.2.0</version>
+        </dependency>
+        <!-- 以下を追加するようにしてください。 -->
+        <dependency>
+          <groupId>javax.activation</groupId>
+          <artifactId>javax.activation-api</artifactId>
+          <version>1.2.0</version>
+        </dependency>
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <version>2.3.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-core</artifactId>
+          <version>2.3.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <version>2.3.0</version>
+        </dependency>
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+          <version>1.3.2</version>
+        </dependency>
+      </dependencies>
+    </plugin>
+  </plugins>
+</pluginManagement>
+```
+
 ### ゴール共通のパラメータ
 
 以下のパラメータは全てのゴールで共通です。
