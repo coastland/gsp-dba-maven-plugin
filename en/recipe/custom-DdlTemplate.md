@@ -8,7 +8,7 @@ Therefore, create the template by following the FreeMaker rules during customiza
 As an example, naming the sequence as "table_name_column_name_SEQ" is described below.
 
 > **Before using your own template, the impact of `generate-entity` on the template must be checked.** <br />
-> In this example, the template for the generate-entity goal must also be modified since `@SequenceGenerator` of the entity class requires to be modified.
+> In this example, the template for the `generate-entity` goal must also be modified since `@SequenceGenerator` of the entity class requires to be modified.
 > For information on how to modify, see [Modify the generate-entity template
 ](#Modify-the-generate-entity-template) given below.
 
@@ -84,8 +84,8 @@ The configuration is as follows when the directory `ddlTemplates` is placed in t
 As mentioned earlier, since the naming rules for the generated sequence names were changed, the generate-entity template also needs to be customized.
 The customization of the generate-entity template for the above change in sequence name is as follows.
 
-[gsp_entity.ftl]
-An example of copying (../../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl) and creating a new template followed by making changes is shown below.
+
+An example of copying [gsp_entity.ftl](../../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl) and creating a new template followed by making changes is shown below.
 ```diff
 <#macro printAttrAnnotations tableName attr>
   <#if attr.id>
