@@ -128,7 +128,7 @@ testDB=db2
         * [jdbc_test.properties](../../src/test/resources/jdbc_test.properties)  
             * [settings.xml](../../src/test/resources/settings.xml)  
                 * [testParentPom.xml](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/testParentPom.xml)  
-                    *  pom.xml of each test case. [Example](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/ExecuteDdlMojo/type/db2/pom.xml)
+                    *  pom.xml of each test case. [Example](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/ExecuteDdlMojo_test/type/db2/pom.xml)
     
     
 ## Troubleshoot
