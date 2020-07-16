@@ -170,7 +170,7 @@ It is not necessary to specify the type name of the column.
 
 ### Restrictions of general ExportSchema/ImportSchema
 
-The data types that can be handled are based on [load-data status](#Support status for load-data).  
+The data types that can be handled are based on [load-data status](#support-status-for-load-data).  
 For data types that cannot be handled, the column is not output by ExportSchema. Therefore, ImportSchema results in a null value for that column.
 
 The following restrictions are specific to the general ExportSchema/ImportSchema.
