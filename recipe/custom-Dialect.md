@@ -1,10 +1,10 @@
-## Example of Dialect Class Customization
+## Dialectクラスのカスタマイズ例
 
-Describes an example of how to customize the handling of data for full-width and half-width spaces only.
+全角空白と半角空白のみのデータの取り扱いをカスタマイズする例を記述します。
 
-As mentioned in the load-data of README.md, data of full-width and half-width spaces will be registered in the DB as null.
-To change this configuration, create a class inheriting the dialect class of the DB used, write the conditions and configure the class to use the dialect class created in pom.
-The following example shows how to register data with full-width spaces as null in OracleDB.
+README.mdのload-dataにあるように、全角空白もしくは半角空白のみのデータはnullとしてDBに登録されます。
+この設定を変更する際には、使用するDBのダイアレクトクラスを継承したクラスを作成、条件を記述し、pomにて作成したダイアレクトクラスを使用するように設定してください。  
+以下は、全角空白のみのデータをnullとしてOracleDBに登録する際の設定例です。
 
 ```java
 public class CustomOracleDialect extends OracleDialect{
@@ -25,8 +25,8 @@ public class CustomOracleDialect extends OracleDialect{
 }
 ```
 
-After customization, add a configuration to the GSP plugin of pom used in the project to import the class that was created.  
-A configuration example is shown below.
+カスタマイズしたら、適用するプロジェクトのpomのGSPプラグインに、作成したクラスを読み込ませるよう設定を追加してください。  
+以下、設定例です。
 
 ```xml
 <plugins>
@@ -34,7 +34,7 @@ A configuration example is shown below.
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      Version of gsp-dba-maven-plugin used
+      使用するgsp-dba-maven-pluginのバージョン
     </version>
     <executions>
       <execution>
@@ -45,7 +45,7 @@ A configuration example is shown below.
         </goals>
         <configuration>
           <optionalDialects>
-            <!-- Specify with the fully qualified class name of the class created. -->
+            <!-- 作成したクラスの完全修飾クラス名で指定する。 -->
             <oracle>jp.co.tis.gsp.tools.dba.dialect.CustomOracleDialect</oracle>
           </optionalDialects>
         </configuration>
@@ -55,6 +55,6 @@ A configuration example is shown below.
 </plugins>
 ```
 
-After adding the configuration, run the GSP plugin. Data with only half-width spaces will not be changed to null and will be registered in the DB as half-width spaces.
+設定追加後、GSPプラグインを実行してください。半角空白のみのデータがnullにならず、半角空白としてDBに登録されます。
 
-Note: Based on the library specification used to import the CSV file, leading and trailing half-width spaces in the data are ignored, enclose them in "" to register them.
+補足:CSVを読み込む際に使用しているライブラリの仕様上、データの前後の半角空白は無視されますので、半角空白を登録する際は""で囲むようにしてください。
