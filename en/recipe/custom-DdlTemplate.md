@@ -1,20 +1,21 @@
-## generate-ddlで使用するテンプレートのカスタマイズ例
+## Example of Template Customization for Use with Generate-ddl
 
-generate-ddlゴールで使用するテンプレートのカスタマイズ方法を記述します。
+This section describes how to customize the template used by generate-ddl goal.
 
-gsp-dba-maven-pluginでは、DDL生成時のテンプレートエンジンとしてFreeMakerを使用しています。
-ですので、カスタマイズする際はFreeMakerのルールに従いテンプレートを作成してください。<br />
+The gsp-dba-maven-plugin uses FreeMaker as the template engine when creating DDL.
+Therefore, create the template by following the FreeMaker rules during customization. <br />
 
-例としてシーケンスの命名を「テーブル名_カラム名_SEQ」とする場合を以下に記載しています。
+As an example, naming the sequence as "table_name_column_name_SEQ" is described below.
 
-> **独自のテンプレートを使用する際は必ず、`generate-entity`のテンプレートへの影響確認を行ってください。** <br />
-> 本例の場合はエンティティクラスの`@SequenceGenerator`に変更が必要なので、`generate-entity`ゴールのテンプレートも修正が必要です。
-> 修正方法は下記の [generate-entityテンプレートの変更](#generate-entityテンプレートの変更) を参照してください。
+> **Before using your own template, the impact of `generate-entity` on the template must be checked.** <br />
+> In this example, the template for the generate-entity goal must also be modified since `@SequenceGenerator` of the entity class requires to be modified.
+> For information on how to modify, see [Modify the generate-entity template
+](#Modify-the-generate-entity-template) given below.
 
 ```diff
 CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
 <#foreach column in entity.columnList>
-  ${column.name} ${column.dataType}<#if column.length != 0>(${column.length}<#if column.scale != 0>,${column.scale}</#if><#if lengthSemantics==LengthSemantics.CHAR && (column.dataType == "VARCHAR2" || column.dataType == "CHAR")> CHAR</#if>)</#if><#if column.isArray()> ARRAY</#if><#if column.defaultValue?has_content> DEFAULT ${column.defaultValue} </#if><#if !column.isNullable()> NOT NULL </#if><#if column_has_next>,</#if>
+${column.name} ${column.dataType}<#if column.length != 0>(${column.length}<#if column.scale != 0>,${column.scale}</#if><#if lengthSemantics==LengthSemantics.CHAR && (column.dataType == "VARCHAR2" || column.dataType == "CHAR")> CHAR</#if>)</#if><#if column.isArray()> ARRAY</#if><#if column.defaultValue?has_content> DEFAULT ${column.defaultValue} </#if><#if !column.isNullable()> NOT NULL </#if><#if column_has_next>,</#if>
 </#foreach>
 );
 <#if entity.label?has_content>COMMENT ON table <#if entity.schema??>${entity.schema}</#if>${entity.name} is '${entity.label}';</#if>
@@ -28,7 +29,7 @@ CREATE TABLE <#if entity.schema??>${entity.schema}</#if>${entity.name} (
 </#foreach>
 ```
 
-このテンプレートの場合、次のようなDDLが出力されます。
+The following DDL is output for the template:
 
 ```sql
 CREATE TABLE BANK_DATA_RECORD (
@@ -41,31 +42,31 @@ CREATE TABLE BANK_DATA_RECORD (
   TRANSFER_AMOUNT NUMBER(10),
   HEADER_RECORD_ID NUMBER(9) NOT NULL
 );
-COMMENT ON table BANK_DATA_RECORD is '銀行データレコード';
-COMMENT ON column BANK_DATA_RECORD.DATA_RECORD_ID is 'データID';
-COMMENT ON column BANK_DATA_RECORD.RECEIVING_BANK_NUMBER is '被仕向金融機関番号';
-COMMENT ON column BANK_DATA_RECORD.RECEIVING_BRANCH_NUMBER is '被仕向支店番号';
-COMMENT ON column BANK_DATA_RECORD.DEPOSIT_TYPE is '預金種目';
-COMMENT ON column BANK_DATA_RECORD.ACCOUNT_NUMBER is '口座番号';
-COMMENT ON column BANK_DATA_RECORD.RECIPIENT_NAME is '受取人名';
-COMMENT ON column BANK_DATA_RECORD.TRANSFER_AMOUNT is '振込金額';
-COMMENT ON column BANK_DATA_RECORD.HEADER_RECORD_ID is 'ヘッダID';
+COMMENT ON table BANK_DATA_RECORD is 'Bank Data Record';
+COMMENT ON column BANK_DATA_RECORD.DATA_RECORD_ID is 'Record ID';
+COMMENT ON column BANK_DATA_RECORD.RECEIVING_BANK_NUMBER is 'Recipient Bank Number';
+COMMENT ON column BANK_DATA_RECORD.RECEIVING_BRANCH_NUMBER is 'Recipient Branch Number';
+COMMENT ON column BANK_DATA_RECORD.DEPOSIT_TYPE is 'Deposit Type';
+COMMENT ON column BANK_DATA_RECORD.ACCOUNT_NUMBER is 'Account Number';
+COMMENT ON column BANK_DATA_RECORD.RECIPIENT_NAME is 'Recipient Name';
+COMMENT ON column BANK_DATA_RECORD.TRANSFER_AMOUNT is 'Transfer Amount';
+COMMENT ON column BANK_DATA_RECORD.HEADER_RECORD_ID is 'Header ID';
 CREATE SEQUENCE BANK_DATA_RECORD_DATA_RECORD_ID_SEQ increment by 1 start with 1;
 ```
 
-使用できる変数は[デフォルトのテンプレート格納ディレクトリ](../src/main/resources/jp/co/tis/gsp/tools/db/template)を参考にしてください。
+For more information on the variables used, see [Default template storage directory](../../src/main/resources/jp/co/tis/gsp/tools/db/template).
 
-カスタマイズしたテンプレートはpom.xmlのgsp-dba-maven-pluginの`<configuration>`タグに`<ddlTemplateFileDir>`を追加することで読み込まれるようになります。
-ただし、ファイル名は以下である必要があります。
+The customized template can be loaded by adding <ddlTemplateFileDir> to the <configuration> tag of the gsp-dba-maven-plugin in pom.xml.
+However, the file name must be as given below:
 
-|用途|ファイル名|
+|Application | File name|
 |:-:|:-:|
 |CREATE TABLE|createTable.ftl|
 |CREATE INDEX|createIndex.ftl|
 |CREATE FOREIGN KEY|createForeignKey.ftl|
 |CREATE VIEW|createView.ftl|
 
-プロジェクトのルートディレクトリに`ddlTemplates`というディレクトリを用意した時の設定は次のようになります。
+The configuration is as follows when the directory `ddlTemplates` is placed in the root directory of the project.
 
 ```xml
 <plugin>
@@ -78,12 +79,13 @@ CREATE SEQUENCE BANK_DATA_RECORD_DATA_RECORD_ID_SEQ increment by 1 start with 1;
 </plugin>
 ```
 
-### generate-entityテンプレートの変更
+### Modify the generate-entity template
 
-前述のとおり、生成されるシーケンス名のネーミングルールを変更したのでgenerate-entityテンプレートもカスタマイズする必要があります。
-上記のシーケンス名変更に伴うgenerate-entityテンプレートのカスタマイズは以下のようになります。
+As mentioned earlier, since the naming rules for the generated sequence names were changed, the generate-entity template also needs to be customized.
+The customization of the generate-entity template for the above change in sequence name is as follows.
 
-[gsp_entity.ftl](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)をコピー新規で作成し、変更を加える例です。
+[gsp_entity.ftl]
+An example of copying (../../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl) and creating a new template followed by making changes is shown below.
 ```diff
 <#macro printAttrAnnotations tableName attr>
   <#if attr.id>
@@ -96,4 +98,4 @@ CREATE SEQUENCE BANK_DATA_RECORD_DATA_RECORD_ID_SEQ increment by 1 start with 1;
 +    @SequenceGenerator(name = "<#if schemaName??>${schemaName}.</#if>${tableName}_${attr.columnName}_SEQ", sequenceName = "<#if schemaName??>${schemaName}.</#if>${tableName}_${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
 ```
 
-変更したgenerate-entityテンプレートの利用方法については[generate-entityで使用するテンプレートのカスタマイズ例](./custom-EntityTemplate.md)を参照して下さい。
+For more information on how to use the modified generate-entity template, see [Example of Template Customization for Use with Generate-entity](./custom-EntityTemplate.md).
