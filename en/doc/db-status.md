@@ -1,23 +1,23 @@
 
-## データベースの対応状況
+## Database Support Status
 
- データベースごとの対応状況を以下にまとめています。
+ The support status for each database is summarized below.
 
-### 事前作業
+### Pre-work
 
-本ツールを使用する場合、データベースによって以下の作業を事前に行なう必要があります。
+To use this tool, the following tasks are required to be performed in advance depending on the database.
 
 * MS SQL Server<br/>
-  サーバー認証を許可するよう設定
+  Configure to allow server authentication
 
 * DB2<br/>
-  DB接続用のOSユーザアカウントを作成
+  Create an OS user account for DB connection
 
-### 対応状況の概要
+### Overview of support status
 
-◎...動作確認済み
-○...実装済み
-×...使用不可
+◎...Operation checked
+○...Implemented
+×...Cannot be used
 
 |                    | generate-ddl | execute-ddl | load-data | generate-entity | import-schema | export-schema |
 |:-------------------|:------------:|:-----------:|:---------:|:---------------:|:-------------:|:-------------:|
@@ -30,19 +30,19 @@
 | DB2 10.5           | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
 
 
-### load-dataの対応状況
+### Support status for load-data
 
-データベースごとに登録可能なデータの型をまとめています。
-使用不可の型を記入した場合はnullが設定されますが、
-一部の型の場合にはエラーが発生します。
+The types of data that can be registered for each database are summarized.
+If a disabled type is entered, it is configured to null, but an error is generated for some types.
+
 
 **Oracle**
 
-カラムの型名を指定する必要はありません。
+It is not necessary to specify the type name of the column.
 
-| 型名          | 使用可否 | 記入例 | 備考 |
+| Type Name          | Usability | Examples | Remarks |
 |:--------------|:--------:|:-------|:-----|
-| BFILE         | ×       | -                                                  | BFILE型のカラム名がCSVファイル内に記載されているとエラーが発生し、正常にデータが登録されない。 |
+| BFILE         | ×       | -                                                  | An error occurs when the column name of BFILE type is included in the CSV file and the data is not registered correctly. |
 | BINARY_DOUBLE | ×       | -                                                  | - |
 | BINARY_FLOAT  | ×       | -                                                  | - |
 | BLOB          | ×       | -                                                  | - |
@@ -64,9 +64,9 @@
 
 **Postgresql**
 
-カラムの型名を指定する必要はありません。
+It is not necessary to specify the type name of the column.
 
-| 型名      | 使用可否 | 記入例                        | 備考 |
+| Type Name      | Usability | Examples                       | Remarks |
 |:----------|:--------:|:------------------------------|:-----|
 | BIGINT    | ○       | -9223372036854770000          | -   |
 | BIGSERIAL | ○       | 9223372036854770000           | -   |
@@ -101,14 +101,14 @@
 
 **MS SQL Server**
 
-IDENTITYを指定したカラムは使用できません。<br />
-カラムの型名を指定する必要はありません。
+A column specified as IDENTITY cannot be used. <br />
+It is not necessary to specify the type name of the column.
 
-| 型名 | 使用可否 | 記入例 | 備考 |
+| Type Name | Usability | Examples | Remarks |
 |:----|:-------:|:-----|:----|
 | BIGINT | ○ | -9223372036854770000 | - |
-| BINARY | ○ | 000101001100 | 16進数のビット表記 |
-| BIT | ○ | 000101001100 | 16進数のビット表記 |
+| BINARY | ○ | 000101001100 | Hexadecimal bit notation |
+| BIT | ○ | 000101001100 |  Hexadecimal bit notation |
 | CHAR | ○ | text | - |
 | DATE | ○ | 1990-08-08 | - |
 | DATETIME | ○ | 2007-05-08 12:35:29 | - |
@@ -118,8 +118,8 @@ IDENTITYを指定したカラムは使用できません。<br />
 | FLOAT | ○ | 1.111 | - |
 | GEOGRAPHY | × | - | - |
 | GEOMETRY | × | - | - |
-| HIERARCHYID | ○ | 000101001100 | 16進数のビット表記 |
-| IMAGE | ○ | 000101001100 | 16進数のビット表記 |
+| HIERARCHYID | ○ | 000101001100 | Hexadecimal bit notation |
+| IMAGE | ○ | 000101001100 | Hexadecimal bit notation |
 | INT | ○ | -2147483648 | - |
 | MONEY | ○ | 1.111 | - |
 | NCHAR | ○ | text | - |
@@ -132,19 +132,19 @@ IDENTITYを指定したカラムは使用できません。<br />
 | SMALLMONEY | ○ | 1.111 | - |
 | SQL_VARIANT | × | - | - |
 | TEXT | ○ | text | - |
-| TIME | ○ | 12:35:29.123 | fractional second precisionに7を設定していても小数点第3位までの精度しか登録できない。 |
+| TIME | ○ | 12:35:29.123 | Although fractional second precision is set to 7, only up to 3 decimal places can be registered. |
 | TIMESTAMP | × | - | - |
 | TINYINT | ○ | 255 | - |
 | UNIQUEIDENTIFIER | ○ | 6F9619FF-8B86-D011-B42D-00C04FC964FF | - |
-| VARBINARY | ○ | 000101001100 | 16進数のビット表記 |
+| VARBINARY | ○ | 000101001100 | Hexadecimal bit notation |
 | VARCHAR | ○ | text | - |
 
 **DB2**
 
-IDENTITYを指定したカラムは使用できません。<br />
-カラムの型名を指定する必要はありません。
+A column specified as IDENTITY cannot be used. <br />
+It is not necessary to specify the type name of the column.
 
-| 型名 | 使用可否 | 記入例 | 備考 |
+| Type Name |  Usability | Examples | Remarks |
 |:----|:-------:|:-----|:----|
 | BIGINT | ○ | -9223372036854770000 | - |
 | BLOB | × | - |
@@ -168,21 +168,22 @@ IDENTITYを指定したカラムは使用できません。<br />
 | VARGRAPHIC | ○ | text | - |
 | XML | × | - | - |
 
-### 汎用ExportSchema/ImportSchemaの制限事項
+### Restrictions of general ExportSchema/ImportSchema
 
-扱えるデータ型は[load-dataの対応状況](#load-dataの対応状況)に準拠します。  
-扱えないデータ型に関しては、ExportSchemaでそのカラムは出力されません。そのため、ImportSchemaをするとそのカラムはNULL値となります。
+The data types that can be handled are based on [load-data status](#Support status for load-data).  
+For data types that cannot be handled, the column is not output by ExportSchema. Therefore, ImportSchema results in a null value for that column.
 
-また汎用ExportSchema/ImportSchema固有の制約として下記のものが存在します。
+The following restrictions are specific to the general ExportSchema/ImportSchema.
+
 
 **H2**
-- OTHER型
-    - 利用不可。
+- OTHER type
+    - Not available.
     
 **Oracle**
-- DATE型
-    - load-dataの制約上、OracleがDATE型で持つ時刻以下のデータは対象外となります。
+- DATE type
+    - Due to load-data restriction, data less than or equal to the time held in DATE type by Oracle is not included.
 
 **SqlServer**
-- BINARY型
-    - 利用不可。
+- BINARY type
+    - Not available.
