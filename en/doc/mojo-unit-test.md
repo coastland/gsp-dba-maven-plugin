@@ -21,7 +21,7 @@ mojo(goal) - Test case (test method) - Target DB(db2, h2, etc..)
 1. Modify [jdbc_test.properties](../../src/test/resources/jdbc_test.properties) and DB connections.
     * Since the test is executed using this connection information, modify jdbc_test.properties or match by changing DB.
     * General users are not required. However, prepare DB users as OS users since it is necessary for DB2.
-1. Define the dependency of third party JDBC driver in [pom.xml](../pom.xml)
+1. Define the dependency of third party JDBC driver in [pom.xml](../../pom.xml)
     * JDBC drivers for Oracle, DB2, and SQLServer are not available in Maven Central.  
       Obtain the jar of JDBC driver and place in the local repository and define dependency relationship in pom.xml.
 
@@ -72,7 +72,7 @@ Mojo and simple JPA tests are executed.
     * A DB name folder is present in the test case folder.
     * The file pom.xml is in the DB name folder.
     * pom.xml specifies the parameters needed for the goal.
-2. [Test class and method](https://github.com/coastland/gsp-dba-maven-plugin/blob/feature-10745/src/test/java/jp/co/tis/gsp/tools/dba/mojo/GenerateDdlMojoTest.java#L33)
+2. [Test class and method](../../src/test/java/jp/co/tis/gsp/tools/dba/mojo/GenerateDdlMojoTest.java#L33)
     * `@TestDBPattern(testCase=..., testDb=...)` controls which test cases and which DBs are tested. <br />
         * `testCase`      Which is the test case folder?
         * `testDb`       Which DB folder should be implemented?
@@ -123,7 +123,7 @@ testDB=db2
 ```
 * Parameter specification details by pom.xml
     * DB connection parameters, etc. are defined in [Parent pom](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/testParentPom.xml)
-    * A profile is defined in [settings.xml](../src/test/resources/settings.xml)
+    * A profile is defined in [settings.xml](../../src/test/resources/settings.xml)
     * Flow of solution
         * [jdbc_test.properties](../../src/test/resources/jdbc_test.properties)  
             * [settings.xml](../../src/test/resources/settings.xml)  
