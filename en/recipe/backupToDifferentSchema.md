@@ -50,7 +50,7 @@ pom.xml
 </div>
 
 * When pom.xml like the above is prepared, execute after specifying the profile with the mvn command.
-  The goals to execute are **generate-dddl**, **execute-dddl** and **load-data**. Execute with option -P.
+  The goals to execute are **generate-ddl**, **execute-ddl** and **load-data**. Execute with option -P.
 
 ```shell
 ## Specify profile BACKUP with option -P.

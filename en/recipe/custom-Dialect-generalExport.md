@@ -1,21 +1,21 @@
-## 汎用モードのエクスポート/インポートの実装
+## Implementation of General Mode Export/Import
 
-- gsp-dba-maven-pluginで用意しているOracleDialectは、DBMS固有のエクスポート機能（expdp）を利用したスキーマのエクスポートを行っています。  
-ここでは、DBMS固有のエクスポートではなくDDLファイルとCSVデータを用いた汎用モードでエクスポートするためのDialectの作成方法を示します。
+-OracleDialect provided by gsp-dba-maven-plugin exports the schema using the export function (expdp) unique to DBMS.  
+This section shows how to create a dialect to export in the general mode using DDL files and CSV data instead of DBMS-specific exports.
 
-### 手順
+### Step
 
-1.  **jp.co.tis.gsp.tools.dba.dialect.Dialect** を継承した **Oracle12cDialect** を作成します。
-    ```java
+1. Create **Oracle12cDialect** that inherits **jp.co.tis.gsp.tools.dba.dialect.Dialect**.
+```java
 package jp.co.tis.gsp.tools.dba.dialect;
 
 public class Oracle12cDialect extends Dialect {
 
 }
-    ```
+```
 
-2.  **jp.co.tis.gsp.tools.dba.dialect.OracleDialect** の実装コードを全て **Oracle12cDialect** にコピーします。
-    ```java
+2. Copy all the implementation code of **jp.co.tis.gsp.tools.dba.dialect.OracleDialect** to **Oracle12cDialect**.
+```java
 package jp.co.tis.gsp.tools.dba.dialect;
 
 import java.io.BufferedReader;
@@ -35,10 +35,10 @@ public class Oracle12cDialect extends Dialect {
             USABLE_TYPE_NAMES.add("CHAR");
             USABLE_TYPE_NAMES.add("DATE");
 ....
-    ```
+```
     
-3. Oracle12cDialectのコンストラクタを修正します。
-    ```java
+3. Modify the constructor of Oracle12cDialect.
+```java
     //public OracleDialect() {
     public Oracle12cDialect() {
         GenDialectRegistry.deregister(
@@ -49,10 +49,10 @@ public class Oracle12cDialect extends Dialect {
                 new ExtendedOracleGenDialect()
         );
     }
-    ```
+```
     
-4.  Oracle12cDialectのexportSchema()及びimportSchema()メソッドをコメントアウトします。
-    ```java
+4. Comment out the exportSchema() and importSchema() of Oracle12cDialect.
+```java
 /***
 Call jp.co.tis.gsp.tools.dba.dialect.Dialect#exportSchema()
 
@@ -70,11 +70,11 @@ Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
 	     ...
    }
 ***/
-    ```
+```
 
-5. プラグイン定義の変更  
-パッケージするDDL及び追加DDLフォルダの場所をパラメータddlDirectory、extraDdlDirectoryで指定します。
-    ```xml
+5. Modify plug-in definition  
+Specify the location of DDL and additional DDL folders to package in the parameters ddlDirectory and extraDdlDirectory.
+```xml
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
         <artifactId>gsp-dba-maven-plugin</artifactId>
@@ -95,4 +95,4 @@ Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
             </configuration>
           </execution>  
         </executions>
-        ```
+```

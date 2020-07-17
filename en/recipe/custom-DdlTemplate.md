@@ -1,4 +1,4 @@
-## Example of Template Customization for Use with Generate-ddl
+## Example of Template Customization for Use with generate-ddl
 
 This section describes how to customize the template used by generate-ddl goal.
 
