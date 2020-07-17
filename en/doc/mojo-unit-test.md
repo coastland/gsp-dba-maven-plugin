@@ -66,7 +66,7 @@ Mojo and simple JPA tests are executed.
 
 ## TestCase Level 1
 
-1. [Test resource](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo)を眺める。
+1. See [Test resource](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo).
     * Each Mojo has a folder.
     * Mojo has a folder for each test case.
     * A DB name folder is present in the test case folder.
