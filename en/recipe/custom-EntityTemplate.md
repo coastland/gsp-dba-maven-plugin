@@ -1,17 +1,17 @@
-## generate-entityで使用するテンプレートのカスタマイズ例
+## Example of Template Customization for Use with Generate-entity
 
-generate-entityで使用するテンプレートのカスタマイズ方法を記述します。
+This section describes how to customize the template used by generate-entity.
 
-このgsp-dba-maven-pluginでは、エンティティ生成時のテンプレートエンジンとしてfreemakerを使用しています。ですので、カスタマイズする際はfreemakerのルールに従いテンプレートを作成してください。  
-以下、簡単な作成例です。
+The gsp-dba-maven-plugin uses FreeMaker as the template engine when creating entities. Therefore, create the template by following the FreeMaker rules during customization.
+A simple example is shown below.
 
 ```
-<#-- エンティティのパッケージ名 -->
+<#-- Package name of entity -->
 <#if packageName??>
 package ${packageName};
 </#if>
 
-<#-- 必要なクラスのインポート -->
+<#-- Import the required classes -->
 <#list importNameSet as importName>
 import ${importName};
 </#list>
@@ -20,9 +20,9 @@ import ${importName};
 @Entity
 public class ${shortClassName}<#if shortSuperclassName??> extends ${shortSuperclassName}</#if> implements Serializable {
 
-<#-- カラムに対応したプロパティ -->
+<#-- Property corresponding to the column -->
 <#list attributeModelList as attr>
-    /** ${attr.name}プロパティ */
+    /** ${attr.name} property */
   <#if !useAccessor>
     <#if attr.id>
     @Id
@@ -35,11 +35,11 @@ public class ${shortClassName}<#if shortSuperclassName??> extends ${shortSupercl
     <#if useAccessor>private<#else>public</#if> ${attr.attributeClass.simpleName} ${attr.name};
 </#list>
 
-<#-- 各プロパティのアクセサ -->
+<#-- Access to each property -->
 <#if useAccessor>
   <#list attributeModelList as attr>
     /**
-     * ${attr.name}を返します。
+     * Returns ${attr.name}.
      *
      * @return ${attr.name}
      */
@@ -54,7 +54,7 @@ public class ${shortClassName}<#if shortSuperclassName??> extends ${shortSupercl
         return ${attr.name};
     }
     /**
-     * ${attr.name}を設定します。
+     * Configure ${attr.name}.
      *
      * @param ${attr.name}
      */
@@ -68,7 +68,7 @@ public class ${shortClassName}<#if shortSuperclassName??> extends ${shortSupercl
 
 ```
 
-このテンプレートの場合、次のようなエンティティが出力されます。
+The following entities are output for this template:
 
 ```java
 package com.example.entity;
@@ -83,17 +83,17 @@ import javax.persistence.Id;
 @Entity
 public class SystemAccount implements Serializable {
 
-    /** userIdプロパティ */
+    /** userId property */
     private String userId;
-    /** userIdLockedプロパティ */
+    /** userIdLocked property */
     private String userIdLocked;
-    /** effectiveDateFromプロパティ */
+    /** effectiveDateFrom property */
     private String effectiveDateFrom;
-    /** effectiveDateToプロパティ */
+    /** effectiveDateTo property */
     private String effectiveDateTo;
 
     /**
-     * userIdを返します。
+     * Returns the userId.
      *
      * @return userId
      */
@@ -103,7 +103,7 @@ public class SystemAccount implements Serializable {
         return userId;
     }
     /**
-     * userIdを設定します。
+     * Configure the userID.
      *
      * @param userId
      */
@@ -111,13 +111,13 @@ public class SystemAccount implements Serializable {
         this.userId = userId;
     }
     
-    // ～以下省略～
+    // ~ Rest is omitted ~
 ```
 
-使用できる変数は[デフォルトのテンプレート](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl)を参考にしてください。
+Refer to [default template](../../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl) for available variables.
 
-カスタマイズしたら、適用するプロジェクトのpomのgsp-dba-maven-pluginに、作成したテンプレートを読み込ませるよう設定を追加してください。
-以下、src/main/resource/gsp/template/gsp_entity_custom.ftlに配置した場合の設定例です。
+Customize and add a configuration to the gsp-dba-maven-plugin of pom used in the project to import the template created.
+The following is an example of a configuration for placement in src/main/resource/gsp/template/gsp_entity_custom.ftl.
 
 ```xml
 <plugins>
@@ -125,7 +125,7 @@ public class SystemAccount implements Serializable {
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-        使用するgsp-dba-maven-pluginのバージョン
+        Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>

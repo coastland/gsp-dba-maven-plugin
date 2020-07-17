@@ -1,20 +1,20 @@
-## GenDialectクラスのカスタマイズ例
+## Example of GenDialect Class Customization
 
-OracleデータベースのNumber型をJavaのクラスに変換する際の対応関係を変更する例を記述します。
+This example describes how to change the correspondence when converting a Number type of Oracle database to a Java class.
 
-現在、OracleのNumber型は、桁数と小数部のありなしで対応付けるJavaの型を決定しています。デフォルトの設定は、  
-・ 小数部あり：BigDecimal  
-・ １桁：boolean  
-・ 5桁未満：Short  
-・ 10桁未満：Integer  
-・ 19桁未満：Long  
-・ 19桁以上：BigInteger  
+Currently, number type of Oracle determines the Java type to which the number of digits and decimals are mapped. The default configuration is as given below:
+- With decimal part: BigDecimal  
+- Single digit: boolean  
+- Less than 5 digits: Short  
+- Less than 10 digits: Integer  
+- Less than 19 digits: Long  
+- 19 digits or more: BigInteger  
 
-となっています。（条件は上部のものが優先されます。）
+ (conditions at the top take precedence.)
 
-この対応付けはExtendedOracleGenDialectで行われており、カスタマイズする場合はこのクラスを継承したクラスを
-作成、条件を記述し、pomにて作成したクラスを読み込むように設定してください。  
-以下はカスタマイズの例です。例では、10桁未満の数字をIntegerに、19桁以上の数字をBigDecimalに対応付けるように変更しています。
+Mapped in ExtendedOracleGenDialect, and when customization is required, create a class that inherits this class, write the conditions, and configure such that the class created in pom is loaded.
+  
+A customization example is given below. In the example, numbers less than 10 digits are mapped to integer, and numbers more than 19 digits are mapped to BigDecimal.
 
 ```java
 public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
@@ -41,8 +41,8 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
 }
 ```
 
-カスタマイズしたら、適用するプロジェクトのpomのGSPプラグインに、作成したクラスを読み込ませるよう設定を追加してください。
-以下、設定例です。
+After customization, add a configuration to the GSP plugin of pom used in the project to import the class that was created.
+A configuration example is shown below.
 
 ```xml
 <plugins>
@@ -50,7 +50,7 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -61,7 +61,7 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
         </goals>
         <configuration>
           <genDialectClassName>
-            <!-- 作成したクラスの完全修飾クラス名で指定する。 -->
+            <!-- Specify with the fully qualified class name of the class created. -->
             jp.co.tis.gsp.tools.dba.dialect.CustomOracleGenDialect
           </genDialectClassName>
         </configuration>
@@ -71,4 +71,4 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
 </plugins>
 ```
 
-設定追加後、GSPプラグインを実行してください。カスタマイズされたルールに則りEntityが生成されます。
+After adding the configuration, run the GSP plug-in. Entity is generated according to the customized rules.

@@ -1,36 +1,35 @@
-## generate-entityで生成されるエンティティで使用されるアノテーション
+## Annotations that are Used by Entities Generated with generate-entity
 
-generate-entity時に生成されるエンティティで使用されるアノテーションに関して解説します。
+This section describes the annotations used by the entities generated with generate-entity.
 
-### テーブルに関するアノテーション
-クラスに対して付与されます
+### Annotations of table
+It is assigned to the class
 
-|アノテーション|説明|
 |:--:|:--|
-|@Generated  | 自動生成されたことを表します。 | 
-|@Entity|エンティティであることを表します。 | 
-|@Table|主テーブルを表します。属性は以下の通り。<br/> ・name:テーブル名<br/>・catalog:カタログ名<br/>・schema:スキーマ名<br/>・uniqueConstraints:複合ユニークキー制約| 
+|@Generated | Indicates that it was automatically generated. | 
+|@Entity | Represents an entity. | 
+|@Table | Represents the primary table. The attributes are as follows. <br/> name: Table name<br/> catalog: Catalog name<br/> schema: Schema name<br/> uniqueConstraints: Composite unique key constraint| 
 
 
-### カラムに関するアノテーション
-各カラムに対応するプロパティのgetterメソッド(パラメータのuseAccessorがfalseの場合はプロパティ自体)に付与されます。
+### Annotations of column
+It is assigned to the getter method of the property corresponding to each column (or the property if the useAccessor parameter is false).
 
-|アノテーション|説明|
+|Annotation | Description|
 |:--:|:--|
-|@Id | 主キーであることを表します。|
-|@GeneratedValue|DBによって自動採番されることを表します。<br/>属性は以下の通り<br/>・generator:使用するジェネレータ。<br/>・strategy:主キーの値を生成する方法|
-| @SequenceGenerator|主キーを作成するシーケンスジェネレータの設定を表します。<br/>@GeneratedValueと同時に使用する必要があります。<br/>属性は以下の通り<br/>・name:このジェネレータを識別するための名前。@GeneratedValueのgeneratorに指定する。<br/>・sequenceName:使用するデータベースシーケンスオブジェクトの名前<br/>・initialValue:主キーの値の初期値<br/>・allocationSize:割り当てる際にキャッシュしておく値の範囲|
-|@Lob|largeオブジェクト型の永続化フィールドまたは永続化プロパティであることを表します。|
-|@Temporal|時刻を表します型（java.util.Dateおよびjava.util.Calendar）を持つ永続化プロパティまたは永続化フィールドを表します。|
-|@Version|楽観的ロック機能を使用するために用いるversionフィールドまたはversionプロパティを表します。<br/>カラム名が正規表現で「VERSION([_]?NO)?」にマッチし、かつEntityのプロパティのデータ型がjava.lang.Integerおよびjava.lang.Longの場合に付与されます。<br />カラム名のパターンはgenerate-entityのパラメータversionColumnNamePatternで変更可能です。|
-|@Column|永続化フィールドまたは永続化プロパティと，データベース上のカラムとのマッピングを表します。<br/>使用される属性は以下の通り。<br/>・name:カラム名<br>・columnDefinition:カラムに付加される制約<br/>・length:カラムの長さ<br/>・precision:カラムの精度<br/>・scale:カラムのスケール<br/>・nullable:null値を指定できるかどうか<br/>・unique:ユニークキーであるかどうか|
+|@Id | Represents the primary key. |
+|@GeneratedValue | Indicates that it will be auto-numbered by the DB. <br/>The attributes are as follows<br/> ・generator: Generator used. <br/> ・Strategy: How to generate a primary key value|
+| @SequenceGenerator| Represents the sequence generator configuration that creates the primary key. <br/> It must be simultaneously used with @GeneratedValue. <br/>The attributes are as follows<br/> ・name: A name to identify this generator. Specify in generator of @GeneratedValue. <br/> ・sequenceName: Name of the database sequence object to be used<br/> ・initialValue: Initial value of the primary key<br/> ・allocationSize: Range of values to be cached during assignment|
+|@Lob | Represents a persistent field or persistent property of a large object type. |
+|@Temporal | Represents the persistent property or persistent field with the type (java.util.Date and java.util.Calendar) that indicates time. |
+|@Version | Represents the version field or version property used to use the optimistic lock function. <br/> If the column name is a regular expression version "VERSION([_]?NO)?" and data type of the Entity property are Java.lang.Integer and Java.lang.Long. <br /> The pattern of the column name can be changed with the generation-entity parameter versionColumnNamePattern. |
+|@Column | Represents the mapping between a persistent column or persistent property and a column on the database. <br/>The attributes used are as follows. <br/> ・name: Column name<br> ・columnDefinition: Constraints to be added to the column <br/> ・length: Column length<br/> ・precision: Accuracy of the column <br/> ・scale: Scale of the column<br/> ・nullable:Whether a null value can be specified<br/> ・unique:Whether it is a unique key|
 
-### リレーションシップに関するアノテーション
-結合するテーブルに対応するプロパティのgetterメソッド(パラメータのuseAccessorがfalseの場合はプロパティ自体)に付与されます。
+### Annotations of relationship
+It is assigned to the getter method of the property corresponding to the table to be joined (or the property if the useAccessor parameter is false).
 
-|アノテーション|説明|ER図|
+|Annotation | Description | ER Diagram|
 |:--:|:--|:--|
-|@ManyToOne|「多対1」で結合することを表します。|テスト2が対象<br/>![ManyToOne](image/relation.png)|
-|@OneToMany|「1対多」で結合することを表します。|テスト1が対象<br/>![relation](image/relation.png)|
-|@JoinColumn|テーブルを結合する際に使用する外部キーを表します。<br/>使用される属性は以下の通り<br/>・name:対象テーブルを結合するために使用する外部キーカラム名<br/>・referencedColumnName:外部キーカラムによって参照された結合先テーブルのカラム名|テスト2が対象<br/>![relation](image/relation.png)|
-|@JoinColumns|複合主キーを使用して結合されることを表します。@JoinColumnを要素として複数持ちます。|テスト2が対象<br/>![joinColumns](image/joinColumns.png)|
+|@ManyToOne | Indicates joining of "many-to-one". |Test 2 is covered<br/>![ManyToOne](image/relation.png)|
+|@OneToMany | Indicates joining of "one-to-many". |Test 1 is covered<br/>![relation](image/relation.png)|
+|@JoinColumn| Represents the foreign key used to join the table. <br/>The attributes used are as follows<br/> ・name: The foreign key column name used to join the target table<br/> ・referencedColumnName: The column name of the joined table referenced by the foreign key column | Test 2 is covered<br/>![relation](image/relation.png)|
+|@JoinColumns | Indicates that it is joined using a composite primary key. Has more than one @JoinColumn as an element. |Test 2 is covered<br/>![joinColumns](image/joinColumns.png)|
