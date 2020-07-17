@@ -40,7 +40,7 @@ Execution command
 ````
 
 
-<a name="generate-enitity"></a>
+<a name="generate-entity"></a>
 
 ## Entity generation
 
