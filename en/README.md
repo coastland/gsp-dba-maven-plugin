@@ -1,47 +1,47 @@
 # gsp-dba-maven-plugin
 
-gsp-dba-maven-pluginは、DBAのルーチンワークを自動化し、本来のデータモデリング作業に
-集中できるようにするためのツールです。
+The gsp-dba-maven-plugin is a tool for automating the routine work of DBA so that developers can focus on data modeling tasks.
 
-以下の操作が簡単に実行できるようになります。
 
-* ER図からDDLを生成し実行する。
-* データベースのテーブルに対応したEntityクラスを生成する。
-* CSV形式のデータをデータベースに登録する。
-* データベーススキーマのダンプファイルを取得する。
-* リポジトリ上のダンプファイルをローカル環境へ反映する。
+The following operations can be performed easily.
 
-> * ER図からDDLを生成するには、モデリングツールとして[SI Object Browser ER](http://www.sint.co.jp/siob/er/)を使用する必要があります。
-> それ以外のツールを使用する場合、DDL生成機能は使用できません。また、DDL実行機能の利用もお勧めしません。
-> 別の方法でDDLを実行しておけば、DDL生成機能、DDL実行機能以外は問題なく利用できます。
+* Generate and execute DDL from the ER diagram.
+* Generate an entity class corresponding to the database table.
+* Register the data in CSV format to the database.
+* Acquire the dump file of the database schema.
+* Reflect the dump file of the repository in the local environment.
 
-> * gsp-dba-maven-pluginは開発フェーズで用いることを想定しています。開発者のローカルDBを主ターゲットとしたツールです。  
-本番環境での使用は推奨しません。  
+> * To generate DDL from the ER diagram, [SI Object Browser ER](http://www.sint.co.jp/siob/er/) must be used as a modeling tool.
+> If any other tools are used, the DDL generation function cannot be used. Using the DDL execution function is not recommended.
+> If DDL is executed using another method, functions excluding DDL generation and DDL execution can be used without any problems.
+
+> * gsp-dba-maven-plugin is intended for use in the development phase. The main target of this plugin is the local DB of developers.  
+Using the plugin in a production environment is not recommended.  
  
 
-想定されるデータモデリングは以下の資料を参考にしています。
-* [イミュータブル データモデル (入門編)](http://www.slideshare.net/kawasima/ss-40471672)  
-* [イミュータブルデータモデル(世代編)](http://www.slideshare.net/kawasima/ss-44958468)  
+The intended data modeling is based on the following documents.
+* [Immutable Data Models (Beginner's Guide)](http://www.slideshare.net/kawasima/ss-40471672)  
+* [Immutable Data Model (Generation Edition)](http://www.slideshare.net/kawasima/ss-44958468)  
 
-## ゴールの概要
+## Overview of goal
 
-* [generate-ddl](#generate-ddl) データモデルを解析し、DDLを生成する。
-* [execute-ddl](#execute-ddl) DDLを実行する。
-* [load-data](#load-data) CSV形式で定義したデータをデータベースに登録する。
-* [generate-entity](#generate-entity) 指定したスキーマを解析し、Entityクラスを生成する。
-* [export-schema](#export-schema) データベーススキーマをダンプする。
-* [import-schema](#import-schema) リポジトリから取得したダンプファイルをインポートする。
+* [generate-ddl](#generate-ddl) Analyze the data model and generate DDL.
+* [execute-ddl](#execute-ddl) Execute DDL.
+* [load-data](#load-data) Register the data defined in CSV format to the database.
+* [generate-entity](#generate-entity) Parse the specified schema and generate the Entity class.
+* [export-schema](#export-schema) Dump the database schema.
+* [import-schema](#import-schema) Import the dump file obtained from the repository.
 
-各ゴールに対応するMojoクラスは[jp.co.tis.gsp.tools.dba.mojo](src/main/java/jp/co/tis/gsp/tools/dba/mojo)パッケージにあります。
+The Mojo classes for each goal are in the [jp.co.tis.gsp.tools.dba.mojo](../src/main/java/jp/co/tis/gsp/tools/dba/mojo) package.
 
-データベースによって、動作が異なる場合や制約事項があります。
-詳細は、 **データベースの対応状況** を参照してください。
+Different databases have different behavior and restrictions.
+For more information, see **Database Support Status**.
 
-## 使用方法
+## How to Use
 
-### 設定
+### Configuration
 
-pom.xmlに以下の設定を追加することでプラグインが使用できるようになります。
+The plugin can be used by adding the following configuration to pom.xml.
 
 ```xml
 <pluginManagement>
@@ -50,10 +50,10 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
       <groupId>jp.co.tis.gsp</groupId>
       <artifactId>gsp-dba-maven-plugin</artifactId>
       <version>
-        使用するgsp-dba-maven-pluginのバージョン
+        Version of gsp-dba-maven-plugin used
       </version>
       <dependencies>
-        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
+        <!-- Modify the JDBC driver according to the DB product used in the project. -->
         <dependency>
           <groupId>com.oracle</groupId>
           <artifactId>ojdbc6</artifactId>
@@ -65,9 +65,9 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 </pluginManagement>
 ```
 
-### Java11での設定
+### Java11 configuration
 
-Java11で使用する場合pom.xmlに以下の設定を追加してください。
+Add the following configuration to pom.xml for using the plugin with Java11.
 
 ```xml
 <pluginManagement>
@@ -75,16 +75,16 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
     <plugin>
       <groupId>jp.co.tis.gsp</groupId>
       <artifactId>gsp-dba-maven-plugin</artifactId>
-      <!-- Java11で使用できるgsp-dba-maven-pluginのバージョンは4.4.0以降です。 -->
+      <!-- gsp-dba-maven-plugin version 4.4.0 or later can be used with Java 11. -->
       <version>4.4.0</version>
       <dependencies>
-        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
+        <!-- Modify the JDBC driver according to the DB product used in the project. -->
         <dependency>
           <groupId>com.oracle</groupId>
           <artifactId>ojdbc6</artifactId>
           <version>11.2.0.2.0</version>
         </dependency>
-        <!-- 以下を追加するようにしてください。 -->
+        <!-- Make sure to add the following -->
         <dependency>
           <groupId>javax.activation</groupId>
           <artifactId>javax.activation-api</artifactId>
@@ -116,26 +116,26 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
 </pluginManagement>
 ```
 
-### ゴール共通のパラメータ
+### Parameters of common goal
 
-以下のパラメータは全てのゴールで共通です。
-対応する値を設定してください。
+The following parameters are common to all goals.
+Set a corresponding value.
 
-| 設定値    | 必須  | 説明                                                            |
+| Configuration value   | Required | Description                                                            |
 |:---------------|:-----:|:----------------------------------------------------------------|
-| driver         | ○     | 使用するJDBCドライバ。                                         |
-| url            | ○     | データベースのURL。 jdbc:subprotocol:subname 形式。            |
-| adminUser      | ○     | データベースのadminユーザ名。Oracleの場合はsysは指定出来ません。DB2の場合はデータベース作成ユーザか対象データベースでDBADM権限を持つユーザを指定して下さい(db2adminを指定すると、データベースのバージョンによってはエラーになります)。|
-| adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
-| user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。PostgreSQLの場合は常に小文字に変換して処理されます。|
-| password       | ×     | userに設定したユーザのパスワード。                             |
-| schema         | ×     | データベースのスキーマ名。<br />H2Databaseの場合は指定不可、常にPUBLICスキーマとして解釈します。<br /> MySQLの場合は指定不可、jdbcのURLのデータベース名をスキーマ名として設定します。<br /> 例）jdbc:mysql://localhost:3306/gspdb → gspdbをスキーマ名として内部で使用します。<br /> それ以外のDBでスキーマを指定しない場合はユーザ名と同じスキーマ名を使用すると解釈されます。 PostgreSQLの場合は常に小文字に、H2、DB2、Oracleの場合は常に大文字に変換して処理されます。|
-| dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
-|optionalDialects | ×    | 使用する[ダイアレクトクラス](#lnk_dialect)のFQCN。|
-|onError | ×    | generate-ddlとload-dataで使用。SQL実行中にエラーが発生した場合の挙動を指定。<br />`abort`(デフォルト)・・・処理を中断する。<br />`continue` ・・・処理を継続する。|
+| driver         | ○     | JDBC driver used.                                         |
+| url            | ○     | URL of the database. jdbc:subprotocol:subname format.            |
+| adminUser      | ○     | Admin user name of database. `sys` cannot be specified for Oracle. Specify a database creation user or a user with DBADM authority in the target database for DB2 (specifying db2admin will result in an error depending on the database version). |
+| adminPassword  | ×     | Password for the user configured in adminUser.                        |
+| user           | ○     | Database username. `sys` cannot be specified for Oracle. It is always converted to lower case for PostgreSQL. |
+| password       | ×     | Password for the user.                             |
+| schema         | ×     | Schema name of the database. <br /> Cannot be specified for H2Database and is always interpreted as PUBLIC schema. <br /> Cannot be specified for MySQL and database name of jdbc URL is configured as the schema name. <br /> Example: jdbc:mysql://localhost:3306/gspdb → gspdb is internally used as the schema name. <br /> If the schema is not specified in other DBs, it is interpreted that the same schema name as the user name is used. It is always converted to lower case for PostgreSQL, and to upper case for H2, DB2 and Oracle. |
+| dmpFile        | ×     | Dump file name. If not specified, the file name will be [schema name].dmp. |
+|optionalDialects | ×    | Use FQCN of [dialect class](#lnk_dialect). |
+|onError | ×    | Used in generate-ddl and load-data. Specifies the behavior when an error occurs during SQL execution. <br />`abort` (default)     Aborts the process. <br />`continue`    Continues the process. |
 
- * optionalDialectsの指定方法  
- 使用するダイアレクトクラスを変更する場合、以下の形式でデータベースと対応するダイアレクトクラスを定義します。
+ * optionalDialects specification method  
+ To change the Dialect class that is to be used, the database and corresponding Dialect class are defined in the following format.
 
 ```xml
 <configuration>
@@ -145,32 +145,32 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
 </configuration>
 ```
 
- * <a name ="lnk_dialect"> Dialectについて
-    * Dialectとは各DBの仕様を考慮し、適切な振る舞いを定義したクラスで、DB毎に存在します。
-    * [jp.co.tis.gsp.tools.dba.dialect](src/main/java/jp/co/tis/gsp/tools/dba/dialect)パッケージで管理しています。
-    * デフォルトではgsp-dba-maven-pluginがJDBCのURLを元に、対応するDBのDialectクラス(gspで用意)を決定します。<br />gsp-dba-maven-pluginで用意しているDialectクラスで不都合がある場合は、上記のoptionalDialectsパラメータとカスタマイズしたDialectクラスを用意することで挙動を変更することが出来ます。
+ * <a name ="lnk_dialect"></a> Dialect
+    * Dialect is a class that defines appropriate behavior by taking into account the specifications of each DB, and exists for each DB.
+    * It is managed by the package [jp.co.tis.gsp.tools.dba.dialect](../src/main/java/jp/co/tis/gsp/tools/dba/dialect).
+    * By default, gsp-dba-maven-plugin determines the Dialect class of the corresponding DB (prepared by gsp) based on the JDBC URL. <br /> If there are any problems with the Dialect class prepared by gsp-dba-maven-plugin, the behavior of the class can be changed by preparing the optionalDialects parameter and customized Dialect class mentioned above.
 
 ### generate-ddl
 
-データモデルを解析し、DDLを生成します。
-生成するDDLとファイル名の対応は以下の通りです。
+Analyzes the data model and generates DDL.
+The correspondence between the generated DDL and file name is as follows
 
-| DDLの種類        | ファイル名                                    |
+| DDL type        | File name                                    |
 |:-----------------|:----------------------------------------------|
-| テーブル定義     | 10_CREATE_<テーブル名>.sql                    |
-| インデックス定義 | 20_CREATE_<インデックスの物理名>.sql          |
-| 外部キー定義     | 30_CREATE_FK_<テーブル名><連番>.sql           |
-| ビュー定義       | 40_CREATE_<ビューの物理名>.sql                |
+| Table definition     | 10_CREATE_<Default name>.sql                    |
+| Index definition | 20_create_<Physical name of index>.sql |
+| Foreign key definition | 30_CREATE_FK_<Table name><serial number>.sql |           |
+| View definition | 40_create_<Physical name of view>.sql |
 
-また自動採番がDDLに反映されるルールは[こちら](./recipe/spec-generateDdl.md)で確認してください。
-
-
-    データモデル上のオブジェクトは「論理・物理モデル」として定義して下さい。
-    「論理モデルのみ」または「物理モデルのみ」と定義した場合、対象のDDLは生成されません。
-    また、文字列型や日付型を持つカラムのデフォルト値を設定する際は値をシングルクォーテーションで囲まないとexecute-ddl時にエラーが発生します。
+For the rules to reflect auto-numbering in DDL, [Click here](./recipe/spec-generateDdl.md).
 
 
-使用する場合、pom.xmlに以下を追加してください。
+    Define objects of the data model as "logical/ physical model".
+    The target DDL is not generated when defined as "logical model only" or "physical model only".
+    When setting the default value for a string or date type column, an error will occur during execute-ddl if the value is not enclosed in single quotes.
+
+
+To use, add the following to pom.xml.
 
 ```xml
 <plugins>
@@ -178,7 +178,7 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -188,7 +188,7 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
           <goal>generate-ddl</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
+          <! -- Add Configuration -->
         </configuration>
       </execution>
     </executions>
@@ -196,28 +196,28 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
 </plugins>
 ```
 
-#### 使用可能なパラメータ
+#### Available parameters
 
-| 設定値                      | 必須  | 説明                                                            |
+| Configuration value   | Required | Description                                                            |
 |:---------------------------|:-----:|:----------------------------------------------------------------|
-| erdFile                    | ○     | erdファイルのパス。ワークディレクトリからの相対パスで指定する。 |
-| outputDirectory            | ×     | DDLの出力ディレクトリ。デフォルトは、"target/ddl"。             |
-| lengthSemantics            | ×     | 長さセマンティクス。デフォルトはバイト。                        |
-| ddlTemplateFileDir         | ×     | プロジェクト固有のDDLテンプレートの配置ディレクトリをワークディレクトリからの相対パスで指定する。 |
-| allocationSize            | ×     | シーケンス生成SQLの増分値(INCREMENT BY)。デフォルトは"1"。<br /> allocationSizeと[generate-entity](#generate-entity)のallocationSizeの値はは一致させるようにして下さい。<br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG)  |
-テンプレートをカスタマイズする際は、[generate-ddlで使用するテンプレートのカスタマイズ例](./recipe/custom-DdlTemplate.md)を参照してください。
+| erdFile                    | ○     | Path of the erd file. Specifies a relative path from the work directory. |
+| outputDirectory            | ×     | Output directory of DDL. Default is "target/ddl".             |
+| lengthSemantics            | ×     | Length semantics. The default is bytes.                        |
+| ddlTemplateFileDir         | ×     | Specifies the directory where the project-specific DDL template is placed with a relative path from the work directory. |
+| allocationSize            | ×     | Increment value of sequence generation SQL (INCREMENT BY). Default is "1". <br /> The values of allocationSize and allocationSize of [generate-entity](#generate-entity) must be the same. <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG)  |
+To customize the template, see [Example of Template Customization for Use with Generate-ddl](./recipe/custom-DdlTemplate.md).
 
 
 ### execute-ddl
 
-* DDLを実行します。
-* 複数ファイルにまたがる場合、ファイル名の昇順で実行します。
-* パラメータuserに指定されたユーザが存在しない場合は指定ユーザを作成します。
-* パラメータschemaで指定されたスキーマが存在しない場合は、指定スキーマを作成します。
-  * MySQLの場合はスキーマの作成を行いません。事前にCREATE DATABASE文などで用意しておく必要があります。
-* パラメータschemaで指定されたスキーマが存在する場合は、指定スキーマ内にあるテーブル、ビュー、シーケンスを最初に全て削除します。
+* Executes DDL.
+* Executes files in ascending order of the file names when multiple files are to be executed.
+* Creates the specified user if the user specified in the parameter user does not exist.
+* Creates the specified schema if the schema specified by the schema parameter does not exist.
+  * Does not create a schema for MySQL. Must be prepared in advance with a CREATE DATABASE statement.
+* Deletes all tables, views and sequences in the specified schema first if the schema specified by the parameter schema exists.
 
-使用する場合、pom.xmlに以下を追加してください。
+To use, add the following to pom.xml.
 
 ```xml
 <plugins>
@@ -225,7 +225,7 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -235,7 +235,7 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
           <goal>execute-ddl</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
+          <! -- Add Configuration -->
         </configuration>
       </execution>
     </executions>
@@ -243,18 +243,18 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
 </plugins>
 ```
 
-#### 使用可能なパラメータ
+#### Available parameters
 
-| 設定値               | 必須  | 説明                                                            |
+| Configuration value   | Required | Description                                                            |
 |:---------------------|:-----:|:----------------------------------------------------------------|
-| ddlDirectory         | ×     | DDLの配置ディレクトリ。デフォルトは、"target/ddl"。             |
-| extraDdlDirectory    | ×     | 追加で実行したいSQLファイルの配置ディレクトリ。                 |
+| ddlDirectory         | ×     | DDL placement directory. Default is "target/ddl".             |
+| extraDdlDirectory    | ×     | The directory where additional SQL files to execute are placed.                 |
 
 ### load-data
 
-CSV形式で定義したデータを、データベースの指定したスキーマに登録します。
+Registers the data defined in CSV format in the specified schema of the database.
 
-使用する場合、pom.xmlに以下を追加してください。
+To use, add the following to pom.xml.
 
 ```xml
 <plugins>
@@ -262,7 +262,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -272,7 +272,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
           <goal>load-data</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
+          <! -- Add Configuration -->
         </configuration>
       </execution>
     </executions>
@@ -281,17 +281,17 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 ```
 
 
-#### 使用可能なパラメータ
+#### Available parameters
 
-| 設定値                 | 必須  | 説明                                                                        |
+| Configuration value                 | Required  | Description                                                                                  |
 |:-----------------------|:-----:|:----------------------------------------------------------------------------|
-| dataDirectory          | ○     | データファイルの配置ディレクトリ。                                          |
-| specifiedEncodingFiles | ×     | データファイルの文字コードを指定する場合に設定。デフォルトは"Windows-31J"。 |
+| dataDirectory          | ○     | Data file placement directory.                                          |
+| specifiedEncodingFiles | ×     | Configure when specifying the character code of a data file. Default is "Windows-31J". |
 
 
-* specifiedEncodingFilesの指定方法
+* How to specify specifiedEncodingFiles
 
-データファイルの文字コードを指定する場合、以下の形式でファイル名と対応する文字コードを定義します。
+When specifying the character code of a data file, define the file name and corresponding character code in the following format.
 
 ```xml
 <configuration>
@@ -303,33 +303,33 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 ```
 
 
-#### データの形式
-データおよびデータファイルは以下の形式で作成してください。
+#### Data format
+Create the data and data file in the following format.
 
-* ファイル名は、 *テーブルの物理名*.csv。
-* 先頭行は、カラムの物理名(:カラムの型名)。DBによっては型名を指定しなくても自動で推定し、設定される。
-* 二行目以降にテストデータを記載。
-* 全角空白、半角空白のみの項目はnullとして扱われる。変更する際は[Dialectクラスのカスタマイズ例](./recipe/custom-Dialect.md)を参照すること。
+* The file name is *physical name of the table*.csv.
+* The first row is the physical name of the column (:column type name). Some DBs are automatically estimated and configured without specifying the type name.
+* Test data is included from the second row.
+* Items with only full-width spaces and half-width spaces are handled as null. To change, see [Example of Dialect Class Customization](./recipe/custom-Dialect.md).
 
-データの例を記載します。
+An example of the data is described.
 
 
     ITEM,VARCHAR_ITEM:VARCHAR,DATE_ITEM:DATE,TIMESTAMP_ITEM:TIMESTAMP,ARRAY_ITEM:ARRAY
-    item,item0000000000000000,2014-12-13,2014-12-13 4:15:16,"項目1,項目2,項目3"
+    item,item0000000000000000,2014-12-13,2014-12-13 4:15:16,"item 1, item 2, item 3"
 
 
-#### 登録可能なデータ型
+#### Data types that can be registered
 
-登録可能なデータ型はデータベースごとに異なります。
-詳細は、 [load-dataの対応状況](./doc/db-status.md#load-dataの対応状況) を参照してください。
+The data types that can be registered vary depending on the database.
+For more information, see [Support status for load-data](./doc/db-status.md#support-status-for-load-data).
 
-#### 異なるスキーマにデータをロードする
+#### Load data into a different schema
 
-異なるスキーマにデータをロードする場合は、以下のようにpom.xmlを記載します。
+To load data in a different schema, include the following in pom.xml.
 
-* executionタグを複数定義します。以下の例では、executionタグを識別する情報としてload-data-without-schemaとload-data-with-schemaのidを定義しています。
-* load-data-without-schemaでは、schemaパラメータを指定していません。
-* load-data-with-schemaでは、schemaパラメータにSCHEMA_TESTを指定しています。
+* Define multiple execution tags. In the following example, the ids of load-data-without-schema and load-data-with-schema as information that identifies execution tags are defined.
+* Schema parameter is not specified in load-data-without-schema.
+* SCHEMA_TEST is not specified in the schema parameter of load-data-with-schema.
 
 ```xml
 <plugins>
@@ -337,7 +337,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -347,7 +347,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
           <goal>load-data</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
+          <! -- Add Configuration -->
         </configuration>
       </execution>
       <execution>
@@ -357,8 +357,8 @@ CSV形式で定義したデータを、データベースの指定したスキ�
           <goal>load-data</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
-          <!-- ここではスキーマ名にSCHEMA_TESTを指定 -->
+          <! -- Add Configuration -->
+          <!-- SCHEMA_TEST is specified as the schema name below-->
           <schema>SCHEMA_TEST</schema>
         </configuration>
       </execution>
@@ -367,7 +367,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 </plugins>
 ```
 
-次の実行コマンドでそれぞれのexecutionを実行します。
+Execute the respective execution with the following execution command.
 
 ````
   mvn gsp-dba:load-data@load-data-without-schema gsp-dba:load-data@load-data-with-schema
@@ -375,10 +375,10 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 
 ### generate-entity
 
-データベースのメタデータから、テーブルに対応するエンティティを生成します。自動生成時に付与される各種アノテーションに関しては、[エンティティで使用されるアノテーション](recipe/spec-generatedEntity.md)をご確認ください。
-生成処理はカスタマイズしたS2JDBC-Genを使用しています。
+Generates entities corresponding to the table from the database metadata. For various annotations that are added during auto-generation, see [Annotations used by entities](recipe/spec-generatedEntity.md).
+The generation process uses customized S2JDBC-Gen.
 
-使用する場合、pom.xmlに以下を追加してください。
+To use, add the following to pom.xml.
 
 ```xml
 <plugins>
@@ -386,7 +386,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -396,7 +396,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
           <goal>generate-entity</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
+          <! -- Add Configuration -->
         </configuration>
       </execution>
     </executions>
@@ -405,42 +405,42 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 ```
 
 
-#### 使用可能なパラメータ
+#### Available parameters
 
-| 設定値                 | 必須  | 説明                                                                      |
+| Configuration value                 | Required  | Description                                                                                  |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------|
-| ignoreTableNamePattern | ×    | 自動生成対象外とするテーブル名。正規表現で指定する。                      |
-| versionColumnNamePattern | ×    | @Versionアノテーション付与対象になるカラム名を正規表現で指定する。デフォルトは”VERSION([_]?NO)?”。<br />その他の付与条件に関しては[spec-generatedEntity.md](recipe/spec-generatedEntity.md)を参照。|
-| entityPackageName      | ×    | エンティティのパッケージ名。デフォルトは、”entity”。                    |
-| genDialectClassName    | ×    | S2JDBC-Genのダイアレクトインタフェースの実装クラス名。<br>カスタマイズする際は[GenDialectクラスのカスタマイズ例](./recipe/custom-genDialect.md)を参照してください。<br> |
-| dialectClassName       | ×    | S2JDBCのダイアレクトインタフェースの実装クラス名。<br />gsp-dba-maven-plugin で用意しているExtendedGenDialectクラスの登録キークラスと異なるクラス名を指定すると、ExtendedGenDialectクラスが利用されなくなるので指定の際には注意が必要です。|
-| rootPackage            | ○    | ルートパッケージ名。                                                      |
-| useAccessor            | ×    | アクセッサを使用するかどうか。デフォルトは、”false”。                   |
-| entityType             | ×    | 生成するEntityのタイプ。jpaとdomaが選択可能。デフォルトは、"jpa"。 <br />domaを指定する場合はentityTemplateに「java/gsp_doma_entity.ftl」を指定すること。|
-| entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"。|
-|javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
-|templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
-| allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。 <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
-| useJSR310         | ×     |JSR301に対応したEntityを生成するかどうか。デフォルトは、”false”。                   |
-テンプレートをカスタマイズする際は、[generate-entityで使用するテンプレートのカスタマイズ例](./recipe/custom-EntityTemplate.md)を参照してください。
+| ignoreTableNamePattern | ×    | Table name to be excluded from auto-generation. Specify with a regular expression.                      |
+| versionColumnNamePattern | ×    | Specifies the column name to be annotated with @Version annotation using regular expression. Default is "VERSION([_]?NO)?". <br /> For other conditions to be assigned, see [spec-generatedEntity.md](recipe/spec-generatedEntity.md). |
+| entityPackageName      | ×    | Package name of the entity. Default is "entity".                    |
+| genDialectClassName    | ×    |  Implementation class name of the Dialect interface of S2JDBC-Gen. <br> To customize, see [Example of GenDialect Class Customization](./recipe/custom-genDialect.md). <br> |
+| dialectClassName       | ×    | Implementation class name of the Dialect interface of S2JDBC. <br /> Note that the ExtendedGenDialect class will not be used if a class name that is different from the registration key class of ExtendedGenDialect class provided by the gsp-dba-maven-plugin is specified. |
+| rootPackage            | ○    |  Root package name.                                                      |
+| useAccessor            | ×    | Whether to use an accessor. Default is "false".                   |
+| entityType             | ×    | Type of entity to generate. Select between jpa and doma. Default is "jpa". <br /> When specifying doma, specify "java/gsp_doma_entity.ftl" in the entityTemplate. |
+| entityTemplate         | ×    | Auto-generated template of the entity. Default is "java/gsp_entity.ftl". |
+|javaFileDestDir        | ×      | Directory where the java file of the generated entity is placed |
+|templateFilePrimaryDir | ×      |Path up to entityTemplate. Default is "src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes". <br> Usage example: If the path to the file is "src/main/resource/template/gsp_template.ftl, configure <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> respectively. |
+| allocationSize         | ×     | allocationSize of @SequenceGenerator. Default is "1". <br /> Make sure that the above mentioned allocationSize and allocationSize of [generate-ddl](#generate-ddl) are the same. <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
+| useJSR310         | ×     | Whether to generate the entity corresponding to JSR301. Default is "false".                   |
+To customize the template, see [Example of Template Customization for Use with Generate-entity](./recipe/custom-EntityTemplate.md).
 
 
 ### export-schema
 
-指定したスキーマのダンプファイルをエクスポートします。  
-DBMS固有のエクスポート機能を内部で呼び出すことで実現しています。
-ただし、DB2とSqlServerに関してはDBMS固有のエクスポート機能を用いることが出来ないため、DDLファイルとCSVファイルをパッケージングする汎用モードで代替します。  
-※[汎用モードの詳細](#exportSchemaGeneral)
+Exports the dump file of the specified schema.  
+This is achieved by internally calling the DBMS-specific export function.
+However, since the DBMS-specific export function cannot be used for DB2 and SqlServer, it is replaced with the general mode that packages DDL and CSV files.  
+* [Advanced general mode](#General-mode)
 
-    maven-install-pluginやmaven-deploy-pluginと組み合わせることで、
-    ローカル環境へのインストールやリモートリポジトリへのデプロイが可能になります。
+    By combining export-schema with maven-install-plugin and maven-deploy-plugin, the schema can be installed in the local environment or deployed to a remote repository possible.
+    
 
-ダンプファイルのファイル名は以下の形式です。
+The file name of the dump file is in the following format.
 
-    プロジェクトのアーティファクトId + "-testdata-" + プロジェクトのバージョン + ".jar"
+    Project Artifact Id + "-testdata-" + Project Version + ".jar"
 
 
-使用する場合、pom.xmlに以下を追加してください。
+To use, add the following to pom.xml.
 
 ```xml
 <plugins>
@@ -448,7 +448,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <executions>
       <execution>
@@ -458,7 +458,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
           <goal>export-schema</goal>
         </goals>
         <configuration>
-          <!-- 設定を追加 -->
+          <! -- Add Configuration -->
         </configuration>
       </execution>
     </executions>
@@ -467,25 +467,25 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 ```
 
 
-#### 使用可能なパラメータ
+#### Available parameters
 
-| 設定値                 | 必須  | 説明                                                                                  |
+| Configuration value                 | Required  | Description                                                                                  |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
-| outputDirectory        | ×     | データベーススキーマをエクスポートするディレクトリのパス。デフォルトは”target/dump”。 |
-| ddlDirectory           | ×     | [汎用モード](#汎用モード)で利用。 DDLディレクトリを指定する。                                  |
-| extraDdlDirectory      | ×     | [汎用モード](#汎用モード)で利用。 追加DDLディレクトリを指定する。                              |
+| outputDirectory        | ×     | Path of the directory to which the database schema is exported. Default is "target/dump". |
+| ddlDirectory           | ×     | Used with the [General mode](#General-mode). Specifies the DDL directory.                                  |
+| extraDdlDirectory      | ×     | Used with the [General mode](#General-mode). Specify the additional DDL directory.                              |
 
-#### <a name="exportSchemaGeneral"> 汎用モード
-- DB2とSQLServerの場合に動作するエクスポート処理の挙動で、DBMS固有のエクスポート機能を使用しません。
-- CSVデータとDDLファイルをパッケージングすることで、スキーマのエクスポート処理を代替します。
-- CSVデータはgsp-dba-maven-pluginで出力します。DDL及び追加DDLは予め用意しておき、上記パラメータの`ddlDirectory`、`extraDdlDirectory`で場所を指定して下さい。
-- 出力されるCSVデータの文字エンコーディングはUTF-8です。
-- 扱えるデータ型及び制限事項は[こちら](doc/db-status.md#汎用exportschemaimportschemaの制限事項)を参照して下さい。
-- 以下に処理の流れを記載します。
-    1. 指定スキーマのテーブルデータをCSVデータとして出力(to dataDirectory)。
-    2. 上記パラメータ`ddlDirectory`配下のDDLファイルを収集します。
-    3. 上記パラメータ`extraDdlDirectory`配下のDDLファイルを収集します。
-    4. 上記３つのリソースをjarファイルにパッケージングします。
+#### general mode
+-The operation of the export process that works for DB2 and SQL Server does not use the DBMS-specific export function.
+- The schema export process is replaced by packaging the CSV data and DDL files.
+- CSV data is output by the gsp-dba-maven-plugin. Prepare DDL and additional DDLs in advance and specify the location with the parameters `ddlDirectory` and `extraDdlDirectory` mentioned above.
+- The character encoding of the output CSV data is UTF-8.
+- Refer to [Click here](doc/db-status.md#Restrictions-of-general-exportschemaimportschema) for data types that can be handled and restrictions.
+-The process flow is described below.
+    1. The table data of the specified schema is output as CSV data (to dataDirectory).
+    2. DDL files under the parameter `ddlDirectory` mentioned above are collected.
+    3. DDL files under the parameter `extraDdlDirectory` mentioned above are collected.
+    4. The above 3 resources are packaged in a jar file.
     ```
     ex.) export-schema.jar
            ├─ META-INF/
@@ -497,9 +497,9 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 
 ### import-schema
 
-リポジトリからダンプファイルを取得し、ローカルのデータベースにインポートする。
+Obtains the dump file from the repository and imports the file into the local database.
 
-使用する場合、pom.xmlに以下を追加してください。
+To use, add the following to pom.xml.
 
 ```xml
 <plugins>
@@ -507,97 +507,97 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <version>
-      使用するgsp-dba-maven-pluginのバージョン
+      Version of gsp-dba-maven-plugin used
     </version>
     <configuration>
-    <!-- 設定を追加 -->
+    <! -- Add Configuration -->
     </configuration>
   </plugin>
 </plugins>
 ```
 
-#### 使用可能なパラメータ
+#### Available parameters
 
-| 設定値                 | 必須  | 説明                                                                                  |
+| Configuration value                 | Required  | Description      
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
-| inputDirectory         | ×     | ダンプファイルの配置ディレクトリ。デフォルトは、”target/dump”。                       |
-| groupId                | ×     | ダンプファイルのグループID。デフォルトは、プロジェクトのグループID。                  |
-| artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
-| version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
+| inputDirectory         | ×     | Directory where the dump file is placed. Default is "target/dump".                       |
+| groupId                | ×     | Group ID of the dump file. Default is the project group ID.                  |
+| artifactId             | ×     | Artifact ID of the dump file. Default is the project artifact ID.  |
+| version                | ×     | Version of the dump file. Default is the project version. |
 
-#### <a name="importSchemaGeneral"> 汎用モード
-- DB2とSQLServerの場合は汎用モードのエクスポートとなるため、それを取り込むことでスキーマのインポートとなります。
-- 扱えるデータ型及び制限事項は[こちら](doc/db-status.md#汎用exportschemaimportschemaの制限事項)を参照して下さい。
-- 以下に処理の流れを記載します。
-    1. 汎用モードで出力されたエクスポートjarファイルを取得、展開します。
-    2. `ddlDirectory`及び`extraDdlDirectory`のDDLファイルを実行します。
-    3. `dataDirectory`内のCSVデータをロードします。
+#### <a name="importSchemaGeneral"></a> general mode
+- Since the general mode export is used for DB2 and SQLServer, importing it will import the schema.
+- Refer to [Click here](doc/db-status.md#Restrictions-of-general-exportschemaimportschema) for data types that can be handled and restrictions.
+-The process flow is described below.
+    1. Acquires and extracts the export jar file output in the general mode.
+    2. DDL files of `ddlDirectory` and `extraDdlDirectory` are executed.
+    3. CSV data in the `dataDirectory` is loaded.
 
-### データベースごとの対応状況
+### Support status of each database
 
-* [こちら](./doc/db-status.md)を参照して下さい。
+* Refer to [Click here](./doc/db-status.md).
 
-### 制約事項
+### Restrictions
 
-各ゴールは、以下の制約事項が存在します。
+Each goal has the following restrictions.
 
 #### execute-ddl
 
 * Oracle<br />
-  ユーザー名とスキーマ名が一致しない時、新たにスキーマが作成されます。<br />
-  ただしスキーマを本プラグインで新規作成した時、同時に作成されるユーザのログインパスワードはスキーマ名と同じになります。
+  When the user name and schema name do not match, a new schema is created. <br />
+  When a new schema is created with this plugin, the login password of the user created simultaneously will be the same as the schema name.
 * DB2<br />
-  ユーザ名とスキーマ名は同一のものしか指定できません。
+  Only the same user name and schema name can be specified.
 * H2<br />
-  ユーザ名とスキーマ名に **同一の値を設定すると** 失敗します。
+  If you ** configure the same value** for the user name and the schema name, it will fail.
 
 #### generate-entity
 
 * MS SQL Server<br />
-   拡張エンティティを用いて設定したテーブル、カラムに対するコメントはjavaファイルに反映されません。
+   Comments for tables and columns configured using extended entities are not reflected in the java file.
 * H2<br />
-  ユーザ名とスキーマ名に **同一の値を設定すると** 失敗します。<br />
-  erdファイルにViewの定義が含まれていると失敗します。
+  If you ** configure the same value** for the user name and the schema name, it will fail. <br />
+  If the erd file contains a View definition, it will fail.
 
 #### export-schema
 
-* 全データベース共通<br />
-  gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。  
+* Common to all databases <br />
+  Not guaranteed to work if the database is not running on the same machine as the machine on which gsp-dba-maven-plugin is running.  
 
-  ただし、[汎用モード](#exportSchemaGeneral)で動作させることで実現可能です。  
-  既存Dialectのexport-schemaの汎用モード化に関しては、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
+  However, this can be achieved by running it in the [general mode](#general-mode).  
+  For more information on the general mode of the existing dialect export-schema, refer to [Implementation of General Mode Export/Import](recipe/custom-Dialect-generalExport.md).
   
-  スキーマはパラメータschemaで指定されたものを参照します。<br />
-  erdファイルに指定したスキーマは参照しません。
+  Schema refers to the one specified in the schema parameter. <br />
+  The schema specified in the erd file is not referenced.
   
 * MS SQL Server<br />
-  [汎用モード](#exportSchemaGeneral)で動作します。
+  Works with [General mode](#general-mode).
 * DB2<br />
-  [汎用モード](#exportSchemaGeneral)で動作します。
+  Works with [General mode](#general-mode).
 
 #### import-schema
 
-* 全データベース共通<br />
-  gsp-dba-maven-pluginを起動するマシンと、同一マシンでデータベースが起動していない場合の動作は保障していません。
+* Common to all databases <br />
+  Not guaranteed to work if the database is not running on the same machine as the machine on which gsp-dba-maven-plugin is running.
 
-  ただし、[汎用モード](#importSchemaGeneral)で動作させることで実現可能です。  
-  既存Dialectのimport-schemaの汎用モード化に関して、[汎用モードのエクスポート/インポートの実装](recipe/custom-Dialect-generalExport.md)を参照して下さい。
+  However, this can be achieved by running it in the [general mode](#importSchemaGeneral).  
+  For more information on the general mode of the existing dialect import-schema, refer to [Implementation of General Mode Export/Import](recipe/custom-Dialect-generalExport.md).
   
-  スキーマはパラメータschemaで指定されたものを参照します。<br />
-  erdファイルに指定したスキーマは参照しません。
+  Schema refers to the one specified in the schema parameter. <br />
+  The schema specified in the erd file is not referenced.
     
 * MS SQL Server<br />
-  [汎用モード](#importSchemaGeneral)で動作します。
+  Works with [General mode](#importSchemaGeneral).
 * DB2<br />
-  [汎用モード](#importSchemaGeneral)で動作します。
+  Works with [General mode](#importSchemaGeneral).
 
 #### load-data
-* 全データベース共通<br />
-  スキーマはパラメータschemaで指定されたものを参照します。<br />
-  erdファイルに指定したスキーマは参照しません。
+* Common to all databases <br />
+  Schema refers to the one specified in the schema parameter. <br />
+  The schema specified in the erd file is not referenced.
   
 ## License
 
-gsp-dba-maven-plugin はApache License 2.0 の元に配布されます。
+gsp-dba-maven-plugin is distributed under Apache License 2.0.
 
 * http://www.apache.org/licenses/LICENSE-2.0.txt
