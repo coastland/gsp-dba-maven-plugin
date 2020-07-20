@@ -138,7 +138,7 @@ testDB=db2
 
 ## JPA simple verification
 
-* Implemented in the `integration-test` phase. Use the plugin maven-invoker-plugin. [it](../src/it) folder is the main folder.
+* Implemented in the `integration-test` phase. Use the plugin maven-invoker-plugin. [it](../../src/it) folder is the main folder.
 * DB connection information uses [JDBC_test.properties](../../src/test/resources/jdbc_test.properties) that is used in the Mojo test class.
 * Project [simple-jpa-test](../../src/it/simple-jpa-test) is used for each DB and executed.
     1. [edm file of each Db](../../src/it/simple-jpa-test/src/main/resources) of the above mentioned project is input and generate-ddl, execute-ddl and generate-entity are executed.
