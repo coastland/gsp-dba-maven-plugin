@@ -3,7 +3,7 @@
 ## Summary
 * This method is executed for a schema that is different from the schema defined in pom.xml.
 * Switches the target schema by specifying a profile when running the mvn command.
-* It is a method to configure the schema name of default behavior in properties of pom.xml and change it when mvn is executed by profile.
+* It is an architecture to configure the schema name of default behavior in properties of pom.xml and change it when mvn is executed by profile.
 * This procedure can be used outside of MySQL.
 
 ## Specific examples
