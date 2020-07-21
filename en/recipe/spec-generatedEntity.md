@@ -5,6 +5,7 @@ This section describes the annotations used by the entities generated with gener
 ### Annotations of table
 It is assigned to the class
 
+|Annotation | Description|
 |:--:|:--|
 |@Generated | Indicates that it was automatically generated. | 
 |@Entity | Represents an entity. | 
