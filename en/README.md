@@ -21,7 +21,7 @@ Using the plugin in a production environment is not recommended.
 
 The intended data modeling is based on the following documents.
 * [Immutable Data Models (Beginner's Guide)](http://www.slideshare.net/kawasima/ss-40471672)  
-* [Immutable Data Model (Generation Edition)](http://www.slideshare.net/kawasima/ss-44958468)  
+* [Immutable Data Model (Generation)](http://www.slideshare.net/kawasima/ss-44958468)  
 
 ## Overview of goal
 
