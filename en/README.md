@@ -155,12 +155,12 @@ Set a corresponding value.
 Analyzes the data model and generates DDL.
 The correspondence between the generated DDL and file name is as follows
 
-| DDL type        | File name                                    |
-|:-----------------|:----------------------------------------------|
-| Table definition     | 10_CREATE_<Default name>.sql                    |
-| Index definition | 20_create_<Physical name of index>.sql |
-| Foreign key definition | 30_CREATE_FK_<Table name><serial number>.sql |           |
-| View definition | 40_create_<Physical name of view>.sql |
+| DDL type               | File name                                       |
+|:-----------------------|:------------------------------------------------|
+| Table definition       | 10_CREATE_\<Default nam\>.sql                   |
+| Index definition       | 20_create_\<Physical name of index\>.sql        |
+| Foreign key definition | 30_CREATE_FK_\<Table name><serial number\>.sql  |
+| View definition        | 40_create_\<Physical name of view\>.sql         |
 
 For the rules to reflect auto-numbering in DDL, [Click here](./recipe/spec-generateDdl.md).
 
@@ -549,14 +549,14 @@ Each goal has the following restrictions.
 * DB2<br />
   Only the same user name and schema name can be specified.
 * H2<br />
-  If you ** configure the same value** for the user name and the schema name, it will fail.
+  If you **configure the same value** for the user name and the schema name, it will fail.
 
 #### generate-entity
 
 * MS SQL Server<br />
    Comments for tables and columns configured using extended entities are not reflected in the java file.
 * H2<br />
-  If you ** configure the same value** for the user name and the schema name, it will fail. <br />
+  If you **configure the same value** for the user name and the schema name, it will fail. <br />
   If the erd file contains a View definition, it will fail.
 
 #### export-schema
