@@ -121,19 +121,19 @@ Add the following configuration to pom.xml for using the plugin with Java11.
 The following parameters are common to all goals.
 Set a corresponding value.
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value   | Required | Description                                                            |
 |:---------------|:-----:|:----------------------------------------------------------------|
-| driver         | ✓     | JDBC driver used.                                         |
-| url            | ✓     | URL of the database. jdbc:subprotocol:subname format.            |
-| adminUser      | ✓     | Admin user name of database. `sys` cannot be specified for Oracle. Specify a database creation user or a user with DBADM authority in the target database for DB2 (specifying db2admin will result in an error depending on the database version). |
-| adminPassword  | ×     | Password for the user configured in adminUser.                        |
-| user           | ✓     | Database username. `sys` cannot be specified for Oracle. It is always converted to lower case for PostgreSQL. |
-| password       | ×     | Password for the user.                             |
-| schema         | ×     | Schema name of the database. <br /> Cannot be specified for H2Database and is always interpreted as PUBLIC schema. <br /> Cannot be specified for MySQL and database name of jdbc URL is configured as the schema name. <br /> Example: jdbc:mysql://localhost:3306/gspdb → gspdb is internally used as the schema name. <br /> If the schema is not specified in other DBs, it is interpreted that the same schema name as the user name is used. It is always converted to lower case for PostgreSQL, and to upper case for H2, DB2 and Oracle. |
-| dmpFile        | ×     | Dump file name. If not specified, the file name will be [schema name].dmp. |
-|optionalDialects | ×    | Use FQCN of [dialect class](#lnk_dialect). |
-|onError | ×    | Used in generate-ddl and load-data. Specifies the behavior when an error occurs during SQL execution. <br />`abort` (default)     Aborts the process. <br />`continue`    Continues the process. |
+| driver         | Y     | JDBC driver used.                                         |
+| url            | Y     | URL of the database. jdbc:subprotocol:subname format.            |
+| adminUser      | Y     | Admin user name of database. `sys` cannot be specified for Oracle. Specify a database creation user or a user with DBADM authority in the target database for DB2 (specifying db2admin will result in an error depending on the database version). |
+| adminPassword  | N     | Password for the user configured in adminUser.                        |
+| user           | Y     | Database username. `sys` cannot be specified for Oracle. It is always converted to lower case for PostgreSQL. |
+| password       | N     | Password for the user.                             |
+| schema         | N     | Schema name of the database. <br /> Cannot be specified for H2Database and is always interpreted as PUBLIC schema. <br /> Cannot be specified for MySQL and database name of jdbc URL is configured as the schema name. <br /> Example: jdbc:mysql://localhost:3306/gspdb → gspdb is internally used as the schema name. <br /> If the schema is not specified in other DBs, it is interpreted that the same schema name as the user name is used. It is always converted to lower case for PostgreSQL, and to upper case for H2, DB2 and Oracle. |
+| dmpFile        | N     | Dump file name. If not specified, the file name will be [schema name].dmp. |
+|optionalDialects | N    | Use FQCN of [dialect class](#lnk_dialect). |
+|onError | N    | Used in generate-ddl and load-data. Specifies the behavior when an error occurs during SQL execution. <br />`abort` (default)     Aborts the process. <br />`continue`    Continues the process. |
 
  * optionalDialects specification method  
  To change the Dialect class that is to be used, the database and corresponding Dialect class are defined in the following format.
@@ -199,14 +199,14 @@ To use, add the following to pom.xml.
 
 #### Available parameters
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value   | Required | Description                                                            |
 |:---------------------------|:-----:|:----------------------------------------------------------------|
-| erdFile                    | ✓     | Path of the erd file. Specifies a relative path from the work directory. |
-| outputDirectory            | ×     | Output directory of DDL. Default is "target/ddl".             |
-| lengthSemantics            | ×     | Length semantics. The default is bytes.                        |
-| ddlTemplateFileDir         | ×     | Specifies the directory where the project-specific DDL template is placed with a relative path from the work directory. |
-| allocationSize            |  ×    | Increment value of sequence generation SQL (INCREMENT BY). Default is "1". <br /> The values of allocationSize and allocationSize of [generate-entity](#generate-entity) must be the same. <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG)  |
+| erdFile                    | Y     | Path of the erd file. Specifies a relative path from the work directory. |
+| outputDirectory            | N     | Output directory of DDL. Default is "target/ddl".             |
+| lengthSemantics            | N     | Length semantics. The default is bytes.                        |
+| ddlTemplateFileDir         | N     | Specifies the directory where the project-specific DDL template is placed with a relative path from the work directory. |
+| allocationSize            |  N    | Increment value of sequence generation SQL (INCREMENT BY). Default is "1". <br /> The values of allocationSize and allocationSize of [generate-entity](#generate-entity) must be the same. <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG)  |
 To customize the template, see [Example of Template Customization for Use with Generate-ddl](./recipe/custom-DdlTemplate.md).
 
 
@@ -247,11 +247,11 @@ To use, add the following to pom.xml.
 
 #### Available parameters
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value   | Required | Description                                                            |
 |:---------------------|:-----:|:----------------------------------------------------------------|
-| ddlDirectory         | ×     | DDL placement directory. Default is "target/ddl".             |
-| extraDdlDirectory    | ×     | The directory where additional SQL files to execute are placed.                 |
+| ddlDirectory         | N     | DDL placement directory. Default is "target/ddl".             |
+| extraDdlDirectory    | N     | The directory where additional SQL files to execute are placed.                 |
 
 ### load-data
 
@@ -286,11 +286,11 @@ To use, add the following to pom.xml.
 
 #### Available parameters
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value                 | Required  | Description                                                                                  |
 |:-----------------------|:-----:|:----------------------------------------------------------------------------|
-| dataDirectory          | ✓     | Data file placement directory.                                          |
-| specifiedEncodingFiles | ×     | Configure when specifying the character code of a data file. Default is "Windows-31J". |
+| dataDirectory          | Y     | Data file placement directory.                                          |
+| specifiedEncodingFiles | N     | Configure when specifying the character code of a data file. Default is "Windows-31J". |
 
 
 * How to specify specifiedEncodingFiles
@@ -411,22 +411,22 @@ To use, add the following to pom.xml.
 
 #### Available parameters
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value                 | Required  | Description                                                                                  |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------|
-| ignoreTableNamePattern |   ×  | Table name to be excluded from auto-generation. Specify with a regular expression.                      |
-| versionColumnNamePattern |  ×   | Specifies the column name to be annotated with @Version annotation using regular expression. Default is "VERSION([_]?NO)?". <br /> For other conditions to be assigned, see [spec-generatedEntity.md](recipe/spec-generatedEntity.md). |
-| entityPackageName      |   ×  | Package name of the entity. Default is "entity".                    |
-| genDialectClassName    |   ×  |  Implementation class name of the Dialect interface of S2JDBC-Gen. <br> To customize, see [Example of GenDialect Class Customization](./recipe/custom-genDialect.md). <br> |
-| dialectClassName       |   ×  | Implementation class name of the Dialect interface of S2JDBC. <br /> Note that the ExtendedGenDialect class will not be used if a class name that is different from the registration key class of ExtendedGenDialect class provided by the gsp-dba-maven-plugin is specified. |
-| rootPackage            | ✓    |  Root package name.                                                      |
-| useAccessor            |   ×  | Whether to use an accessor. Default is "false".                   |
-| entityType             |   ×  | Type of entity to generate. Select between jpa and doma. Default is "jpa". <br /> When specifying doma, specify "java/gsp_doma_entity.ftl" in the entityTemplate. |
-| entityTemplate         |   ×  | Auto-generated template of the entity. Default is "java/gsp_entity.ftl". |
-|javaFileDestDir        |    ×   | Directory where the java file of the generated entity is placed |
-|templateFilePrimaryDir |    ×   |Path up to entityTemplate. Default is "src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes". <br> Usage example: If the path to the file is "src/main/resource/template/gsp_template.ftl, configure <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> respectively. |
-| allocationSize         |   ×   | allocationSize of @SequenceGenerator. Default is "1". <br /> Make sure that the above mentioned allocationSize and allocationSize of [generate-ddl](#generate-ddl) are the same. <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
-| useJSR310         |   ×   | Whether to generate the entity corresponding to JSR301. Default is "false".                   |
+| ignoreTableNamePattern |   N  | Table name to be excluded from auto-generation. Specify with a regular expression.                      |
+| versionColumnNamePattern |  N   | Specifies the column name to be annotated with @Version annotation using regular expression. Default is "VERSION([_]?NO)?". <br /> For other conditions to be assigned, see [spec-generatedEntity.md](recipe/spec-generatedEntity.md). |
+| entityPackageName      |   N  | Package name of the entity. Default is "entity".                    |
+| genDialectClassName    |   N  |  Implementation class name of the Dialect interface of S2JDBC-Gen. <br> To customize, see [Example of GenDialect Class Customization](./recipe/custom-genDialect.md). <br> |
+| dialectClassName       |   N  | Implementation class name of the Dialect interface of S2JDBC. <br /> Note that the ExtendedGenDialect class will not be used if a class name that is different from the registration key class of ExtendedGenDialect class provided by the gsp-dba-maven-plugin is specified. |
+| rootPackage            | Y    |  Root package name.                                                      |
+| useAccessor            |   N  | Whether to use an accessor. Default is "false".                   |
+| entityType             |   N  | Type of entity to generate. Select between jpa and doma. Default is "jpa". <br /> When specifying doma, specify "java/gsp_doma_entity.ftl" in the entityTemplate. |
+| entityTemplate         |   N  | Auto-generated template of the entity. Default is "java/gsp_entity.ftl". |
+|javaFileDestDir        |    N   | Directory where the java file of the generated entity is placed |
+|templateFilePrimaryDir |    N   |Path up to entityTemplate. Default is "src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes". <br> Usage example: If the path to the file is "src/main/resource/template/gsp_template.ftl, configure <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> respectively. |
+| allocationSize         |   N   | allocationSize of @SequenceGenerator. Default is "1". <br /> Make sure that the above mentioned allocationSize and allocationSize of [generate-ddl](#generate-ddl) are the same. <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
+| useJSR310         |   N   | Whether to generate the entity corresponding to JSR301. Default is "false".                   |
 To customize the template, see [Example of Template Customization for Use with Generate-entity](./recipe/custom-EntityTemplate.md).
 
 
@@ -474,12 +474,12 @@ To use, add the following to pom.xml.
 
 #### Available parameters
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value                 | Required  | Description                                                                                  |
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
-| outputDirectory        |   ×   | Path of the directory to which the database schema is exported. Default is "target/dump". |
-| ddlDirectory           |   ×   | Used with the [General mode](#General-mode). Specifies the DDL directory.                                  |
-| extraDdlDirectory      |   ×   | Used with the [General mode](#General-mode). Specify the additional DDL directory.                              |
+| outputDirectory        |   N   | Path of the directory to which the database schema is exported. Default is "target/dump". |
+| ddlDirectory           |   N   | Used with the [General mode](#General-mode). Specifies the DDL directory.                                  |
+| extraDdlDirectory      |   N   | Used with the [General mode](#General-mode). Specify the additional DDL directory.                              |
 
 #### general mode
 -The operation of the export process that works for DB2 and SQL Server does not use the DBMS-specific export function.
@@ -524,13 +524,13 @@ To use, add the following to pom.xml.
 
 #### Available parameters
 
-Configuration items(✓:required ×:optional)
+Configuration items(Y:required N:optional)
 | Configuration value                 | Required  | Description      
 |:-----------------------|:-----:|:--------------------------------------------------------------------------------------|
-| inputDirectory         |  ×    | Directory where the dump file is placed. Default is "target/dump".                       |
-| groupId                |  ×    | Group ID of the dump file. Default is the project group ID.                  |
-| artifactId             |  ×    | Artifact ID of the dump file. Default is the project artifact ID.  |
-| version                |  ×    | Version of the dump file. Default is the project version. |
+| inputDirectory         |  N    | Directory where the dump file is placed. Default is "target/dump".                       |
+| groupId                |  N    | Group ID of the dump file. Default is the project group ID.                  |
+| artifactId             |  N    | Artifact ID of the dump file. Default is the project artifact ID.  |
+| version                |  N    | Version of the dump file. Default is the project version. |
 
 #### <a name="importSchemaGeneral"></a> general mode
 - Since the general mode export is used for DB2 and SQLServer, importing it will import the schema.
