@@ -71,4 +71,4 @@ A configuration example is shown below.
 </plugins>
 ```
 
-After adding the configuration, run the GSP plug-in. Entity is generated according to the customized rules.
+After adding the configuration, run the GSP plugin. Entity is generated according to the customized rules.

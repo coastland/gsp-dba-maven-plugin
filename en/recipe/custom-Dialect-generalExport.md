@@ -72,7 +72,7 @@ Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
 ***/
 ```
 
-5. Modify plug-in definition  
+5. Modify plugin definition  
 Specify the location of DDL and additional DDL folders to package in the parameters ddlDirectory and extraDdlDirectory.
 ```xml
       <plugin>

@@ -1,6 +1,6 @@
 # Sample that Works with Minimum Configuration
 
-Sample GSP plug-in using H2 with minimum configuration (items not required are set to default).
+Sample GSP plugin using H2 with minimum configuration (items not required are set to default).
 The following can be executed.
 
 * [DDL generation](#generate-ddl)
