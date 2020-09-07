@@ -74,20 +74,15 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
 
 1. [pom.xml](../pom.xml)にサードパーティ製JDBCドライバの依存関係定義
     * 使用するJDBCドライバのバージョンは、https://github.com/nablarch/nablarch-parent/blob/master/pom.xml を参考にする。Nablarchのテストで使用しているJDBCドライバが記載されている。
-    * Oracle、DB2、SQLServerのJDBCドライバはMavenセントラルにいません。  
-      JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義して下さい。
-
-
-        * ローカルインストールの例（バージョンとかよしなに変更して下さい）
-    
+    * 2020年現在、GSPが対応しているRDBMSの最新のドライバはMavenセントラルに存在する。  
+      もし、古いドライバでテストする必要がある場合は、JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義すること。
+      * ローカルインストールの例（バージョンは適宜変更してください）
         ```shell
         mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.2.0 -Dpackaging=jar
         mvn install:install-file -Dfile=db2jcc4.jar -DgroupId=com.ibm -DartifactId=db2jcc4 -Dversion=9.7.200.358 -Dpackaging=jar
         mvn install:install-file -Dfile=sqljdbc4.jar -DgroupId=com.microsoft -DartifactId=sqljdbc4 -Dversion=4.0 -Dpackaging=jar
         ```
-        
-        * pom.xmlに追加する依存関係定義の例
-        
+      * pom.xmlに追加する依存関係定義の例
         ```xml:pom.xml
         <dependency>
             <groupId>com.ibm</groupId>
