@@ -42,6 +42,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.seasar.extension.jdbc.gen.dialect.GenDialectRegistry;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.framework.util.StatementUtil;
+import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.tiger.Maps;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;
@@ -110,7 +111,7 @@ public class OracleDialect extends Dialect {
 		    String user = params.getUser();
 		    String password = params.getPassword();
 		    String schema = params.getSchema();
-		    
+
             createDirectory(user, password, dumpFile.getParentFile());
 			ProcessBuilder pb = new ProcessBuilder(
 					"expdp",
@@ -309,6 +310,30 @@ public class OracleDialect extends Dialect {
 
 	@Override
 	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
+
+	/**
+	 * stmtの指定されたインデックスに指定された値をセットする。
+	 * <p>
+	 * Oracleの場合、JDBCドライバによっては、オブジェクト設定時に{@link PreparedStatement#setObject(int, Object, int)} を
+	 * 使用するとデータ型の詳細を誤判定する(小数部がある型を少数部無しと判定する)。
+	 * そのため、{@link PreparedStatement#setObject(int, Object)}を使用している。
+	 * </p>
+	 * @param stmt I/O
+	 * @param parameterIndex parameter index
+	 * @param value set value
+	 * @param sqlType sql type
+	 * @throws SQLException error
+	 */
+	@Override
+	public void setObjectInStmt(PreparedStatement stmt, int parameterIndex, String value, int sqlType) throws SQLException {
+		if(sqlType == UN_USABLE_TYPE) {
+			stmt.setNull(parameterIndex, Types.NULL);
+		} else if(StringUtil.isBlank(value) || "　".equals(value)) {
+			stmt.setNull(parameterIndex, sqlType);
+		} else {
+			stmt.setObject(parameterIndex, value);
+		}
+	}
 
     /**
 	 * ビュー定義を検索するSQLを返却する。
