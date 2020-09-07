@@ -8,4 +8,4 @@ FOREIGN KEY (
 <#foreach refColumn in foreignKey.referenceColumnList>
   ${refColumn.name}<#if refColumn_has_next>,</#if>
 </#foreach>
-)
+);

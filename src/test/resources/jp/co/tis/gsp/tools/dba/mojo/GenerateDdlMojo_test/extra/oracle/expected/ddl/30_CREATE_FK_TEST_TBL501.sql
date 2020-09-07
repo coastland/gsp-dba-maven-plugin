@@ -8,4 +8,4 @@ FOREIGN KEY (
   TEST_TBL4_ID,
   SUB_ID,
   TEST_ID
-)
+);

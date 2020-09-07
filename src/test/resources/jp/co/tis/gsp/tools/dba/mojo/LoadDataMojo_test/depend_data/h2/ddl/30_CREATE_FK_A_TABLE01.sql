@@ -4,4 +4,4 @@ FOREIGN KEY (
   B_ID
 ) REFERENCES PUBLIC.B_TABLE (
   B_ID
-)
+);

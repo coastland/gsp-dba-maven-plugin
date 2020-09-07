@@ -4,4 +4,4 @@ FOREIGN KEY (
   D_ID
 ) REFERENCES gspanother.D_TABLE (
   D_ID
-)
+);
