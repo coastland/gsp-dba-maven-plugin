@@ -74,6 +74,7 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
 
 1. [pom.xml](../pom.xml)にサードパーティ製JDBCドライバの依存関係定義
     * 使用するJDBCドライバのバージョンは、https://github.com/nablarch/nablarch-parent/blob/master/pom.xml を参考にする。Nablarchのテストで使用しているJDBCドライバが記載されている。
+    * OracleのJDBCドライバとJavaのバージョンの関係は https://www.oracle.com/database/technologies/faq-jdbc.html を参照。
     * 2020年現在、GSPが対応しているRDBMSの最新のドライバはMavenセントラルに存在する。  
       もし、古いドライバでテストする必要がある場合は、JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義すること。
       * ローカルインストールの例（バージョンは適宜変更してください）
