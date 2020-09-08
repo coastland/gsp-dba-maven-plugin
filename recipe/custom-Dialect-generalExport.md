@@ -1,7 +1,9 @@
 ## 汎用モードのエクスポート/インポートの実装
 
 - gsp-dba-maven-pluginで用意しているOracleDialectは、DBMS固有のエクスポート機能（expdp）を利用したスキーマのエクスポートを行っています。  
-ここでは、DBMS固有のエクスポートではなくDDLファイルとCSVデータを用いた汎用モードでエクスポートするためのDialectの作成方法を示します。
+ここでは、DBMS固有のエクスポートではなくDDLファイルとCSVデータを用いた汎用モードでエクスポートするためのDialectの作成方法を示します。  
+  Dialectは別途作成したjarに格納します。Dialectを格納したjarの作成は[Dialectクラスのカスタマイズ例](./custom-Dialect.md)を参考にしてください。
+
 
 ### 手順
 
@@ -72,8 +74,10 @@ Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
 ***/
     ```
 
-5. プラグイン定義の変更  
-パッケージするDDL及び追加DDLフォルダの場所をパラメータddlDirectory、extraDdlDirectoryで指定します。
+5. プラグイン定義の変更
+以下を設定します。  
+- パッケージするDDL及び追加DDLフォルダの場所をパラメータddlDirectory、extraDdlDirectoryで指定
+- Dialectが存在するjarへの依存関係を追加
     ```xml
       <plugin>
         <groupId>jp.co.tis.gsp</groupId>
@@ -90,9 +94,18 @@ Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
               <goal>export-schema</goal>
             </goals>
             <configuration>
+               <!-- パッケージするDDL及び追加DDLフォルダの場所の指定 -->
               <ddlDirectory>target/ddl</ddlDirectory>
               <extraDdlDirectory>src/main/resources/extraDDL</extraDdlDirectory>
             </configuration>
           </execution>  
         </executions>
-        ```
+        <dependencies>
+          <!-- Dialectを配置したjarを依存関係に追加 -->
+          <dependency>
+            <groupId>jp.co.tis.gsp.tools.dba.dialect</groupId>
+            <artifactId>my-dialect</artifactId>
+            <version>0.1.0</version>
+          </dependency>
+        </dependencies>
+    ```
