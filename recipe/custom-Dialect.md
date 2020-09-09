@@ -9,7 +9,7 @@ README.mdのload-dataにあるように、全角空白もしくは半角空白�
 ### 手順
 以下の手順で行います。
 1. Dialectを配置したjarの作成
-2. 作成したDialectを使用するようにプロジェクトを設定
+2. 作成したDialectを使用するように設定変更
 
 以下に個々の手順について説明します。
 
@@ -89,7 +89,7 @@ README.mdのload-dataにあるように、全角空白もしくは半角空白�
   $ mvn install
   ```
 
-#### 作成したDialectを使用するようにプロジェクトを設定
+#### 作成したDialectを使用するように設定変更
 * 適用するプロジェクトのpomのGSPプラグインに、作成したクラスを読み込ませるよう設定を追加してください。  
 以下、設定例です。
   ```xml
@@ -119,7 +119,7 @@ README.mdのload-dataにあるように、全角空白もしくは半角空白�
         </execution>
       </executions>
       <dependencies>
-        <!-- Dialectを配置したjarを依存関係に追加 -->
+        <!-- Dialectを配置したjarを依存関係に追加する。 -->
         <dependency>
           <groupId>jp.co.tis.gsp.tools.dba.dialect</groupId>
           <artifactId>my-dialect</artifactId>
