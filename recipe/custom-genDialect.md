@@ -69,7 +69,7 @@ public class CustomOracleGenDialect extends ExtendedOracleGenDialect {
       </execution>
     </executions>
     <dependencies>
-      <!-- Dialectを配置したjarを依存関係に追加 -->
+      <!-- Dialectを配置したjarを依存関係に追加する。-->
       <dependency>
         <groupId>jp.co.tis.gsp.tools.dba.dialect</groupId>
         <artifactId>my-dialect</artifactId>
