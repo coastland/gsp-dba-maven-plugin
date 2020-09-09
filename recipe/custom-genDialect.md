@@ -13,7 +13,7 @@ OracleデータベースのNumber型をJavaのクラスに変換する際の対�
 となっています。（条件は上部のものが優先されます。）
 
 この対応付けはExtendedOracleGenDialectで行われており、カスタマイズする場合はこのクラスを継承したクラスを作成、条件を記述し、pomにて作成したクラスを読み込むように設定してください。  
-Dialectは別途作成したjarに格納します。Dialectを格納したjarの作成は[Dialectクラスのカスタマイズ例](./custom-Dialect.md)を参考にしてください。
+Dialectは別途作成したjarに格納します。Dialectを格納するjarの作成は[Dialectクラスのカスタマイズ例](./custom-Dialect.md)を参考にしてください。
 
 以下はカスタマイズの例です。例では、10桁未満の数字をIntegerに、19桁以上の数字をBigDecimalに対応付けるように変更しています。
 

@@ -2,7 +2,7 @@
 
 - gsp-dba-maven-pluginで用意しているOracleDialectは、DBMS固有のエクスポート機能（expdp）を利用したスキーマのエクスポートを行っています。  
 ここでは、DBMS固有のエクスポートではなくDDLファイルとCSVデータを用いた汎用モードでエクスポートするためのDialectの作成方法を示します。  
-  Dialectは別途作成したjarに格納します。Dialectを格納したjarの作成は[Dialectクラスのカスタマイズ例](./custom-Dialect.md)を参考にしてください。
+  Dialectは別途作成したjarに格納します。Dialectを格納するjarの作成は[Dialectクラスのカスタマイズ例](./custom-Dialect.md)を参考にしてください。
 
 
 ### 手順
