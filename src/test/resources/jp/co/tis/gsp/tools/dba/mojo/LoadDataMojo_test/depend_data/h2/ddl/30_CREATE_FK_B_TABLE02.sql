@@ -4,4 +4,4 @@ FOREIGN KEY (
   D_ID
 ) REFERENCES PUBLIC.D_TABLE (
   D_ID
-)
+);

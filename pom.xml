@@ -8,7 +8,7 @@
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>4.4.0</version>
+    <version>4.4.1</version>
     <name>GSP Maven Mojo for DBA</name>
     <description>
       To automate the routine work of the DBA, it is a tool to be able to concentrate on the data modeling work.
@@ -168,6 +168,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.2</version>
                     <configuration>
+                        <!-- 依存モジュールJDK8以降のものが存在するためビルドはJDK8で行う -->
                         <source>1.6</source>
                         <target>1.6</target>
                         <encoding>UTF-8</encoding>
@@ -321,13 +322,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.oracle</groupId>-->
-            <!--<artifactId>ojdbc6</artifactId>-->
-            <!--<version>11.2.0.2.0</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
@@ -384,42 +378,36 @@
             <version>1.13.1</version>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
-        <groupId>org.postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4.1208.jre6</version>
+            <version>42.2.10.jre6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.37</version>
-            <scope>test</scope>
-        </dependency>
-        
-<!--
-        <dependency>
-            <groupId>com.ibm</groupId>
-            <artifactId>db2jcc4</artifactId>
-            <version>9.7.200.358</version>
+            <version>5.1.49</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.2.0</version>
+            <groupId>com.ibm.db2</groupId>
+            <artifactId>jcc</artifactId>
+            <version>11.1.4.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.microsoft</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>4.0</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.7.0.0</version>
             <scope>test</scope>
         </dependency>
--->
-
-
+       <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>8.2.1.jre8</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

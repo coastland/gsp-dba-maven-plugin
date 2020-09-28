@@ -4,4 +4,4 @@ FOREIGN KEY (
   C_ID
 ) REFERENCES PUBLIC.C_TABLE (
   C_ID
-)
+);
