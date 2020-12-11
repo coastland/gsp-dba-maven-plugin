@@ -57,17 +57,17 @@ The Dialect will be stored in a jar to be created separately, refer to [Example 
     /***
     Call jp.co.tis.gsp.tools.dba.dialect.Dialect#exportSchema()
 
-      	@Override
-      	public void exportSchema(ExportParams params) throws MojoExecutionException {
-      	    ...
-      	}
+        @Override
+        public void exportSchema(ExportParams params) throws MojoExecutionException {
+            ...
+        }
     ***/
 
     /***
     Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
 
-    	@Override
-    	public void importSchema(ImportParams params) throws MojoExecutionException{
+        @Override
+        public void importSchema(ImportParams params) throws MojoExecutionException{
             ...
         }
     ***/
