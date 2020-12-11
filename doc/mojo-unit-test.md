@@ -19,25 +19,25 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
 
 ## SetUp
 1. テスト対象のRDBMSをローカルにインストールしていない場合は、インストールする。
-  * DB共通の注意点
-    * 本ツールのexport/importはDB付属のコマンドを実行する。そのためDockerでインストールすると、export/importのテストが実行できない。
-  * 各DBの注意点
-    * Oracle 19c
-      * 再インストールする際、古いOracleを消した後、環境変数ORACLE_HOME削除し、OSを再起動してから、新しくインストールすること。  
-        ORACLE_HOMEの参照先が古いと再インストールに失敗する。
-      * インストーラーの途中の選択肢で、「デスクトップ」と「サーバー」のどちらにするかを尋ねられたら、「サーバー」の方を選択する。
-        「デスクトップ」だと一部のオプションが選べないため、インストール後の作業が増える可能性がある。
-      * マルチテナント構成に *しない* 。 マルチテナント構成にするとGSPで接続可能にするまでに必要な手順が増える。
-      * SIDは `XE` にすると、後々の設定が楽になるため、 `XE` にすることを推奨する。 
-      * インストール直後、意外なIPアドレスで待ち受ける設定になっていることがある。  
-        ローカルからTCP/IPで接続出来ない場合は、 `listener.ora` と `tnsnames.ora` を編集し、 `127.0.0.1` で待ち受けるようにする。  
-        ファイルの編集後は、OSの再起動を推奨する(サービスのみ再起動しても、うまく設定が反映されないことがある)。
-    * SQLServer
-      * Microsoft SQL Server Management Studio (通称SSMS)は設定に有用なのでインストールする。
-    * MySQL
-      * 5系でテストしている。
-      * 文字コードは `utf8mb4` にすること。(MySQLのutf8は、使えないunicode文字がある)
-        * `C:\ProgramData\MySQL\MySQL Server 5.7\my.ini` を編集して `character-set-server=utf8mb4` 設定する。
+    * DB共通の注意点
+      * 本ツールのexport/importはDB付属のコマンドを実行する。そのためDockerでインストールすると、export/importのテストが実行できない。
+    * 各DBの注意点
+      * Oracle 19c
+        * 再インストールする際、古いOracleを消した後、環境変数ORACLE_HOME削除し、OSを再起動してから、新しくインストールすること。  
+          ORACLE_HOMEの参照先が古いと再インストールに失敗する。
+        * インストーラーの途中の選択肢で、「デスクトップ」と「サーバー」のどちらにするかを尋ねられたら、「サーバー」の方を選択する。
+          「デスクトップ」だと一部のオプションが選べないため、インストール後の作業が増える可能性がある。
+        * マルチテナント構成に *しない* 。 マルチテナント構成にするとGSPで接続可能にするまでに必要な手順が増える。
+        * SIDは `XE` にすると、後々の設定が楽になるため、 `XE` にすることを推奨する。 
+        * インストール直後、意外なIPアドレスで待ち受ける設定になっていることがある。  
+          ローカルからTCP/IPで接続出来ない場合は、 `listener.ora` と `tnsnames.ora` を編集し、 `127.0.0.1` で待ち受けるようにする。  
+          ファイルの編集後は、OSの再起動を推奨する(サービスのみ再起動しても、うまく設定が反映されないことがある)。
+      * SQLServer
+        * Microsoft SQL Server Management Studio (通称SSMS)は設定に有用なのでインストールする。
+      * MySQL
+        * 5系でテストしている。
+        * 文字コードは `utf8mb4` にすること。(MySQLのutf8は、使えないunicode文字がある)
+          * `C:\ProgramData\MySQL\MySQL Server 5.7\my.ini` を編集して `character-set-server=utf8mb4` 設定する。
 1. [jdbc_test.properties](../src/test/resources/jdbc_test.properties)とDB接続の変更。
     * この接続情報を使ってテストを実行するので、jdbc_test.propertiesを修正するかDBのほうを変更して合わせる。
       * DB共通

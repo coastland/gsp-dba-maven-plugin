@@ -19,25 +19,25 @@ mojo(goal) - Test case (test method) - Target DB(db2, h2, etc..)
 
 ## SetUp
 1. If the RDBMS to be tested has not been installed locally, install it.
-  * Notes for all DBs
-    * The export/import of this tool executes the commands that are bundled with the DB. Therefore, if Docker is used for installation, the export/import tests cannot be executed.
-  * Notes on each DB
-    * Oracle 19c
-      * When reinstalling, delete the environment variable ORACLE_HOME after deleting the old Oracle, reboot the OS, and then install a new one.
-        Reinstallation fails if the reference of ORACLE_HOME is old.
-      * When the installer asks you to choose between "Desktop" and "Server", choose "Server".
-        If you use "Desktop", some options are not available and you may have to do more work after installation.
-      * Do *not* configure for multi-tenancy. Multi-tenant configuration will increase the number of steps required to enable GSP to connect.
-      * It is recommended to set the SID to `XE`, because it will be easier to set it later.
-      * Immediately after installation, it may be set to listen on an unexpected IP address.
-        If connection is not possible from local via TCP/IP, edit `listener.ora` and `tnsnames.ora` to listen on `127.0.0.1`.  
-        After editing the file, it is recommended to restart the OS (restarting the service only may not reflect the settings properly).
-    * SQLServer
-      * Install Microsoft SQL Server Management Studio (a.k.a. SSMS) as it is useful for configuration.
-    * MySQL
-      * Testing with Series 5.
-      * The charset should be `utf8mb4`. (MySQL's utf8 has some unicode characters that cannot be used.)
-        * Edit `C:\blur1}ProgramData\MySQL Server 5.7\my.ini` and set `character-set-server=utf8mb4`.
+    * Notes for all DBs
+      * The export/import of this tool executes the commands that are bundled with the DB. Therefore, if Docker is used for installation, the export/import tests cannot be executed.
+    * Notes on each DB
+      * Oracle 19c
+        * When reinstalling, delete the environment variable ORACLE_HOME after deleting the old Oracle, reboot the OS, and then install a new one.
+          Reinstallation fails if the reference of ORACLE_HOME is old.
+        * When the installer asks you to choose between "Desktop" and "Server", choose "Server".
+          If you use "Desktop", some options are not available and you may have to do more work after installation.
+        * Do *not* configure for multi-tenancy. Multi-tenant configuration will increase the number of steps required to enable GSP to connect.
+        * It is recommended to set the SID to `XE`, because it will be easier to set it later.
+        * Immediately after installation, it may be set to listen on an unexpected IP address.
+          If connection is not possible from local via TCP/IP, edit `listener.ora` and `tnsnames.ora` to listen on `127.0.0.1`.  
+          After editing the file, it is recommended to restart the OS (restarting the service only may not reflect the settings properly).
+      * SQLServer
+        * Install Microsoft SQL Server Management Studio (a.k.a. SSMS) as it is useful for configuration.
+      * MySQL
+        * Testing with Series 5.
+        * The charset should be `utf8mb4`. (MySQL's utf8 has some unicode characters that cannot be used.)
+          * Edit `C:\blur1}ProgramData\MySQL Server 5.7\my.ini` and set `character-set-server=utf8mb4`.
 1. Modify [jdbc_test.properties](../../src/test/resources/jdbc_test.properties) and DB connections.
     * Since the test is executed using this connection information, modify jdbc_test.properties or match by changing DB.
       * All DBs
