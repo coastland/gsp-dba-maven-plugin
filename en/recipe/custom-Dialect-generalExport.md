@@ -68,7 +68,7 @@ The Dialect will be stored in a jar to be created separately, refer to [Example 
 
     	@Override
     	public void importSchema(ImportParams params) throws MojoExecutionException{
-	        ...
+            ...
         }
     ***/
     ```
