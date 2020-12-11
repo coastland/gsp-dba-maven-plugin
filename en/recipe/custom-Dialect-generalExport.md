@@ -1,8 +1,8 @@
 ## Implementation of General Mode Export/Import
 
--OracleDialect provided by gsp-dba-maven-plugin exports the schema using the export function (expdp) unique to DBMS.  
+- OracleDialect provided by gsp-dba-maven-plugin exports the schema using the export function (expdp) unique to DBMS.  
 This section shows how to create a dialect to export in the general mode using DDL files and CSV data instead of DBMS-specific exports.
-Dialectは別途作成するjarに格納します。Dialectを格納するjarの作成は[Dialectクラスのカスタマイズ例](./custom-Dialect.md)を参考にしてください。
+The Dialect will be stored in a jar to be created separately, refer to [Example of Dialect Class Customization](./custom-Dialect.md) for creating the jar to store the Dialect.
 
 ### Step
 
