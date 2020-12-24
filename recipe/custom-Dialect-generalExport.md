@@ -68,9 +68,9 @@
     Call jp.co.tis.gsp.tools.dba.dialect.Dialect#importSchema()
 
         @Override
-      public void importSchema(ImportParams params) throws MojoExecutionException{
-          ...
-      }
+        public void importSchema(ImportParams params) throws MojoExecutionException{
+            ...
+        }
     ***/
     ```
 
