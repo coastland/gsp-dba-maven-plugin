@@ -13,6 +13,7 @@ Currently, number type of Oracle determines the Java type to which the number of
  (conditions at the top take precedence.)
 
 Mapped in ExtendedOracleGenDialect, and when customization is required, create a class that inherits this class, write the conditions, and configure such that the class created in pom is loaded.
+The Dialect will be stored in a jar to be created separately, refer to [Example of Dialect Class Customization](./custom-Dialect.md) for creating the jar to store the Dialect.
   
 A customization example is given below. In the example, numbers less than 10 digits are mapped to integer, and numbers more than 19 digits are mapped to BigDecimal.
 
@@ -67,6 +68,14 @@ A configuration example is shown below.
         </configuration>
       </execution>
     </executions>
+    <dependencies>
+      <!-- Add the jar containing the Dialect to the dependencies. -->
+      <dependency>
+        <groupId>jp.co.tis.gsp.tools.dba.dialect</groupId>
+        <artifactId>my-dialect</artifactId>
+        <version>0.1.0</version>
+      </dependency>
+    </dependencies>
   </plugin>
 </plugins>
 ```
