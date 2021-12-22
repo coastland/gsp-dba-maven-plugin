@@ -116,6 +116,67 @@ Java11で使用する場合pom.xmlに以下の設定を追加してください�
 </pluginManagement>
 ```
 
+### Java17での設定
+
+Java17で使用する場合、以下2つの対応が必要になります。
+
+- pom.xmlに依存関係を追加する
+- MavenのJVMオプションに--add-opensを追加する
+
+#### pom.xmlに依存関係を追加する
+
+pom.xmlに以下の設定を追加してください。
+
+```xml
+<pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>jp.co.tis.gsp</groupId>
+      <artifactId>gsp-dba-maven-plugin</artifactId>
+      <!-- Java17で使用できるgsp-dba-maven-pluginのバージョンは4.4.0以降です。 -->
+      <version>4.4.0</version>
+      <dependencies>
+        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
+        <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <version>11.2.0.2.0</version>
+        </dependency>
+        <!-- 以下を追加するようにしてください。 -->
+        <dependency>
+          <groupId>javax.activation</groupId>
+          <artifactId>javax.activation-api</artifactId>
+          <version>1.2.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-core</artifactId>
+          <version>2.3.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <version>2.3.5</version>
+        </dependency>
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+          <version>1.3.2</version>
+        </dependency>
+      </dependencies>
+    </plugin>
+  </plugins>
+</pluginManagement>
+```
+
+#### MavenのJVMオプションに--add-opensを追加する
+
+以下のようにして、環境変数 `MAVEN_OPTS` に `--add-opens` の JVM オプションを追加してください。
+
+```
+> set MAVEN_OPTS=%MAVEN_OPTS% --add-opens java.base/java.lang=ALL-UNNAMED
+```
+
 ### ゴール共通のパラメータ
 
 以下のパラメータは全てのゴールで共通です。
