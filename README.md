@@ -127,6 +127,12 @@ Java17で使用する場合、以下2つの対応が必要になります。
 
 pom.xmlに以下の設定を追加してください。
 
+なお、 [Java11での設定](#Java11での設定) との違いは、以下の2点になります。
+
+- `jaxb-impl` のバージョンに `2.3.5` を指定する
+- `jaxb-api` のアーティファクトを外す
+    - `jaxb-impl` の `2.3.5` が、 `jakarta.xml.bind-api` という別のアーティファクトを推移的に使用するため
+
 ```xml
 <pluginManagement>
   <plugins>
