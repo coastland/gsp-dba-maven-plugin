@@ -177,11 +177,8 @@ pom.xmlに以下の設定を追加してください。
 
 #### MavenのJVMオプションに--add-opensを追加する
 
-以下のようにして、環境変数 `MAVEN_OPTS` に `--add-opens` の JVM オプションを追加してください。
-
-```
-> set MAVEN_OPTS=%MAVEN_OPTS% --add-opens java.base/java.lang=ALL-UNNAMED
-```
+MavenのJVMオプションに、 `--add-opens java.base/java.lang=ALL-UNNAMED` を設定してください。
+MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](https://maven.apache.org/configure.html#maven_opts-environment-variable)。
 
 ### ゴール共通のパラメータ
 
