@@ -116,6 +116,70 @@ Add the following configuration to pom.xml for using the plugin with Java11.
 </pluginManagement>
 ```
 
+### Java17 configuration
+
+If you want to use Java17, you need to take the following two actions.
+
+- Add dependencies to pom.xml
+- Add --add-opens to Maven's JVM options
+
+#### Add dependencies to pom.xml
+
+Add the following settings to pom.xml.
+
+The difference from the [Java11 configuration](#java11-configuration) are the following two points.
+
+- Specify `2.3.5` for `jaxb-impl` version
+- Remove the `jaxb-api` artifact.
+    - Because `2.3.5` of `jaxb-impl` transitively uses another artifact called `jakarta.xml.bind-api`
+
+```xml
+<pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>jp.co.tis.gsp</groupId>
+      <artifactId>gsp-dba-maven-plugin</artifactId>
+      <!-- gsp-dba-maven-plugin version 4.4.0 or later can be used with Java 17. -->
+      <version>4.4.0</version>
+      <dependencies>
+        <!-- Modify the JDBC driver according to the DB product used in the project. -->
+        <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <version>11.2.0.2.0</version>
+        </dependency>
+        <!-- Make sure to add the following -->
+        <dependency>
+          <groupId>javax.activation</groupId>
+          <artifactId>javax.activation-api</artifactId>
+          <version>1.2.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-core</artifactId>
+          <version>2.3.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <version>2.3.5</version>
+        </dependency>
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+          <version>1.3.2</version>
+        </dependency>
+      </dependencies>
+    </plugin>
+  </plugins>
+</pluginManagement>
+```
+
+#### Add --add-opens to Maven's JVM options
+
+Add `--add-opens java.base/java.lang=ALL-UNNAMED` to Maven's JVM option.
+Maven's JVM options can be set in the [MAVEN_OPTS environment variable](https://maven.apache.org/configure.html#maven_opts-environment-variable).
+
 ### Parameters of common goal
 
 The following parameters are common to all goals.
