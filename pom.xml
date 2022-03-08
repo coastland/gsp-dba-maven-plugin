@@ -182,7 +182,7 @@
         <repository>
             <id>maven.seasar.org</id>
             <name>The Seasar Foundation Maven Repository</name>
-            <url>http://maven.seasar.org/maven2</url>
+            <url>https://maven.seasar.org/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
