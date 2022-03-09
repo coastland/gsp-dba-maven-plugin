@@ -2,6 +2,13 @@
 
 All major changes to this project will be documented in this file.
 
+## 4.5.0 (2022-03-24)
+### Updates
+#### Change
+- Changed the URL of the dependent Seasar Maven repository.
+  - Maven 3.8.1 and later versions block external HTTP repositories by default.
+    Changed the URL to HTTPS so that Maven 3.8.1 and later versions can still access the dependent Seasar repository.
+
 ## 4.4.1 (2020-09-24)
 ### Updates
 #### Change
