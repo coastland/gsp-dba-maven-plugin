@@ -109,7 +109,6 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
         	
             // jarの解凍
             extractJarAll(jarFile, inputDirectory.getAbsolutePath());
-            
         } catch(IOException e) {
             throw new MojoExecutionException("", e);
         }
@@ -158,8 +157,12 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
             }
             java.io.InputStream is = jar.getInputStream(file);
             java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            while (is.available() > 0) {
-                fos.write(is.read());
+
+            byte[] buffer = new byte[4096];
+            int size;
+
+            while ((size = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, size);
             }
             fos.close();
             is.close();
