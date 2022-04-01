@@ -14,6 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -203,11 +206,31 @@ public class DBTestUtil {
 				if (getCount(countSql, url, adminUser, adminPassword) == 0)
 					return;
 
-				ProcessBuilder pb = new ProcessBuilder("cmd","/c","sqlcmd", "-S", url.split("/")[2].split(":")[0], "-U", adminUser,
-						"-P", adminPassword, "-d", conn.getCatalog(), "-i",
-						new File(DBTestUtil.class.getResource(DBTestUtil.class.getSimpleName() + "_test" + "/dropAll.sql")
-								.getPath()).getAbsolutePath(),
-						"-v", "SCHEMA=" + dropSchema);
+				List<String> args = new ArrayList<String>();
+				if (isWindows()) {
+					// Windows
+					args.add("cmd");
+					args.add("/c");
+					args.add("sqlcmd");
+				} else {
+					// Linux(Docker)
+					args.add("/opt/mssql-tools/bin/sqlcmd");
+				}
+				args.add("-S");
+				args.add(url.split("/")[2].split(":")[0]);
+				args.add("-U");
+				args.add(adminUser);
+				args.add("-P");
+				args.add(adminPassword);
+				args.add("-d");
+				args.add(conn.getCatalog());
+				args.add("-i");
+				args.add(new File(DBTestUtil.class.getResource(DBTestUtil.class.getSimpleName() + "_test" + "/dropAll.sql").getPath()).getAbsolutePath());
+
+				ProcessBuilder pb = new ProcessBuilder(args.toArray(new String[0]));
+
+				final Map<String, String> environment = pb.environment();
+				environment.put("SCHEMA", dropSchema);
 
 				pb.redirectErrorStream(true);
 				Process process = pb.start();
@@ -243,6 +266,14 @@ public class DBTestUtil {
 			StatementUtil.close(stmt);
 			ConnectionUtil.close(conn);
 		}
+	}
+
+	/**
+	 * 現在の実行環境がWindowsかどうか判定する。
+	 * @return Windowsの場合はtrue
+	 */
+	private static boolean isWindows() {
+		return System.getProperty("os.name").toLowerCase().contains("windows");
 	}
 
 	/**
