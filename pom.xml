@@ -528,7 +528,9 @@
                                     <goal>test</goal>
                                 </goals>
                                 <configuration combine.self="override">
-                                    <argLine>-Dfile.encoding=UTF-8 ${jacocoArgs}</argLine>
+                                    <!-- ロケールを日本にしないと、Docker上でテストしたときにOracleの日付の
+                                         デフォルト書式が変わってテストが失敗する -->
+                                    <argLine>-Dfile.encoding=UTF-8 ${jacocoArgs} -Duser.language=ja -Duser.country=JP</argLine>
                                 </configuration>
                             </execution>
                         </executions>
