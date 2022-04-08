@@ -247,9 +247,11 @@ public class MysqlDialect extends Dialect {
 					"-u", user,
 					"--password="+ password,
 					"-D", schema,
-					"-e", "\"source " + dumpFile.getAbsolutePath().replaceAll("\\\\", "/") + "\""
+					// -e の引数をダブルクォーテーションで括ると、
+					// Windows では問題ないが Linux 上で動かしたときにインポートができない
+					"-e", "source " + dumpFile.getAbsolutePath().replaceAll("\\\\", "/")
 			};
-            
+
             ProcessUtil.exec(args);
 
 		} catch (Exception e) {
