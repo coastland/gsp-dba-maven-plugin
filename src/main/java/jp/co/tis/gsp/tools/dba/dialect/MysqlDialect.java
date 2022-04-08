@@ -28,7 +28,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
