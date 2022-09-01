@@ -168,7 +168,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE6
      */
-    @Column(name = "TYPE6", length = 8, nullable = true, unique = false)
+    @Column(name = "TYPE6", length = 10, nullable = true, unique = false)
     public String getType6() {
         return type6;
     }
