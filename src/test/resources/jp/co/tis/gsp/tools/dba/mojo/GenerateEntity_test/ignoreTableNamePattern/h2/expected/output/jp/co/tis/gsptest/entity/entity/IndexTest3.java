@@ -35,7 +35,7 @@ public class IndexTest3 implements Serializable {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "INDEX_TEST3_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "INDEX_TEST3_ID", precision = 64, nullable = false, unique = true)
     public Long getIndexTest3Id() {
         return indexTest3Id;
     }
@@ -53,7 +53,7 @@ public class IndexTest3 implements Serializable {
      *
      * @return SUB_ID_1
      */
-    @Column(name = "SUB_ID_1", precision = 19, nullable = false, unique = false)
+    @Column(name = "SUB_ID_1", precision = 64, nullable = false, unique = false)
     public Long getSubId1() {
         return subId1;
     }
@@ -71,7 +71,7 @@ public class IndexTest3 implements Serializable {
      *
      * @return SUB_ID_2
      */
-    @Column(name = "SUB_ID_2", precision = 19, nullable = false, unique = false)
+    @Column(name = "SUB_ID_2", precision = 64, nullable = false, unique = false)
     public Long getSubId2() {
         return subId2;
     }

@@ -98,7 +98,7 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         	String typeName = getObjectTypeName(metaData, tableMeta);
         	String tableName = tableMeta.getName();
 
-        	if (!StringUtils.equals(typeName, "TABLE")) {
+			if (!StringUtils.equals(typeName, "TABLE") && !StringUtils.equals(typeName, "BASE TABLE")) {
         		return Collections.emptyList();
         	}
 

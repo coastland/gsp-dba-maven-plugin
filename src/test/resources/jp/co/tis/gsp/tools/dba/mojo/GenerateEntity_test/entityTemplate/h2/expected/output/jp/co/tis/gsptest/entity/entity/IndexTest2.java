@@ -37,7 +37,7 @@ public class IndexTest2 implements Serializable {
 // ENTITY_TEMPLATE_TEST!
     @Id
     @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
-    @Column(name = "INDEX_TEST2_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "INDEX_TEST2_ID", precision = 64, nullable = false, unique = true)
     public Long getIndexTest2Id() {
         return indexTest2Id;
     }
@@ -56,7 +56,7 @@ public class IndexTest2 implements Serializable {
      * @return SUB_ID_1
      */
 // ENTITY_TEMPLATE_TEST!
-    @Column(name = "SUB_ID_1", precision = 19, nullable = false, unique = false)
+    @Column(name = "SUB_ID_1", precision = 64, nullable = false, unique = false)
     public Long getSubId1() {
         return subId1;
     }
@@ -75,7 +75,7 @@ public class IndexTest2 implements Serializable {
      * @return SUB_ID_2
      */
 // ENTITY_TEMPLATE_TEST!
-    @Column(name = "SUB_ID_2", precision = 19, nullable = false, unique = false)
+    @Column(name = "SUB_ID_2", precision = 64, nullable = false, unique = false)
     public Long getSubId2() {
         return subId2;
     }

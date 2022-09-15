@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 /**
- * 
+ * TestTbl1エンティティクラス
  *
  */
 @Generated("GSP")
@@ -21,38 +21,38 @@ public class TestTbl1 implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**  */
+    /** testTbl1Idプロパティ */
     private Long testTbl1Id;
 
-    /**  */
+    /** testNameプロパティ */
     private String testName;
 
-    /**  */
+    /** versionNoプロパティ */
     private Long versionNo;
     /**
-     * を返します。
+     * testTbl1Idを返します。
      *
-     * @return 
+     * @return testTbl1Id
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TEST_TBL1_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long getTestTbl1Id() {
         return testTbl1Id;
     }
 
     /**
-     * を設定します。
+     * testTbl1Idを設定します。
      *
-     * @param testTbl1Id 
+     * @param testTbl1Id
      */
     public void setTestTbl1Id(Long testTbl1Id) {
         this.testTbl1Id = testTbl1Id;
     }
     /**
-     * を返します。
+     * testNameを返します。
      *
-     * @return 
+     * @return testName
      */
     @Column(name = "TEST_NAME", length = 30, nullable = true, unique = false)
     public String getTestName() {
@@ -60,28 +60,28 @@ public class TestTbl1 implements Serializable {
     }
 
     /**
-     * を設定します。
+     * testNameを設定します。
      *
-     * @param testName 
+     * @param testName
      */
     public void setTestName(String testName) {
         this.testName = testName;
     }
     /**
-     * を返します。
+     * versionNoを返します。
      *
-     * @return 
+     * @return versionNo
      */
     @Version
-    @Column(name = "VERSION_NO", precision = 19, nullable = true, unique = false)
+    @Column(name = "VERSION_NO", precision = 64, nullable = true, unique = false)
     public Long getVersionNo() {
         return versionNo;
     }
 
     /**
-     * を設定します。
+     * versionNoを設定します。
      *
-     * @param versionNo 
+     * @param versionNo
      */
     public void setVersionNo(Long versionNo) {
         this.versionNo = versionNo;

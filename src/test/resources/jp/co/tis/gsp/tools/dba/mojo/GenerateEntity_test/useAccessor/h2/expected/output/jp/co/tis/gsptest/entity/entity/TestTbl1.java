@@ -23,7 +23,7 @@ public class TestTbl1 implements Serializable {
     /** TEST_TBL1_ID */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TEST_TBL1_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long testTbl1Id;
 
     /** TEST_NAME */

@@ -37,7 +37,7 @@ public class TestTbl1 implements Serializable {
 // ENTITY_TEMPLATE_TEST!
     @Id
     @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
-    @Column(name = "TEST_TBL1_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long getTestTbl1Id() {
         return testTbl1Id;
     }
