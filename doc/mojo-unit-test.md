@@ -186,6 +186,8 @@ testDB=db2
 
 ## JPA簡易検証
 
+* gsp-dba-maven-pluginは、指定したDBのテーブル情報から、エンティティクラスを自動生成します。この検証では、生成されたソースがJPAの仕様に則っていることを担保します。
+* Eclpselinkを使った現状の簡易検証では、H2のテストに失敗します。ただし、生成されたソースはDBに依存しないため、必要に応じてH2以外のDBを使って検証を実施してください。
 * `integration-test`フェーズで実施。`maven-invoker-plugin`プラグインを使用。メインフォルダは[it](../src/it)フォルダ。
 * DB接続情報はMojoテストクラスで利用した[jdbc_test.properties](../src/test/resources/jdbc_test.properties)を使用。
 * [simple-jpa-test](../src/it/simple-jpa-test)プロジェクトを各DBごとで使い回して実行。
