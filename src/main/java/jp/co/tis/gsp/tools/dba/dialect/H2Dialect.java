@@ -63,7 +63,7 @@ public class H2Dialect extends Dialect {
         	
 			// スキーマ内のテーブル、ビュー、シーケンス削除
 			String nmzschema = normalizeSchemaName(schema);
-            String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS " +
+			String dropListSql = "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS " +
                     "WHERE CONSTRAINT_SCHEMA='" + nmzschema + "' AND CONSTRAINT_TYPE='FOREIGN KEY'";
 			dropObjectsInSchema(conn, dropListSql, nmzschema, OBJECT_TYPE.FK);
 			
@@ -95,7 +95,8 @@ public class H2Dialect extends Dialect {
         Connection conn = null;
         try {
             File dumpFile = params.getDumpFile();
-            if (!dumpFile.exists())
+			
+		    if (!dumpFile.exists())
 		        throw new MojoExecutionException(dumpFile.getName() + " is not found?");
 		    
 		    String user = params.getAdminUser();

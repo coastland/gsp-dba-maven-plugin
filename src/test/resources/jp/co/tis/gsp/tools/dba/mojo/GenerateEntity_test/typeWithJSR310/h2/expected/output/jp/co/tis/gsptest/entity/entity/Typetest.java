@@ -246,7 +246,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE10
      */
-    @Column(name = "TYPE10", length = 1048576, nullable = true, unique = false)
+    @Column(name = "TYPE10", length = 1000000000, nullable = true, unique = false)
     public String getType10() {
         return type10;
     }
@@ -337,7 +337,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE15
      */
-    @Column(name = "TYPE15", length = 1048576, nullable = true, unique = false)
+    @Column(name = "TYPE15", length = 1000000000, nullable = true, unique = false)
     public String getType15() {
         return type15;
     }
@@ -355,7 +355,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE16
      */
-    @Column(name = "TYPE16", length = 1048576, nullable = true, unique = false)
+    @Column(name = "TYPE16", length = 1000000000, nullable = true, unique = false)
     public String getType16() {
         return type16;
     }
