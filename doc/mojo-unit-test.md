@@ -185,7 +185,7 @@ testDB=db2
     * *プロジェクトのフルクリア・フルビルド*をすれば直ります。
 
 ## JPA簡易検証
-* DBにH2を指定した場合、JPA簡易テストで使用しているEclipseLinkの2.5.0が、H2の2.x系に未対応のため、テストに失敗します。PostgreSQLを代替に使用して検証を実施してください。
+* DBにH2を指定した場合、JPA簡易検証で使用しているEclipseLinkの2.5.0が、H2の2.x系に未対応のため、テストに失敗します。PostgreSQLを代替に使用して検証を実施してください。
     - gsp-dba-maven-pluginは 2022年9月現在、Jakarta EE 9 に未対応です。
         - EclipseLink 3.0以降は、Jakarta EE 9 に対応されています。
           [Release Notes](https://www.eclipse.org/eclipselink/releases/3.0.php)
