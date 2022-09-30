@@ -185,13 +185,15 @@ testDB=db2
     * *プロジェクトのフルクリア・フルビルド*をすれば直ります。
 
 ## JPA簡易検証
+* DBにH2を指定した場合、JPA簡易テストで使用しているEclipseLinkの2.5.0が、H2の2.x系に未対応のため、テストに失敗します。PostgreSQLを代替に使用して検証を実施してください。
+    - gsp-dba-maven-pluginは 2022年9月現在、Jakarta EE 9 に未対応です。
+        - EclipseLink 3.0以降は、Jakarta EE 9 に対応されています。
+          [Release Notes](https://www.eclipse.org/eclipselink/releases/3.0.php)
+        - EclipseLink以外のJPA実装には、Hibernateがありますが、こちらはH2の 2.1.214 に対応されており、また、Jakarta EE 9 に対応されています。
+    - gsp-dba-maven-pluginが生成したエンティティに設定されているアノテーションがJPAの仕様通りであることを確認することが、JPA簡易検証の目的です。
+        - アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2以外のDB製品で確認しても問題ありません。
+        - JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
 
-* gsp-dba-maven-pluginは、指定したDBのテーブル情報から、エンティティクラスを自動生成します。この検証では、生成されたエンティティクラスに設定されたアノテーションがJPAの仕様に則っていることを担保します。
-* DBにH2を指定した場合、EclipseLinkが最新のH2に未対応のため、テストに失敗します。
-  * 自動生成されたエンティティに設定されているアノテーションがJPAの仕様通りであることをJPA簡易検証の目的としています。
-  * JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
-  * アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2以外のDB製品で確認しても問題ないため、H2ではなく、postgresqlを代替に使用して検証を実施してください。
-  * EclipseLink以外のJPA実装に、Hibernateがありますが、こちらは最新のH2(2.1.214)に対応しているバージョンは(Java EEから)Jakarta EE 9への対応がされており、別途変更が必要となります。
 * `integration-test`フェーズで実施。`maven-invoker-plugin`プラグインを使用。メインフォルダは[it](../src/it)フォルダ。
 * DB接続情報はMojoテストクラスで利用した[jdbc_test.properties](../src/test/resources/jdbc_test.properties)を使用。
 * [simple-jpa-test](../src/it/simple-jpa-test)プロジェクトを各DBごとで使い回して実行。
