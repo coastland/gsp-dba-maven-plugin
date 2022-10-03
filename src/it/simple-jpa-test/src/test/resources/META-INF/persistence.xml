@@ -5,20 +5,6 @@
 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 	version="2.1">
 
-	<persistence-unit name="persistence-h2"
-		transaction-type="RESOURCE_LOCAL">
-		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-		<jar-file>file:../classes</jar-file>
-		<properties>
-			<property name="javax.persistence.jdbc.driver" value="${h2.jdbcDriver}" />
-			<property name="javax.persistence.jdbc.url" value="${h2.url}" />
-			<property name="javax.persistence.jdbc.user" value="${h2.user}" />
-			<property name="javax.persistence.jdbc.password" value="${h2.password}" />
-			<property name="eclipselink.ddl-generation" value="none" />
-			<property name="eclipselink.logging.level" value="ALL" />
-		</properties>
-	</persistence-unit>
-
 	<persistence-unit name="persistence-oracle"
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
