@@ -185,17 +185,32 @@ testDB=db2
     * *プロジェクトのフルクリア・フルビルド*をすれば直ります。
 
 ## JPA簡易検証
-* DBにH2を指定した場合、JPA簡易検証で使用しているEclipseLinkの2.5.0が、H2の2.x系に未対応のため、テストに失敗します。PostgreSQLを代替に使用して検証を実施してください。
-    - gsp-dba-maven-pluginは 2022年9月現在、Jakarta EE 9 に未対応です。
-        - EclipseLink 3.0以降は、Jakarta EE 9 に対応されています。
-          [Release Notes](https://www.eclipse.org/eclipselink/releases/3.0.php)
-        - EclipseLink以外のJPA実装には、Hibernateがありますが、こちらはH2の 2.1.214 に対応されており、また、Jakarta EE 9 に対応されています。
-    - gsp-dba-maven-pluginが生成したエンティティに設定されているアノテーションがJPAの仕様通りであることを確認することが、JPA簡易検証の目的です。
-        - アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2以外のDB製品で確認しても問題ありません。
-        - JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
 
 * `integration-test`フェーズで実施。`maven-invoker-plugin`プラグインを使用。メインフォルダは[it](../src/it)フォルダ。
 * DB接続情報はMojoテストクラスで利用した[jdbc_test.properties](../src/test/resources/jdbc_test.properties)を使用。
 * [simple-jpa-test](../src/it/simple-jpa-test)プロジェクトを各DBごとで使い回して実行。
     1. 上記プロジェクトの[各DBのedmファイル](../src/it/simple-jpa-test/src/main/resources)をインプットにして、generate-ddl、execute-ddl、generate-entityを実行。
     1. [テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31)を実行。
+
+* DBにH2を使用する場合、[レガシーモードでJPA簡易検証を実施](#H2のレガシーモードでJPA簡易検証を実施する手順)してください。
+    * JPA簡易検証で使用しているJPA実装の EclipseLink 2.5.0 は、H2の2.x系に未対応のため、[テスト](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L580)に失敗します。
+        * 2022年10月現在、[EclipseLink 3.0](https://www.eclipse.org/eclipselink/releases/3.0.php) は、Jakarta EE 9 に対応していますが、gsp-dba-maven-pluginはJakarta EE 9 に未対応のため、使用できません。
+        * EclipseLink以外のJPA実装には、Hibernateがありますが、こちらはH2の 2.1.214 に対応していますが、EclipseLink 3.0 と同様にJakarta EE 9 に対応しているため、使用できません。
+    * gsp-dba-maven-pluginが生成したエンティティに設定されたアノテーションが、JPAの仕様通りであることを確認することが、JPA簡易検証の目的です。
+        * アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2以外のDB製品で確認しても問題ありません。
+        * JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
+
+### H2のレガシーモードでJPA簡易検証を実施する手順
+`maven-invoker-plugin`プラグインにより実行する[各ゴール](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L575-L580)を、mvnコマンドで直接実行します。
+
+1. `src/it/simple-jpa-test` に移動
+1. 以下のコマンドを実行
+    ```
+    mvn -P h2 -s ../../test/resources/settings.xml clean gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:generate-entity -Dh2.jdbcDriver=org.h2.Driver -Dgsp.version=4.6.0-SNAPSHOT -Dh2.user=gsptest -Dh2.password=gsptest -Dh2.adminUser=sa -Dh2.url=jdbc:h2:./target/gsp_test
+    ```
+    * H2のモードの指定無しで、gsp-dba-maven-plugin の generate-ddl, execute-ddl, generate-entity が実行されます。
+1. 以下のコマンドを実行
+    ```
+    mvn -P h2 -s ../../test/resources/settings.xml test -Dh2.jdbcDriver=org.h2.Driver -Dgsp.version=4.6.0-SNAPSHOT -Dh2.user=gsptest -Dh2.password=gsptest -Dh2.adminUser=sa -Dh2.url="jdbc:h2:./target/gsp_test;MODE=LEGACY"
+    ```
+    * H2のレガシーモードを指定して、[テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31) が実行されます。
