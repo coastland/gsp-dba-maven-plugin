@@ -98,6 +98,8 @@ public class DbTableMetaReaderWithView extends DbTableMetaReaderImpl {
         	String typeName = getObjectTypeName(metaData, tableMeta);
         	String tableName = tableMeta.getName();
 
+			// TABLE は H2 以外のDB用、BASE TABLE は H2 の 2.x 系用です。
+			// https://www.h2database.com/html/systemtables.html#information_schema_tables の TABLE_TYPE の値です。
         	if (!StringUtils.equals(typeName, "TABLE") && !StringUtils.equals(typeName, "BASE TABLE")) {
         		return Collections.emptyList();
         	}
