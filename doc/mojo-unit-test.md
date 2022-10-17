@@ -186,6 +186,7 @@ testDB=db2
 
 ## JPA簡易検証
 
+* 事前に、開発中の `gsp-dba-maven-plugin` をローカルリポジトリに install しておく必要があります。開発中のブランチで、`mvn install -DskipTests` を実施してください。
 * `integration-test`フェーズで実施。`maven-invoker-plugin`プラグインを使用。メインフォルダは[it](../src/it)フォルダ。
 * DB接続情報はMojoテストクラスで利用した[jdbc_test.properties](../src/test/resources/jdbc_test.properties)を使用。
 * [simple-jpa-test](../src/it/simple-jpa-test)プロジェクトを各DBごとで使い回して実行。
