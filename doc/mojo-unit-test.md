@@ -199,7 +199,8 @@ testDB=db2
         * EclipseLink 3.0 が H2 の 2.x系に対応している可能性はありますが、こちらも Jakarta EE 9 対応が入っているためいずれにせよ gsp-dba-maven-plugin では使用できません。
     * gsp-dba-maven-pluginが生成したエンティティに設定されたアノテーションが、JPAの仕様通りであることを確認することが、JPA簡易検証の目的です。
         * アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2のレガシーモードで確認しても問題ありません。
-        * JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
+        * JPAの仕様では、基本的にDB製品やDBのバージョンに依存しない形でアノテーションは設定できるようになっています。
+            * H2の [互換性の特徴](http://www.h2database.com/html/features.html#compatibility) により、モードをレガシーモードにすることで、バージョン 1.x系として動作させることができます。
 
 ### テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施する手順
 `maven-invoker-plugin`プラグインにより実行する[各ゴール](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L575-L580)を、mvnコマンドで直接実行します。
