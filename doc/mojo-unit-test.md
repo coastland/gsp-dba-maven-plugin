@@ -204,15 +204,30 @@ testDB=db2
 
 ### テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施する手順
 `maven-invoker-plugin`プラグインにより実行する[各ゴール](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L575-L580)を、mvnコマンドで直接実行します。
+コマンドプロンプト(Windows)を起動し、以下を実施してください。
+Linuxの場合、キャレット(^)をバックスラッシュ(\)に読み替えてください。
 
 1. `src/it/simple-jpa-test` に移動
 1. 以下のコマンドを実行
     ```
-    mvn -P h2 -s ../../test/resources/settings.xml clean gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:generate-entity -Dh2.jdbcDriver=org.h2.Driver -Dgsp.version=4.6.0-SNAPSHOT -Dh2.user=gsptest -Dh2.password=gsptest -Dh2.adminUser=sa -Dh2.url=jdbc:h2:./target/gsp_test
+    mvn -P h2 -s ../../test/resources/settings.xml clean ^
+    gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:generate-entity ^
+    -Dh2.jdbcDriver=org.h2.Driver ^
+    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dh2.user=gsptest ^
+    -Dh2.password=gsptest ^
+    -Dh2.adminUser=sa ^
+    -Dh2.url=jdbc:h2:./target/gsp_test
     ```
     * H2のモードの指定無しで、gsp-dba-maven-plugin の generate-ddl, execute-ddl, generate-entity が実行されます。
 1. 以下のコマンドを実行
     ```
-    mvn -P h2 -s ../../test/resources/settings.xml test -Dh2.jdbcDriver=org.h2.Driver -Dgsp.version=4.6.0-SNAPSHOT -Dh2.user=gsptest -Dh2.password=gsptest -Dh2.adminUser=sa -Dh2.url="jdbc:h2:./target/gsp_test;MODE=LEGACY"
+    mvn -P h2 -s ../../test/resources/settings.xml test ^
+    -Dh2.jdbcDriver=org.h2.Driver ^
+    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dh2.user=gsptest ^
+    -Dh2.password=gsptest ^
+    -Dh2.adminUser=sa ^
+    -Dh2.url="jdbc:h2:./target/gsp_test;MODE=LEGACY"
     ```
     * H2のレガシーモードを指定して、[テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31) が実行されます。
