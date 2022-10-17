@@ -192,7 +192,7 @@ testDB=db2
     1. 上記プロジェクトの[各DBのedmファイル](../src/it/simple-jpa-test/src/main/resources)をインプットにして、generate-ddl、execute-ddl、generate-entityを実行。
     1. [テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31)を実行。
 
-* DBにH2を使用する場合、[レガシーモードでJPA簡易検証を実施](#H2のレガシーモードでJPA簡易検証を実施する手順)してください。
+* DBにH2を使用する場合、[テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施](#テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施する手順)してください。
     * JPA簡易検証で使用しているJPA実装の EclipseLink 2.5.0 は、H2の2.x系に未対応のため、[テスト](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L580)に失敗します。
         * 2022年10月現在、[EclipseLink 3.0](https://www.eclipse.org/eclipselink/releases/3.0.php) は、Jakarta EE 9 に対応していますが、gsp-dba-maven-pluginはJakarta EE 9 に未対応のため、使用できません。
         * EclipseLink以外のJPA実装には、Hibernateがありますが、こちらはH2の 2.1.214 に対応していますが、EclipseLink 3.0 と同様にJakarta EE 9 に対応しているため、使用できません。
@@ -200,7 +200,7 @@ testDB=db2
         * アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2以外のDB製品で確認しても問題ありません。
         * JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
 
-### H2のレガシーモードでJPA簡易検証を実施する手順
+### テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施する手順
 `maven-invoker-plugin`プラグインにより実行する[各ゴール](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L575-L580)を、mvnコマンドで直接実行します。
 
 1. `src/it/simple-jpa-test` に移動
