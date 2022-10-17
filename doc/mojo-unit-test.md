@@ -193,9 +193,10 @@ testDB=db2
     1. [テストメソッド](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31)を実行。
 
 * DBにH2を使用する場合、[テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施](#テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施する手順)してください。
-    * JPA簡易検証で使用しているJPA実装の EclipseLink 2.5.0 は、H2の2.x系に未対応のため、[テスト](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L580)に失敗します。
-        * 2022年10月現在、[EclipseLink 3.0](https://www.eclipse.org/eclipselink/releases/3.0.php) は、Jakarta EE 9 に対応していますが、gsp-dba-maven-pluginはJakarta EE 9 に未対応のため、使用できません。
-        * EclipseLink以外のJPA実装には、Hibernateがありますが、こちらはH2の 2.1.214 に対応していますが、EclipseLink 3.0 と同様にJakarta EE 9 に対応しているため、使用できません。
+    * JPA簡易検証で使用しているJPA実装の EclipseLink 2.5.0 は、H2 の 2.x系に未対応のため、[テスト](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L580)に失敗します。
+        * Hibernate の 6系ならH2の 2.1.214 に対応していますが、Jakarta EE 9 の対応が入っているため使用できません。
+            * gsp-dba-maven-plugin は Jakarta EE 9 対応が入っていないため
+        * EclipseLink 3.0 が H2 の 2.x系に対応している可能性はありますが、こちらも Jakarta EE 9 対応が入っているためいずれにせよ gsp-dba-maven-plugin では使用できません。
     * gsp-dba-maven-pluginが生成したエンティティに設定されたアノテーションが、JPAの仕様通りであることを確認することが、JPA簡易検証の目的です。
         * アノテーションの設定はDB製品に依存しないため、JPAの仕様通りであるか確認することが目的ならH2以外のDB製品で確認しても問題ありません。
         * JPAの仕様では、基本的にDB製品に依存しない形でアノテーションは設定できるようになっています。
