@@ -204,9 +204,12 @@ testDB=db2
         * JPAの仕様では、基本的にDB製品やDBのバージョンに依存しない形でアノテーションは設定できるようになっています。
 
 ### テスト実行時のみH2をレガシーモードにしてJPA簡易検証を実施する手順
+
 `maven-invoker-plugin`プラグインにより実行する[各ゴール](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L575-L580)を、mvnコマンドで直接実行します。
+
 コマンドプロンプト(Windows)を起動し、以下を実施してください。
 Linuxの場合、キャレット(^)をバックスラッシュ(\)に読み替えてください。
+
 プロキシ環境下で行う場合は、コマンドで指定する [settings.xml](../src/test/resources/settings.xml) にプロキシの設定を追記してください。
 
 1. `src/it/simple-jpa-test` に移動
