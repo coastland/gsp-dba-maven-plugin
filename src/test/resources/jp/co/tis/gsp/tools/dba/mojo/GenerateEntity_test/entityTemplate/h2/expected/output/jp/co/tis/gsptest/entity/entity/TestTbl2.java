@@ -37,7 +37,7 @@ public class TestTbl2 implements Serializable {
      * @return TEST_TBL2_ID
      */
 // ENTITY_TEMPLATE_TEST!
-    @Column(name = "TEST_TBL2_ID", precision = 19, nullable = false, unique = false)
+    @Column(name = "TEST_TBL2_ID", precision = 64, nullable = false, unique = false)
     public Long getTestTbl2Id() {
         return testTbl2Id;
     }
@@ -57,7 +57,7 @@ public class TestTbl2 implements Serializable {
      */
 // ENTITY_TEMPLATE_TEST!
     @Id
-    @Column(name = "TEST_TBL1_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long getTestTbl1Id() {
         return testTbl1Id;
     }

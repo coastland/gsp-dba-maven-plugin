@@ -24,7 +24,7 @@ public class TestTbl1 implements Serializable {
 // templateFilePrimaryDir_TEST!
     @Id
     @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
-    @Column(name = "TEST_TBL1_ID", precision = 19, nullable = false, unique = true)
+    @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long testTbl1Id;
 
     /** TEST_NAME */

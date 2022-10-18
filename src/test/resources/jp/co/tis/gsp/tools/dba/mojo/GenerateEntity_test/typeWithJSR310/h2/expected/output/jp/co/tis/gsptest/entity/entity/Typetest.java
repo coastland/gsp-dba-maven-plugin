@@ -79,7 +79,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE1
      */
-    @Column(name = "TYPE1", precision = 19, nullable = true, unique = false)
+    @Column(name = "TYPE1", precision = 64, nullable = true, unique = false)
     public Long getType1() {
         return type1;
     }
@@ -97,7 +97,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE2
      */
-    @Column(name = "TYPE2", length = 2147483647, nullable = true, unique = false)
+    @Column(name = "TYPE2", length = 1, nullable = true, unique = false)
     public byte[] getType2() {
         return type2;
     }
@@ -134,7 +134,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE4
      */
-    @Column(name = "TYPE4", length = 2147483647, nullable = true, unique = false)
+    @Column(name = "TYPE4", length = 1, nullable = true, unique = false)
     public String getType4() {
         return type4;
     }
@@ -190,7 +190,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE7
      */
-    @Column(name = "TYPE7", precision = 65535, scale = 32767, nullable = true, unique = false)
+    @Column(name = "TYPE7", precision = 100000, nullable = true, unique = false)
     public BigDecimal getType7() {
         return type7;
     }
@@ -210,7 +210,7 @@ public class Typetest implements Serializable {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TYPE8", precision = 19, nullable = false, unique = true)
+    @Column(name = "TYPE8", precision = 64, nullable = false, unique = true)
     public Long getType8() {
         return type8;
     }
@@ -228,7 +228,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE9
      */
-    @Column(name = "TYPE9", precision = 10, nullable = true, unique = false)
+    @Column(name = "TYPE9", precision = 32, nullable = true, unique = false)
     public Integer getType9() {
         return type9;
     }
@@ -246,7 +246,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE10
      */
-    @Column(name = "TYPE10", length = 2147483647, nullable = true, unique = false)
+    @Column(name = "TYPE10", length = 1000000000, nullable = true, unique = false)
     public String getType10() {
         return type10;
     }
@@ -264,7 +264,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE11
      */
-    @Column(name = "TYPE11", precision = 7, nullable = true, unique = false)
+    @Column(name = "TYPE11", precision = 24, nullable = true, unique = false)
     public Float getType11() {
         return type11;
     }
@@ -282,7 +282,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE12
      */
-    @Column(name = "TYPE12", precision = 5, nullable = true, unique = false)
+    @Column(name = "TYPE12", precision = 16, nullable = true, unique = false)
     public Short getType12() {
         return type12;
     }
@@ -337,7 +337,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE15
      */
-    @Column(name = "TYPE15", length = 2147483647, nullable = true, unique = false)
+    @Column(name = "TYPE15", length = 1000000000, nullable = true, unique = false)
     public String getType15() {
         return type15;
     }
@@ -355,7 +355,7 @@ public class Typetest implements Serializable {
      *
      * @return TYPE16
      */
-    @Column(name = "TYPE16", length = 2147483647, nullable = true, unique = false)
+    @Column(name = "TYPE16", length = 1000000000, nullable = true, unique = false)
     public String getType16() {
         return type16;
     }
