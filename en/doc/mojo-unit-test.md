@@ -191,7 +191,7 @@ testDB=db2
     1. [edm file of each Db](../../src/it/simple-jpa-test/src/main/resources) of the above mentioned project is input and generate-ddl, execute-ddl and generate-entity are executed.
     1. Execute [Test method](../../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31).
 
-* When using H2 for DB, [Perform JPA simple verification by setting H2 to legacy mode only when running tests](#Perform JPA simple verification by setting H2 to legacy mode only when running tests).
+* When using H2 for DB, [Perform JPA simple verification by setting H2 to legacy mode only when running tests](#perform-jpa-simple-verification-by-setting-h2-to-legacy-mode-only-when-running-tests).
     * Since EclipseLink 2.5.0, the JPA implementation used for JPA simple verification, does not support 2.x series of H2, [test](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L580) fails.
         * Hibernate 6 series supports H2 2.1.214, but it cannot be used because it supports Jakarta EE 9.
             * Because gsp-dba-maven-plugin does not support Jakarta EE 9.
