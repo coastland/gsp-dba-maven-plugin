@@ -209,7 +209,7 @@ Run [each goals](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/po
 Start Command Prompt (Windows) and execute the following.
 For Linux, replace the caret (^) with a backslash (\\).
 
-If you use a proxy environment, add the proxy settings to [settings.xml](../src/test/resources/settings.xml) specified in the command.
+If you use a proxy environment, add the proxy settings to [settings.xml](../../src/test/resources/settings.xml) specified in the command.
 
 1. Go to `src/it/simple-jpa-test`
 1. Run the command below
