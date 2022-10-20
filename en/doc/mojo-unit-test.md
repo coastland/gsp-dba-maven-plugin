@@ -223,7 +223,7 @@ If you use a proxy environment, add the proxy settings to [settings.xml](../src/
     -Dh2.adminUser=sa ^
     -Dh2.url=jdbc:h2:./target/gsp_test
     ```
-    * Generate-ddl, execute-ddl, generate-entity of gsp-dba-maven-plugin are executed without specifying H2 mode.
+    * The goals (generate-ddl, execute-ddl and generate-entity) of gsp-dba-maven-plugin are executed without specifying H2 mode.
 1. Run the command below
     ```
     mvn -P h2 -s ../../test/resources/settings.xml test ^
