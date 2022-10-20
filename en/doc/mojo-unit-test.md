@@ -234,4 +234,4 @@ If you use a proxy environment, add the proxy settings to [settings.xml](../src/
     -Dh2.adminUser=sa ^
     -Dh2.url="jdbc:h2:./target/gsp_test;MODE=LEGACY"
     ```
-    * [test](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31) is run specifying H2's legacy mode.
+    * The [test](../src/it/simple-jpa-test/src/test/java/jp/co/tis/gsp/jpatest/AppTest.java#L31) is run specifying H2's legacy mode.
