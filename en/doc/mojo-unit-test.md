@@ -207,7 +207,7 @@ testDB=db2
 Run [each goals](https://github.com/coastland/gsp-dba-maven-plugin/blob/4.5.0/pom.xml#L575-L580) run by `maven-invoker-plugin` directly with the mvn command.
 
 Start Command Prompt (Windows) and execute the following.
-For Linux, replace the caret (^) with a backslash (\).
+For Linux, replace the caret (^) with a backslash (\\).
 
 If you use a proxy environment, add the proxy settings to [settings.xml](../src/test/resources/settings.xml) specified in the command.
 
