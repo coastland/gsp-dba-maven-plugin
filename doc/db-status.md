@@ -7,10 +7,10 @@
 
 本ツールを使用する場合、データベースによって以下の作業を事前に行なう必要があります。
 
-* MS SQL Server<br/>
+* SQL Server<br/>
   サーバー認証を許可するよう設定
 
-* DB2<br/>
+* Db2<br/>
   DB接続用のOSユーザアカウントを作成
 
 ### 対応状況の概要
@@ -19,15 +19,29 @@
 ○...実装済み
 ×...使用不可
 
-|                    | generate-ddl | execute-ddl | load-data | generate-entity | import-schema | export-schema |
-|:-------------------|:------------:|:-----------:|:---------:|:---------------:|:-------------:|:-------------:|
-| Oracle             | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| Solr               | ○           | ○          | ○        | ○              | ○            | ○            |
-| H2                 | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| MySql              | ◎           | ◎          | ○        | ◎              | ◎            | ◎            |
-| Postgresql         | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| MS SQL Server 2008 | ◎           | ◎          | ◎        | ◎              |◎|   ◎| 
-| DB2 10.5           | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
+|            | generate-ddl | execute-ddl | load-data | generate-entity | import-schema | export-schema |
+|:-----------|:------------:|:-----------:|:---------:|:---------------:|:-------------:|:-------------:|
+| Oracle     | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
+| Solr       | ○           | ○          | ○        | ○              | ○            | ○            |
+| H2         | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
+| MySQL      | ◎           | ◎          | ○        | ◎              | ◎            | ◎            |
+| PostgreSQL | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
+| SQL Server | ◎           | ◎          | ◎        | ◎              |◎|   ◎|
+| Db2        | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
+
+#### 動作確認済みバージョン
+* Oracle
+  * 18c / 19c / 21c
+* H2
+  * 2.1.214
+* MySQL
+  * 8.0
+* PostgreSQL
+  * 10.0 / 11.5 / 12.2 / 13.2 / 14.0
+* SQL Server
+  * 2017 / 2019
+* Db2
+  * 10.5 / 11.5
 
 
 ### load-dataの対応状況
@@ -62,7 +76,7 @@
 | VARCHAR2      | ○       | text                                                | - |
 
 
-**Postgresql**
+**PostgreSQL**
 
 カラムの型名を指定する必要はありません。
 
@@ -99,7 +113,7 @@
 | VARBIT    | ×       | -                            | -   |
 | VARCHAR   | ○       | text                          | -   |
 
-**MS SQL Server**
+**SQL Server**
 
 IDENTITYを指定したカラムは使用できません。<br />
 カラムの型名を指定する必要はありません。
@@ -139,7 +153,7 @@ IDENTITYを指定したカラムは使用できません。<br />
 | VARBINARY | ○ | 000101001100 | 16進数のビット表記 |
 | VARCHAR | ○ | text | - |
 
-**DB2**
+**Db2**
 
 IDENTITYを指定したカラムは使用できません。<br />
 カラムの型名を指定する必要はありません。
@@ -183,6 +197,6 @@ IDENTITYを指定したカラムは使用できません。<br />
 - DATE型
     - load-dataの制約上、OracleがDATE型で持つ時刻以下のデータは対象外となります。
 
-**SqlServer**
+**SQL Server**
 - BINARY型
     - 利用不可。
