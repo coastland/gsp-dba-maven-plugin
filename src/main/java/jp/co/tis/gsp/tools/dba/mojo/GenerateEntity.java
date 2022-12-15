@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import freemarker.core.XMLOutputFormat;
 import jp.co.tis.gsp.tools.db.beans.Erd;
 import jp.co.tis.gsp.tools.dba.dialect.Dialect;
 import jp.co.tis.gsp.tools.dba.dialect.DialectFactory;
@@ -147,9 +148,9 @@ public class GenerateEntity extends AbstractDbaMojo {
      */
     @Override
 	protected void executeMojoSpec() throws MojoExecutionException, MojoFailureException {
-        Configuration fmConfig = new Configuration();
+        Configuration fmConfig = new Configuration(Configuration.VERSION_2_3_31);
         fmConfig.setTemplateLoader(new ClassTemplateLoader(Erd.class, "/jp/co/tis/gsp/tools/dba/template/dicon"));
-        
+        fmConfig.setOutputFormat(XMLOutputFormat.INSTANCE);
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("driver", driver);
         param.put("url", url);
