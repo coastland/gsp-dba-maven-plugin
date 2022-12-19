@@ -39,7 +39,7 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 		<jar-file>file:../classes</jar-file>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="${mysql.jdbcDriver}" />
-			<property name="javax.persistence.jdbc.url" value="${mysql.url}" />
+			<property name="javax.persistence.jdbc.url" value="${mysql.reference.url}" />
 			<property name="javax.persistence.jdbc.user" value="${mysql.user}" />
 			<property name="javax.persistence.jdbc.password" value="${mysql.password}" />
 			<property name="eclipselink.ddl-generation" value="none" />
