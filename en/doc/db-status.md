@@ -35,7 +35,7 @@ To use this tool, the following tasks are required to be performed in advance de
 * H2
   * 2.1.214
 * MySQL
-  * 8.0
+  * 8.0 (MySQL connector uses 5.1.49)
 * PostgreSQL
   * 10.0 / 11.5 / 12.2 / 13.2 / 14.0
 * SQL Server
