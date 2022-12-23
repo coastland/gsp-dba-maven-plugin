@@ -110,12 +110,13 @@ public class OracleDialect extends Dialect {
 		    File dumpFile = params.getDumpFile();
 		    String user = params.getUser();
 		    String password = params.getPassword();
+			String specifier = params.getSpecifier();
 		    String schema = params.getSchema();
 
             createDirectory(user, password, dumpFile.getParentFile());
 			ProcessBuilder pb = new ProcessBuilder(
 					"expdp",
-					user + "/" + password,
+					user + "/" + password + specifier,
                     "directory=exp_dir",
 					"dumpfile=" + dumpFile.getName(),
 					"schemas=" + schema,
@@ -159,6 +160,7 @@ public class OracleDialect extends Dialect {
 
 		    String user = params.getAdminUser();
 		    String password = params.getAdminPassword();
+			String specifier = params.getSpecifier();
 		    String schema = params.getSchema();
 
             createDirectory(user, password, dumpFile.getParentFile());
@@ -168,7 +170,7 @@ public class OracleDialect extends Dialect {
             
 			ProcessBuilder pb = new ProcessBuilder(
 					"impdp",
-					user + "/" + password,
+					user + "/" + password + specifier,
                     "directory=exp_dir",
 					"dumpfile=" + dumpFile.getName(),
 					"schemas=" + schema,

@@ -111,6 +111,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	    
 	    param.setUser(user);
 	    param.setPassword(password);
+	    param.setSpecifier(specifier);
 	    param.setAdminUser(adminUser);
 	    param.setAdminPassword(adminPassword);
 	    param.setSchema(schema);

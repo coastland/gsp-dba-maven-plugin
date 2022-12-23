@@ -15,6 +15,8 @@ public class ImportParams {
 
     private String password;
 
+    private String specifier;
+
     private String schema;
 
     private File dumpFile;
@@ -59,6 +61,14 @@ public class ImportParams {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getSpecifier() {
+        return specifier;
+    }
+
+    public void setSpecifier(String specifier) {
+        this.specifier = specifier;
     }
 
     public String getSchema() {
