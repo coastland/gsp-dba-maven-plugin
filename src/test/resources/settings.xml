@@ -39,7 +39,6 @@
 				<db.anotherSchema>${oracle.anotherSchema}</db.anotherSchema>
 				<db.user>${oracle.user}</db.user>
 				<db.password>${oracle.password}</db.password>
-				<db.specifier>${oracle.specifier}</db.specifier>
 				<db.jdbcDriver>${oracle.jdbcDriver}</db.jdbcDriver>
 				<db.url>${oracle.url}</db.url>
 				<db.adminUser>${oracle.adminUser}</db.adminUser>

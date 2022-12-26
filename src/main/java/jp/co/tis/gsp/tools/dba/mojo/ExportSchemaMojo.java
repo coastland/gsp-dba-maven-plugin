@@ -59,7 +59,9 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
     @Parameter
     protected File extraDdlDirectory;
-    
+
+	private String specifier;
+
     /** エクスポートファイル構築用一時フォルダ */
     File outputDirectoryTemp;
    
@@ -83,7 +85,13 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 				throw new MojoExecutionException("Can't create dump output directory." + outputDirectoryTemp, e);
 			}
 		}
-		
+
+		if(url.split(":")[1].equals("oracle")) {
+			int beginIndex = url.indexOf("@");
+			String sub = url.substring(beginIndex);
+			specifier = sub.replace("@", "@//");
+		}
+
 		getLog().info(schema+"スキーマのExportを開始します。");
 
 		try {

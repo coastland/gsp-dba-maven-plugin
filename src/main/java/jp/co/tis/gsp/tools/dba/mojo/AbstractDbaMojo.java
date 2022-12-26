@@ -66,12 +66,6 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     @Parameter
     protected String password;
 
-    /**
-     * The specifier of database;
-     */
-    @Parameter
-    protected String specifier;
-
 	/**
 	 * The name of schema.
 	 */
@@ -135,12 +129,6 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
 
         Dialect dialect = DialectFactory.getDialect(url, driver);
         user = dialect.normalizeUserName(user);
-
-        if(url.split(":")[1].equals("oracle")) {
-            int beginIndex = url.indexOf("@");
-            String sub = url.substring(beginIndex);
-            specifier = sub.replace("@", "@//");
-        }
 
         if(schema == null){
             if (url.split(":")[1].equals("h2")) {
