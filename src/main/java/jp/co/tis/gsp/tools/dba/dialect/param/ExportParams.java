@@ -12,7 +12,7 @@ public class ExportParams {
 
     private String password;
 
-    private String specifier;
+    private String databaseSpecifier;
 
     private String schema;
 
@@ -58,12 +58,12 @@ public class ExportParams {
         this.password = password;
     }
 
-    public String getSpecifier() {
-        return specifier;
+    public String getDatabaseSpecifier() {
+        return databaseSpecifier;
     }
 
-    public void setSpecifier(String specifier) {
-        this.specifier = specifier;
+    public void setDatabaseSpecifier(String databaseSpecifier) {
+        this.databaseSpecifier = databaseSpecifier;
     }
 
     public String getSchema() {

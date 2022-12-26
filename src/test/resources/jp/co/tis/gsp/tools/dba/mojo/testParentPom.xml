@@ -22,6 +22,7 @@
 						<adminPassword>${db.adminPassword}</adminPassword>
 						<user>${db.user}</user>
 						<password>${db.password}</password>
+						<databaseSpecifier>${db.databaseSpecifier}</databaseSpecifier>
 						<schema>${db.schema}</schema>
 					</configuration>
 				</plugin>
