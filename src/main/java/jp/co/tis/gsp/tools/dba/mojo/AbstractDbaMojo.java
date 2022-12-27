@@ -126,10 +126,10 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     public final void execute() throws MojoExecutionException, MojoFailureException {
         registerOptionalDialect();
         setupEnvironments();
-
+        
         Dialect dialect = DialectFactory.getDialect(url, driver);
         user = dialect.normalizeUserName(user);
-
+        
         if(schema == null){
             if (url.split(":")[1].equals("h2")) {
                 schema = "PUBLIC";
