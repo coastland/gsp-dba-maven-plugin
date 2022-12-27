@@ -72,6 +72,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
     @Parameter(defaultValue = "${project.version}")
     protected String version;
 
+    @Parameter
+    protected String connectIdentifier;
+
     final protected String delimiter = ";";
     final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -91,7 +94,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
                 getLog().error("インポートするダンプファイルの取得に失敗しました。", e);
             }
         }
-        
+
         ImportParams params = createImportParams();
 
         JarFile jarFile = JarFileUtil.create(new File(localRepository.getBasedir(),
@@ -126,6 +129,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
 	    
 	    param.setUser(user);
 	    param.setPassword(password);
+	    param.setConnectIdentifier(connectIdentifier);
 	    param.setAdminUser(adminUser);
 	    param.setAdminPassword(adminPassword);
 	    param.setSchema(schema);

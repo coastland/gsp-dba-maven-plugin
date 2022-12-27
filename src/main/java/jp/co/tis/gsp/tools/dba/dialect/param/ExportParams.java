@@ -12,6 +12,8 @@ public class ExportParams {
 
     private String password;
 
+    private String connectIdentifier;
+
     private String schema;
 
     private File dumpFile;
@@ -54,6 +56,14 @@ public class ExportParams {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getConnectIdentifier() {
+        return connectIdentifier;
+    }
+
+    public void setConnectIdentifier(String connectIdentifier) {
+        this.connectIdentifier = connectIdentifier;
     }
 
     public String getSchema() {

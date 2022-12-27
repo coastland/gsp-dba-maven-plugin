@@ -59,7 +59,10 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 
     @Parameter
     protected File extraDdlDirectory;
-    
+
+    @Parameter
+    protected String connectIdentifier;
+
     /** エクスポートファイル構築用一時フォルダ */
     File outputDirectoryTemp;
    
@@ -83,7 +86,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 				throw new MojoExecutionException("Can't create dump output directory." + outputDirectoryTemp, e);
 			}
 		}
-		
+
 		getLog().info(schema+"スキーマのExportを開始します。");
 
 		try {
@@ -93,7 +96,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 		} catch (Exception e) {
 			throw new MojoExecutionException("データのExportに失敗しました。 ", e);
 		}
-        
+
         jarArchiver.addDirectory(outputDirectoryTemp);
         jarArchiver.setDestFile(new File(outputDirectory, jarName()));
         
@@ -108,9 +111,10 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
 	private ExportParams createExportParams() {
 	    ExportParams param = new ExportParams();
 	    File exportFile = new File(outputDirectoryTemp, StringUtils.defaultIfEmpty(dmpFile, schema + ".dmp"));
-	    
+
 	    param.setUser(user);
 	    param.setPassword(password);
+	    param.setConnectIdentifier(connectIdentifier);
 	    param.setAdminUser(adminUser);
 	    param.setAdminPassword(adminPassword);
 	    param.setSchema(schema);
