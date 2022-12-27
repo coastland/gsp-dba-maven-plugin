@@ -70,7 +70,7 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
      * The specifier of database;
      */
     @Parameter
-    protected String databaseSpecifier;
+    protected String connectIdentifier;
 
 	/**
 	 * The name of schema.
