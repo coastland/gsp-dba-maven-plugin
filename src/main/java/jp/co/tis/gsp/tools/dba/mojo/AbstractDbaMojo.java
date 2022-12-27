@@ -66,12 +66,6 @@ public abstract class AbstractDbaMojo extends AbstractMojo {
     @Parameter
     protected String password;
 
-    /**
-     * The specifier of database;
-     */
-    @Parameter
-    protected String connectIdentifier;
-
 	/**
 	 * The name of schema.
 	 */

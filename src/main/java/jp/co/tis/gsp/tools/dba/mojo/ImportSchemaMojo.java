@@ -72,6 +72,9 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
     @Parameter(defaultValue = "${project.version}")
     protected String version;
 
+    @Parameter(defaultValue = "${project.connectIdentifier}")
+    protected String connectIdentifier;
+
     final protected String delimiter = ";";
     final Charset UTF8 = Charset.forName("UTF-8");
 
