@@ -28,7 +28,6 @@
 						<adminPassword>${db.adminPassword}</adminPassword>
 						<user>${db.user}</user>
 						<password>${db.password}</password>
-						<connectIdentifier>${db.connectIdentifier}</connectIdentifier>
 						<schema>${db.schema}</schema>
 
 						<!-- generate-ddl -->
