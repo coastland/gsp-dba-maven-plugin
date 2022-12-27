@@ -60,7 +60,7 @@ public class ExportSchemaMojo extends AbstractDbaMojo {
     @Parameter
     protected File extraDdlDirectory;
 
-    @Parameter(defaultValue = "${project.connectIdentifier}")
+    @Parameter
     protected String connectIdentifier;
 
     /** エクスポートファイル構築用一時フォルダ */

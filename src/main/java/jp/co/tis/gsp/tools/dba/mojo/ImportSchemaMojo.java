@@ -72,7 +72,7 @@ public class ImportSchemaMojo extends AbstractDbaMojo {
     @Parameter(defaultValue = "${project.version}")
     protected String version;
 
-    @Parameter(defaultValue = "${project.connectIdentifier}")
+    @Parameter
     protected String connectIdentifier;
 
     final protected String delimiter = ";";
