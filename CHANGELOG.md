@@ -7,9 +7,8 @@
 #### 変更
 - H2 Database のバージョンを 2.1.214 に更新しました。
 - JDBC接続URLに複数のオプションを指定した場合に動作するように変更しました。
-- Oracle18c 以降のバージョンで動作するよう変更しました。
-  - 接続文字列の指定ができるように変更しました。
-    接続文字列は Oracle の export-schema と import-schema のゴールで指定する必要があります。
+- Oracle18c 以降のバージョンでexport-schema、import-schemaを実行できるよう対応しました。
+  - Oracle18c以降ではexport-schema、import-schemaのゴールを実行する際に接続文字列を必要としますが、今までは接続文字列を設定することができなかったため処理に失敗していました。接続文字列を設定できるようにすることでOracle18c以降のバージョンでexport-schema、import-schemaが正常に実行できるよう対応しました。
 
 ## 4.5.0 (2022-03-24)
 ### 更新内容
