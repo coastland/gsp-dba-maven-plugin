@@ -193,6 +193,7 @@ MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](
 | adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
 | user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。PostgreSQLの場合は常に小文字に変換して処理されます。|
 | password       | ×     | userに設定したユーザのパスワード。                             |
+|connectIdentifier| ×    | 接続文字列。Oracle の export-schema と import-schema のゴールで指定が必要になります。<br />export-schema では[データ・ポンプ・エクスポート](https://docs.oracle.com/cd/E96517_01/sutil/oracle-data-pump-export-utility.html#GUID-D5455260-C28C-475F-9E0E-2BE227E7F0E3)を、impport-schema では [データ・ポンプ・インポート](https://docs.oracle.com/cd/E96517_01/sutil/datapump-import-utility.html#GUID-D34AA2AC-DD27-4557-98AC-CE9A3AC21E35)を使用しています。 <br /> 例) pdb1 → pdb1というPDBを指定する場合。<br /> 例) localhost:1521/XEPDB1 → ホスト、ポート、XEPDB1というPDBを指定する場合。|
 | schema         | ×     | データベースのスキーマ名。<br />H2Databaseの場合は指定不可、常にPUBLICスキーマとして解釈します。<br /> MySQLの場合は指定不可、jdbcのURLのデータベース名をスキーマ名として設定します。<br /> 例）jdbc:mysql://localhost:3306/gspdb → gspdbをスキーマ名として内部で使用します。<br /> それ以外のDBでスキーマを指定しない場合はユーザ名と同じスキーマ名を使用すると解釈されます。 PostgreSQLの場合は常に小文字に、H2、DB2、Oracleの場合は常に大文字に変換して処理されます。|
 | dmpFile        | ×     | ダンプファイル名。指定しなかった場合、[スキーマ名].dmpとなる。 |
 |optionalDialects | ×    | 使用する[ダイアレクトクラス](#lnk_dialect)のFQCN。|
