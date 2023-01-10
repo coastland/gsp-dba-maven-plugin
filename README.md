@@ -538,6 +538,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 | outputDirectory        | ×     | データベーススキーマをエクスポートするディレクトリのパス。デフォルトは”target/dump”。 |
 | ddlDirectory           | ×     | [汎用モード](#汎用モード)で利用。 DDLディレクトリを指定する。                                  |
 | extraDdlDirectory      | ×     | [汎用モード](#汎用モード)で利用。 追加DDLディレクトリを指定する。                              |
+| connectIdentifier      | ×     | データ・ポンプ・エクスポートユーティリティの起動時に指定する接続文字列。Oracle の場合、指定が必要になります。また、Oracle 以外では指定が無視されます。[接続文字列には接続識別子を指定できます](https://docs.oracle.com/cd/E96517_01/sutil/oracle-data-pump-export-utility.html#GUID-72973E3D-FC0A-47E8-A62A-6DF8AD83138D)。|
 
 #### <a name="exportSchemaGeneral"> 汎用モード
 - DB2とSQLServerの場合に動作するエクスポート処理の挙動で、DBMS固有のエクスポート機能を使用しません。
@@ -588,6 +589,7 @@ DBMS固有のエクスポート機能を内部で呼び出すことで実現し�
 | groupId                | ×     | ダンプファイルのグループID。デフォルトは、プロジェクトのグループID。                  |
 | artifactId             | ×     | ダンプファイルのアーティファクトID。デフォルトは、プロジェクトのアーティファクトID。  |
 | version                | ×     | ダンプファイルのバージョン。デフォルトは、プロジェクトのバージョン。                  |
+| connectIdentifier      | ×     | データ・ポンプ・インポートユーティリティの起動時に指定する接続文字列。Oracle の場合、指定が必要になります。また、Oracle 以外では指定が無視されます。[接続文字列には接続識別子を指定できます](https://docs.oracle.com/cd/E96517_01/sutil/datapump-import-utility.html#GUID-AF614D9B-71B1-4234-AD0D-D33B53A16A6E)。|
 
 #### <a name="importSchemaGeneral"> 汎用モード
 - DB2とSQLServerの場合は汎用モードのエクスポートとなるため、それを取り込むことでスキーマのインポートとなります。
