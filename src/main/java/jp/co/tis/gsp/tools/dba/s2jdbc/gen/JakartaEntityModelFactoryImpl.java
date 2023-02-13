@@ -1,5 +1,8 @@
 package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import org.seasar.extension.jdbc.gen.desc.AssociationType;
 import org.seasar.extension.jdbc.gen.desc.EntityDesc;
 import org.seasar.extension.jdbc.gen.internal.model.EntityModelFactoryImpl;
@@ -11,23 +14,24 @@ import org.seasar.extension.jdbc.gen.model.CompositeUniqueConstraintModelFactory
 import org.seasar.extension.jdbc.gen.model.EntityModel;
 
 import jakarta.annotation.Generated;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.Lob;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
+import jakarta.persistence.Lob;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
@@ -73,10 +77,10 @@ public class JakartaEntityModelFactoryImpl extends EntityModelFactoryImpl {
                             .addImportName(model, GeneratedValue.class);
                     classModelSupport
                             .addImportName(model, GenerationType.class);
-                    if (attr.getGenerationType() == GenerationType.SEQUENCE) {
+                    if (attr.getGenerationType() == javax.persistence.GenerationType.SEQUENCE) {
                         classModelSupport.addImportName(model,
                                 SequenceGenerator.class);
-                    } else if (attr.getGenerationType() == GenerationType.TABLE) {
+                    } else if (attr.getGenerationType() == javax.persistence.GenerationType.TABLE) {
                         classModelSupport.addImportName(model,
                                 TableGenerator.class);
                     }
@@ -104,8 +108,14 @@ public class JakartaEntityModelFactoryImpl extends EntityModelFactoryImpl {
             if (associationType == AssociationType.ONE_TO_MANY) {
                 classModelSupport.addImportName(model, List.class);
             }
-            classModelSupport.addImportName(model, associationType
-                    .getAnnotation());
+
+            Class<? extends Annotation> associationTypeClass = switch (associationType) {
+                case ONE_TO_MANY -> OneToMany.class;
+                case ONE_TO_ONE -> OneToOne.class;
+                case MANY_TO_ONE -> ManyToOne.class;
+            };
+            classModelSupport.addImportName(model, associationTypeClass);
+            
             if (asso.getJoinColumnModel() != null) {
                 classModelSupport.addImportName(model, JoinColumn.class);
             }
