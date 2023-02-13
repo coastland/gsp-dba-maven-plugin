@@ -22,8 +22,8 @@ import jp.co.tis.gsp.tools.db.beans.Erd;
 import jp.co.tis.gsp.tools.db.beans.ForeignKey;
 import org.junit.Test;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.File;
 
 /**

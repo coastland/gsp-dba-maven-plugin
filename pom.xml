@@ -75,9 +75,10 @@
     <properties>
         <seasarVersion>2.4.46</seasarVersion>
         <mavenVersion>3.0.5</mavenVersion>
-        <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
+        <mavenPluginPluginVersion>3.7.1</mavenPluginPluginVersion>
         <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
         <builtByUser>${user.name}</builtByUser>
+        <jakarta-xml-binding.ci.version>4.0.1</jakarta-xml-binding.ci.version>
     </properties>
 
     <prerequisites>
@@ -169,8 +170,8 @@
                     <version>3.2</version>
                     <configuration>
                         <!-- 依存モジュールJDK8以降のものが存在するためビルドはJDK8で行う -->
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>17</source>
+                        <target>17</target>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
@@ -190,6 +191,24 @@
     </repositories>
 
     <dependencies>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>${jakarta-xml-binding.ci.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>${jakarta-xml-binding.ci.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>2.1.1</version>
+      </dependency>
+
       <dependency>
         <groupId>org.seasar.doma</groupId>
         <artifactId>doma</artifactId>
@@ -543,7 +562,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.7.6.201602180812</version>
+                        <version>0.8.8</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>

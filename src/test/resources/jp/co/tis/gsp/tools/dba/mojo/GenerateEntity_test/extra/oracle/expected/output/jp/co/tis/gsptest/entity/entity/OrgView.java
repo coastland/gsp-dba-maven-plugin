@@ -1,7 +1,7 @@
 package jp.co.tis.gsptest.entity.entity;
 
+import jakarta.annotation.Generated;
 import java.io.Serializable;
-import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
