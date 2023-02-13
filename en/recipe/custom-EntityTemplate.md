@@ -73,11 +73,11 @@ The following entities are output for this template:
 ```java
 package com.example.entity;
 
+import jakarta.annotation.Generated;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.io.Serializable;
-import javax.annotation.Generated;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 @Generated("GSP_CUSTOM")
 @Entity
