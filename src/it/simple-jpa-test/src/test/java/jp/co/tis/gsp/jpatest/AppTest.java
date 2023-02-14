@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Assert;
@@ -119,6 +120,7 @@ public class AppTest extends AbstractJpaTest {
 		assertThat(findTestOrder.getOrderDate(), is(df.parse("2011/01/01")));
 		
 		List<OrderDetail> odList = findTestOrder.getOrderDetailList();
+		odList.sort(Comparator.comparing(OrderDetail::getDetailId));
 		
 		assertThat(odList.size(), is(2));
 		
