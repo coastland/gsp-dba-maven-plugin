@@ -7,6 +7,8 @@ import static org.junit.Assert.assertThat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -106,20 +108,18 @@ public class AppTest extends AbstractJpaTest {
 		entityManager.flush();
 		entityManager.refresh(order);
 		
-		
 		List<TestOrder> ordersOfQuery = entityManager.createQuery("SELECT T FROM " + TestOrder.class.getSimpleName() + " T").getResultList();
 		assertThat(ordersOfQuery.size(), is(1));
-		
 		long assertOrderId = order.getOrderId();
 		TestOrder findTestOrder = entityManager.find(TestOrder.class, assertOrderId);
 		Assert.assertNotNull(findTestOrder);
 		
 		assertThat(findTestOrder.getOrderId(), is(assertOrderId));
 		assertThat(findTestOrder.getCustomerId(), is(customer1.getCustomerId()));
-		assertThat(findTestOrder.getOrderDate(), is(df.parse("2011/01/01")));
+		assertThat(normalize(findTestOrder.getOrderDate()), is(df.parse("2011/01/01")));
 		
 		List<OrderDetail> odList = findTestOrder.getOrderDetailList();
-		
+		odList.sort(Comparator.comparing(OrderDetail::getDetailId));
 		assertThat(odList.size(), is(2));
 		
 		assertThat(odList.get(0).getProductId(), is(product1.getProductId()));
@@ -135,17 +135,28 @@ public class AppTest extends AbstractJpaTest {
 		odList.get(0).setUnitPrice(900);
 
 		entityManager.persist(findTestOrder);
-		
 		long assertOrderId2 = findTestOrder.getOrderId();
 		TestOrder findTestOrder2 = entityManager.find(TestOrder.class, assertOrderId2);
-		assertThat(findTestOrder2.getOrderDate(), is(df.parse("2012/02/02")));
+		assertThat(normalize(findTestOrder2.getOrderDate()), is(df.parse("2012/02/02")));
 		assertThat(findTestOrder2.getOrderDetailList().get(0).getUnitPrice(), is(900));
 		
 		entityManager.remove(findTestOrder2);
-		
 		TestOrder findTestOrder3 = entityManager.find(TestOrder.class, assertOrderId2);
 		Assert.assertNull(findTestOrder3);
 
+	}
+
+	/**
+	 * dateの実体がTimestamp型だと equals の比較に失敗する可能性があるので※、確実に java.util.Date に正規化する。
+	 * <p>
+	 * ※Timestampのequalsは、相手の型がTimestampでなければその時点でfalseを返す
+	 * </p>
+	 * 
+	 * @param date 変換対象のdate
+	 * @return 同じ時間を持つjava.util.Date
+	 */
+	private Date normalize(Date date) {
+		return new Date(date.getTime());
 	}
 
 }

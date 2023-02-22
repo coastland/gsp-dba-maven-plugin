@@ -65,121 +65,6 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 </pluginManagement>
 ```
 
-### Java11での設定
-
-Java11で使用する場合pom.xmlに以下の設定を追加してください。
-
-```xml
-<pluginManagement>
-  <plugins>
-    <plugin>
-      <groupId>jp.co.tis.gsp</groupId>
-      <artifactId>gsp-dba-maven-plugin</artifactId>
-      <!-- Java11で使用できるgsp-dba-maven-pluginのバージョンは4.4.0以降です。 -->
-      <version>4.4.0</version>
-      <dependencies>
-        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
-        <dependency>
-          <groupId>com.oracle</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <version>11.2.0.2.0</version>
-        </dependency>
-        <!-- 以下を追加するようにしてください。 -->
-        <dependency>
-          <groupId>javax.activation</groupId>
-          <artifactId>javax.activation-api</artifactId>
-          <version>1.2.0</version>
-        </dependency>
-        <dependency>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-          <version>2.3.0</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-core</artifactId>
-          <version>2.3.0</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-          <version>2.3.0</version>
-        </dependency>
-        <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-          <version>1.3.2</version>
-        </dependency>
-      </dependencies>
-    </plugin>
-  </plugins>
-</pluginManagement>
-```
-
-### Java17での設定
-
-Java17で使用する場合、以下2つの対応が必要になります。
-
-- pom.xmlに依存関係を追加する
-- MavenのJVMオプションに--add-opensを追加する
-
-#### pom.xmlに依存関係を追加する
-
-pom.xmlに以下の設定を追加してください。
-
-なお、 [Java11での設定](#Java11での設定) との違いは、以下の2点になります。
-
-- `jaxb-impl` のバージョンに `2.3.5` を指定する
-- `jaxb-api` のアーティファクトを外す
-    - `jaxb-impl` の `2.3.5` が、 `jakarta.xml.bind-api` という別のアーティファクトを推移的に使用するため
-
-```xml
-<pluginManagement>
-  <plugins>
-    <plugin>
-      <groupId>jp.co.tis.gsp</groupId>
-      <artifactId>gsp-dba-maven-plugin</artifactId>
-      <!-- Java17で使用できるgsp-dba-maven-pluginのバージョンは4.4.0以降です。 -->
-      <version>4.4.0</version>
-      <dependencies>
-        <!-- プロジェクトで使用するDB製品にあわせたJDBCドライバに修正してください。 -->
-        <dependency>
-          <groupId>com.oracle</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <version>11.2.0.2.0</version>
-        </dependency>
-        <!-- 以下を追加するようにしてください。 -->
-        <dependency>
-          <groupId>javax.activation</groupId>
-          <artifactId>javax.activation-api</artifactId>
-          <version>1.2.0</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-core</artifactId>
-          <version>2.3.0</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-          <version>2.3.5</version>
-        </dependency>
-        <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-          <version>1.3.2</version>
-        </dependency>
-      </dependencies>
-    </plugin>
-  </plugins>
-</pluginManagement>
-```
-
-#### MavenのJVMオプションに--add-opensを追加する
-
-MavenのJVMオプションに、 `--add-opens java.base/java.lang=ALL-UNNAMED` を設定してください。
-MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](https://maven.apache.org/configure.html#maven_opts-environment-variable)。
-
 ### ゴール共通のパラメータ
 
 以下のパラメータは全てのゴールで共通です。
@@ -468,6 +353,25 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 </plugins>
 ```
 
+また、MavenのJVMオプションに `--add-opens java.base/java.lang=ALL-UNNAMED` を設定してください。
+MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](https://maven.apache.org/configure.html#maven_opts-environment-variable)。
+
+生成されたエンティティをコンパイル対象に含める場合は、エンティティに付与されるアノテーションをプロジェクトの`dependencies`に追加する必要があります。
+以下2つの`depenedency`を追加してください。
+
+```xml
+<dependency>
+  <groupId>jakarta.annotation</groupId>
+  <artifactId>jakarta.annotation-api</artifactId>
+  <version>2.1.1</version>
+</dependency>
+
+<dependency>
+  <groupId>jakarta.persistence</groupId>
+  <artifactId>jakarta.persistence-api</artifactId>
+  <version>3.1.0</version>
+</dependency>
+```
 
 #### 使用可能なパラメータ
 

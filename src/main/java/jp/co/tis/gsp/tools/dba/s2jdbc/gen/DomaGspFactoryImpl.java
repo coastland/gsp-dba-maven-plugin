@@ -18,7 +18,7 @@ package jp.co.tis.gsp.tools.dba.s2jdbc.gen;
 
 import java.io.Serializable;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import jp.co.tis.gsp.tools.dba.mojo.ExtendedGenerateEntityCommand;
 import org.seasar.doma.Column;

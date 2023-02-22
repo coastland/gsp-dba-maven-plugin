@@ -1,11 +1,11 @@
 package jp.co.tis.gsptest.entity.entity;
 
+import jakarta.annotation.Generated;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
-import javax.annotation.Generated;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Table;
