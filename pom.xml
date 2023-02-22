@@ -169,7 +169,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.2</version>
                     <configuration>
-                        <!-- 依存モジュールJDK8以降のものが存在するためビルドはJDK8で行う -->
                         <source>17</source>
                         <target>17</target>
                         <encoding>UTF-8</encoding>
