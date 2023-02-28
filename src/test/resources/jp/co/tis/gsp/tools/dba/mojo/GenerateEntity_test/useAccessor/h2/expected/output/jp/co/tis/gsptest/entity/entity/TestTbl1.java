@@ -4,8 +4,6 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -22,7 +20,6 @@ public class TestTbl1 implements Serializable {
 
     /** TEST_TBL1_ID */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long testTbl1Id;
 

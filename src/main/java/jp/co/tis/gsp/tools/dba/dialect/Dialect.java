@@ -197,7 +197,7 @@ public abstract class Dialect {
 	}
 
     public GenerationType getGenerationType() {
-        return GenerationType.IDENTITY;
+        return null;
     }
 
 	public List<AlternativeGenerator> getAlternativeGenerators() {

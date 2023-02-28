@@ -4,23 +4,25 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
- * INDEX_TEST1
+ * SEQUENCE_TEST
  *
  */
 @Generated("GSP")
 @Entity
-@Table(schema = "PUBLIC", name = "INDEX_TEST1", uniqueConstraints = { @UniqueConstraint(columnNames = { "SUB_ID_1", "SUB_ID_2" }) })
-public class IndexTest1 implements Serializable {
+@Table(schema = "PUBLIC", name = "SEQUENCE_TEST")
+public class SequenceTest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** INDEX_TEST1_ID */
-    private Long indexTest1Id;
+    /** SEQUENCE_TEST_ID */
+    private Long sequenceTestId;
 
     /** SUB_ID_1 */
     private Long subId1;
@@ -28,23 +30,25 @@ public class IndexTest1 implements Serializable {
     /** SUB_ID_2 */
     private Long subId2;
     /**
-     * INDEX_TEST1_IDを返します。
+     * SEQUENCE_TEST_IDを返します。
      *
-     * @return INDEX_TEST1_ID
+     * @return SEQUENCE_TEST_ID
      */
     @Id
-    @Column(name = "INDEX_TEST1_ID", precision = 64, nullable = false, unique = true)
-    public Long getIndexTest1Id() {
-        return indexTest1Id;
+    @GeneratedValue(generator = "PUBLIC.SEQUENCE_TEST_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "PUBLIC.SEQUENCE_TEST_ID_SEQ", sequenceName = "PUBLIC.SEQUENCE_TEST_ID_SEQ", initialValue = 1, allocationSize = 1)
+    @Column(name = "SEQUENCE_TEST_ID", precision = 64, nullable = false, unique = true)
+    public Long getSequenceTestId() {
+        return sequenceTestId;
     }
 
     /**
-     * INDEX_TEST1_IDを設定します。
+     * SEQUENCE_TEST_IDを設定します。
      *
-     * @param indexTest1Id INDEX_TEST1_ID
+     * @param sequenceTestId SEQUENCE_TEST_ID
      */
-    public void setIndexTest1Id(Long indexTest1Id) {
-        this.indexTest1Id = indexTest1Id;
+    public void setSequenceTestId(Long sequenceTestId) {
+        this.sequenceTestId = sequenceTestId;
     }
     /**
      * SUB_ID_1を返します。

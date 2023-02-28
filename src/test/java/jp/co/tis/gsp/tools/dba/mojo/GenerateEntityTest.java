@@ -891,4 +891,52 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
 
         }
     }
+
+
+    /**
+     * DialectのgetGenerationTypeでSEQUENCEを返した場合のテスト。
+     *
+     * <h4>検証内容</h4>
+     * <ul>
+     * <li>getGenerationTypeがSEQUENCEを返すカスタムのDialectをoptionalDialectsで指定する</li>
+     * <li>IDカラムにSEQUENCE用の{@code @GeneratedValue}と{@code @SequenceGenerator}が設定されることを検証</li>
+     * </ul>
+     *
+     * <h4>検証結果</h4>
+     * <ul>
+     * <li>期待値Entityファイルと同一であること。</li>
+     * </ul>
+     *
+     * @throws Exception
+     */
+    @Test
+    @TestDBPattern(testCase = "generationTypeSequence", testDb = { TestDB.h2 })
+    public void testGenerationTypeSequence() throws Exception {
+
+        // 指定されたケース及びテスト対象のDBだけループ
+        for (MojoTestFixture mf : mojoTestFixtureList) {
+
+            // テストケース対象プロジェクトのpom.xmlを取得
+            File pom = new File(getTestCaseDBPath(mf) + "/pom.xml");
+
+            // 先にインプットになるテーブル定義を作成するためexecute-ddl
+            ExecuteDdlMojoTest ddlTest = new ExecuteDdlMojoTest();
+            ddlTest.setUp();
+            ExecuteDdlMojo ddlMojo = ddlTest.lookupConfiguredMojo(pom, EXECUTE_DDL, mf.testDb);
+            ddlMojo.execute();
+
+            // pom.xmlより指定ゴールのMojoを取得し実行。Mavenプロファイルを指定する(DB)
+            GenerateEntity mojo = this.lookupConfiguredMojo(pom, GENERATE_ENTITY, mf.testDb);
+            mojo.execute();
+
+            assertTrue(true);
+
+            // 検証
+            String actualPath = mojo.javaFileDestDir.getAbsolutePath();
+            Entry actualFiles = DirUtil.collectEntry(actualPath);
+            Entry expectedFiles = DirUtil.collectEntry(getExpectedPath(mf) + FS + "output");
+            assertThat("TestDb:" + mf.testDb, actualFiles.equals(expectedFiles), is(true));
+
+        }
+    }
 }

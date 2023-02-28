@@ -34,3 +34,31 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 |@OneToMany|「1対多」で結合することを表します。|テスト1が対象<br/>![relation](image/relation.png)|
 |@JoinColumn|テーブルを結合する際に使用する外部キーを表します。<br/>使用される属性は以下の通り<br/>・name:対象テーブルを結合するために使用する外部キーカラム名<br/>・referencedColumnName:外部キーカラムによって参照された結合先テーブルのカラム名|テスト2が対象<br/>![relation](image/relation.png)|
 |@JoinColumns|複合主キーを使用して結合されることを表します。@JoinColumnを要素として複数持ちます。|テスト2が対象<br/>![joinColumns](image/joinColumns.png)|
+
+### 主キーのプロパティに設定されるアノテーションについて
+
+ここでは、デフォルトのテンプレートファイル([gsp_entity.ftl](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl))を使用した場合に主キーのプロパティに設定されるアノテーションの仕様について説明します。
+
+まず、`@Id`は主キーであれば必ず設定されます。
+
+次に、カラムの値がデータベースによって自動採番される場合は、`@GeneratedValue(strategy = GenerationType.IDENTITY)`が設定されます。
+ただし、Oracleの場合は自動採番されるカラムかどうかの判定ができないため、自動採番が設定されたカラムであってもこのアノテーションは設定されません。
+これは、自動採番されるカラムかどうかの判定に`ResultSetMetaData`の`isAutoIncrement`が内部的に使用されていますが、OracleのJDBCの実装ではこのメソッドが常に`false`を返すようになっているためです。
+
+自動採番されないカラムの場合は、`Dialect`の`getGenerationType`メソッドが返す値によって次のようにアノテーションが設定されます。
+
+- `GenerationType.SEQUENCE`を返す場合
+    - 以下2つのアノテーションが設定されます
+        - `@GeneratedValue(generator = "{sequenceName}", strategy = GenerationType.AUTO)`
+        - `@SequenceGenerator(name = "{sequenceName}", sequenceName = "{sequenceName}", initialValue = 1, allocationSize = {allocationSize})`
+    - `{sequenceName}`には`スキーマ名.カラム名_SEQ`という名前が設定されます（例：`PUBLIC.ID_SEQ`）
+    - `{allocationSize}`には[generate-entityのパラメータ](../README.md#使用可能なパラメータ-3)で指定した`allocationSize`が設定されます（デフォルトは1）
+- `GenerationType.IDENTITY`を返す場合
+    - `@GeneratedValue(strategy = GenerationType.IDENTITY)`が設定されます
+- それ以外の場合
+    - 追加のアノテーションは設定されません
+
+デフォルトでは、`Dialect`の`getGenerationType`は`null`を返します。
+
+`null`以外の`GenerationType`を返すようにしたい場合は、カスタムの`Dialect`を作成して差し替えてください。
+`Dialect`を差し替える方法については[Dialectクラスのカスタマイズ例](custom-Dialect.md)を参照してください。

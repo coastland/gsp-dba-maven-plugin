@@ -4,8 +4,6 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -35,7 +33,6 @@ public class IndexTest1 implements Serializable {
      * @return INDEX_TEST1_ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "index_test1_id", precision = 19, nullable = false, unique = true)
     public Long getIndexTest1Id() {
         return indexTest1Id;
