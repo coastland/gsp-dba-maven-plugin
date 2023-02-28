@@ -37,7 +37,7 @@ generate-entity時に生成されるエンティティで使用されるアノ�
 
 ### 主キーのプロパティに設定されるアノテーションについて
 
-ここでは、デフォルトのテンプレートファイル(`java/gsp_entity.ftl`)を使用した場合に主キーのプロパティに設定されるアノテーションの仕様について説明します。
+ここでは、デフォルトのテンプレートファイル([gsp_entity.ftl](../src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes/java/gsp_entity.ftl))を使用した場合に主キーのプロパティに設定されるアノテーションの仕様について説明します。
 
 まず、`@Id`は主キーであれば必ず設定されます。
 
