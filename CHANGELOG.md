@@ -11,6 +11,13 @@
   - JDBC接続URLに複数のオプションを"&"で繋げたURLを指定した場合、generate-entityのゴールを実行する際、中間ファイルとして生成されるXMLに"&"がそのまま出力されてXMLのパースに失敗していました。複数オプションを指定しても正常に処理できるよう"&"をエスケープして出力するように対応しました。
 - Oracle18c 以降のバージョンでexport-schema、import-schemaを実行できるよう対応しました。
   - Oracle18c以降ではexport-schema、import-schemaのゴールを実行する際に接続文字列を必要としますが、今までは接続文字列を設定することができなかったため処理に失敗していました。接続文字列を設定できるようにすることでOracle18c以降のバージョンでexport-schema、import-schemaが正常に実行できるよう対応しました。
+- generate-entityで生成されるクラスについて、主キーカラムのプロパティに設定されるアノテーションを修正しました。
+    - これまでは、数値型の主キーカラムのプロパティには一律で`@GeneratedValue(strategy = GenerationType.IDENTITY)`が付けられていました。
+    - これを、そのカラムが自動採番される場合だけ`@GeneratedValue(strategy = GenerationType.IDENTITY)`を付けるように修正しました。
+    - また、Oracleの場合はシーケンスオブジェクトで主キーカラムを採番する前提とした出力になっていましたが、これを廃止しました。
+        - 12c以降はOracleでもカラムの自動採番が可能であるため。
+        - ただし、Oracleの場合は自動採番されるカラムであっても`@GeneratedValue(strategy = GenerationType.IDENTITY)`は設定されません。
+        - 詳細は[主キーのプロパティに設定されるアノテーションについて](recipe/spec-generatedEntity.md#主キーのプロパティに設定されるアノテーションについて)を参照してください。
 
 ## 4.5.0 (2022-03-24)
 ### 更新内容
