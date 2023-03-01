@@ -6,9 +6,12 @@ import java.util.List;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -41,6 +44,8 @@ public class MstOrgName implements Serializable {
      * @return orgId
      */
     @Id
+    @GeneratedValue(generator = "ORG_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ORG_ID_SEQ", sequenceName = "ORG_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "ORG_ID", precision = 3, nullable = false, unique = true)
     public Short getOrgId() {
         return orgId;

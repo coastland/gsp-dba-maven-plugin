@@ -4,7 +4,10 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -32,6 +35,8 @@ public class IndexTest3 implements Serializable {
      * @return INDEX_TEST3_ID
      */
     @Id
+    @GeneratedValue(generator = "GSPANOTHER.INDEX_TEST3_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "GSPANOTHER.INDEX_TEST3_ID_SEQ", sequenceName = "GSPANOTHER.INDEX_TEST3_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "INDEX_TEST3_ID", precision = 18, nullable = false, unique = true)
     public Long getIndexTest3Id() {
         return indexTest3Id;
