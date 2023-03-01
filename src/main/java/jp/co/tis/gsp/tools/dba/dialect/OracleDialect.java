@@ -310,6 +310,9 @@ public class OracleDialect extends Dialect {
 		return StringUtils.upperCase(schemaName);
 	}
 
+	@Override
+	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
+	
 	/**
 	 * stmtの指定されたインデックスに指定された値をセットする。
 	 * <p>

@@ -6,8 +6,11 @@ import java.util.List;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -35,6 +38,8 @@ public class TestTbl1 implements Serializable {
      * @return TEST_TBL1_ID
      */
     @Id
+    @GeneratedValue(generator = "TEST_TBL1_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "TEST_TBL1_ID_SEQ", sequenceName = "TEST_TBL1_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "TEST_TBL1_ID", nullable = false, unique = true)
     public BigDecimal getTestTbl1Id() {
         return testTbl1Id;

@@ -5,7 +5,10 @@ import java.math.BigDecimal;
 import javax.annotation.Generated;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
+import org.seasar.doma.GeneratedValue;
+import org.seasar.doma.GenerationType;
 import org.seasar.doma.Id;
+import org.seasar.doma.SequenceGenerator;
 import org.seasar.doma.Table;
 
 /**
@@ -21,6 +24,8 @@ public class TestTbl1 implements Serializable {
 
     /** TEST_TBL1_ID */
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(sequence = "TEST_TBL1_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "TEST_TBL1_ID")
     private BigDecimal testTbl1Id;
 

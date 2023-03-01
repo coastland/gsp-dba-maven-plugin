@@ -6,7 +6,10 @@ import java.util.Date;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -39,6 +42,8 @@ public class 注文テーブル implements Serializable {
      * @return orderId
      */
     @Id
+    @GeneratedValue(generator = "ORDER_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ORDER_ID_SEQ", sequenceName = "ORDER_ID_SEQ", initialValue = 1, allocationSize = 1)
     @Column(name = "ORDER_ID", nullable = false, unique = false)
     public BigDecimal getOrderId() {
         return orderId;
