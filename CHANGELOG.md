@@ -14,9 +14,7 @@
 - generate-entityで生成されるクラスについて、主キーカラムのプロパティに設定されるアノテーションを修正しました。
     - これまでは、数値型の主キーカラムのプロパティには一律で`@GeneratedValue(strategy = GenerationType.IDENTITY)`が付けられていました。
     - これを、そのカラムが自動採番される場合だけ`@GeneratedValue(strategy = GenerationType.IDENTITY)`を付けるように修正しました。
-    - また、Oracleの場合はシーケンスオブジェクトで主キーカラムを採番する前提とした出力になっていましたが、これを廃止しました。
-        - 12c以降はOracleでもカラムの自動採番が可能であるため。
-        - ただし、Oracleの場合は自動採番されるカラムであっても`@GeneratedValue(strategy = GenerationType.IDENTITY)`は設定されません。
+    - ただし、Oracleはこの修正の対象外となります。
         - 詳細は[主キーのプロパティに設定されるアノテーションについて](recipe/spec-generatedEntity.md#主キーのプロパティに設定されるアノテーションについて)を参照してください。
 
 ## 4.5.0 (2022-03-24)

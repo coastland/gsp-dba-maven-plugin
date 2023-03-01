@@ -59,6 +59,7 @@ generate-entity時に生成されるエンティティで使用されるアノ�
     - 追加のアノテーションは設定されません
 
 デフォルトでは、`Dialect`の`getGenerationType`は`null`を返します。
+ただし、`OracleDialect`の`getGenerationType`は`GenerationType.SEQUENCE`を返すようになっています。
 
-`null`以外の`GenerationType`を返すようにしたい場合は、カスタムの`Dialect`を作成して差し替えてください。
+これら以外の`GenerationType`を返すようにしたい場合は、カスタムの`Dialect`を作成して差し替えてください。
 `Dialect`を差し替える方法については[Dialectクラスのカスタマイズ例](custom-Dialect.md)を参照してください。
