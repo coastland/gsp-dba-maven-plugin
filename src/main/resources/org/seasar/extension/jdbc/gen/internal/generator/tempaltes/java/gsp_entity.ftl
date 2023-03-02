@@ -18,13 +18,13 @@
 <#macro printAttrAnnotations tableName attr>
   <#if attr.id>
     @Id
-    <#if attr.generationType??>
-      <#if attr.generationType == "SEQUENCE">
+  </#if>
+  <#if attr.generationType??>
+    <#if attr.generationType == "SEQUENCE">
     @GeneratedValue(generator = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", strategy = GenerationType.AUTO)
     @SequenceGenerator(name = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", sequenceName = "<#if schemaName??>${schemaName}.</#if>${attr.columnName}_SEQ", initialValue = ${attr.initialValue}, allocationSize = ${attr.allocationSize})
-      <#else>
+    <#elseif attr.generationType == "IDENTITY">
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-      </#if>
     </#if>
   </#if>
   <#if attr.lob>
