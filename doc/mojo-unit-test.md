@@ -71,6 +71,8 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
         * saユーザがデフォルトで無効になっているので有効にする。SSMSを使用して設定変更すると容易である。
         * デフォルトでTCPが有効になっていないので有効にする。  
           参考：https://qiita.com/sugasaki/items/a95c2495085e32851707
+      * Oracle
+        * Oracle 19c の場合、接続情報の `XEPDB1` の部分を `ORCLPDB1` に修正すること。
 
 1. [pom.xml](../pom.xml)にサードパーティ製JDBCドライバの依存関係定義
     * 使用するJDBCドライバのバージョンは、https://github.com/nablarch/nablarch-parent/blob/master/pom.xml を参考にする。Nablarchのテストで使用しているJDBCドライバが記載されている。

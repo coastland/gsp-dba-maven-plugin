@@ -70,6 +70,8 @@ mojo(goal) - Test case (test method) - Target DB(db2, h2, etc..)
         * Enable sa user since it is disabled by default. it is easy to change the setting using SSMS.
         * TCP is not enabled by default, so enable it.
           Reference：https://qiita.com/sugasaki/items/a95c2495085e32851707
+      * Oracle
+        * For Oracle 19c, modify the connection information `XEPDB1` part to `ORCLPDB1`.
 1. In [pom.xml](../../pom.xml) to define dependencies for third-party JDBC drivers
     * The version of the JDBC driver to be used can be found at https://github.com/nablarch/nablarch-parent/blob/master/pom.xml. The JDBC driver used in the Nablarch tests is listed there.
     * For the relationship between Oracle's JDBC driver and the Java version, see https://www.oracle.com/database/technologies/faq-jdbc.html.
