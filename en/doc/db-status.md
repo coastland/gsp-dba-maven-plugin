@@ -29,7 +29,7 @@ To use this tool, the following tasks are required to be performed in advance de
 | SQL Server | ◎           | ◎          | ◎        | ◎              |◎|   ◎|
 | Db2        | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
 
-#### Operation checked version
+#### Tested version
 * Oracle
   * 18c / 19c / 21c
 * H2
