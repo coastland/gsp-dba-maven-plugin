@@ -7,10 +7,10 @@
 
 To use this tool, the following tasks are required to be performed in advance depending on the database.
 
-* MS SQL Server<br/>
+* SQL Server<br/>
   Configure to allow server authentication
 
-* DB2<br/>
+* Db2<br/>
   Create an OS user account for DB connection
 
 ### Overview of support status
@@ -19,15 +19,29 @@ To use this tool, the following tasks are required to be performed in advance de
 ○...Implemented
 ×...Cannot be used
 
-|                    | generate-ddl | execute-ddl | load-data | generate-entity | import-schema | export-schema |
-|:-------------------|:------------:|:-----------:|:---------:|:---------------:|:-------------:|:-------------:|
-| Oracle             | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| Solr               | ○           | ○          | ○        | ○              | ○            | ○            |
-| H2                 | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| MySql              | ◎           | ◎          | ○        | ◎              | ◎            | ◎            |
-| Postgresql         | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
-| MS SQL Server 2008 | ◎           | ◎          | ◎        | ◎              |◎|   ◎| 
-| DB2 10.5           | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
+|            | generate-ddl | execute-ddl | load-data | generate-entity | import-schema | export-schema |
+|:-----------|:------------:|:-----------:|:---------:|:---------------:|:-------------:|:-------------:|
+| Oracle     | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
+| Solr       | ○           | ○          | ○        | ○              | ○            | ○            |
+| H2         | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
+| MySQL      | ◎           | ◎          | ○        | ◎              | ◎            | ◎            |
+| PostgreSQL | ◎           | ◎          | ◎        | ◎              | ◎            | ◎            |
+| SQL Server | ◎           | ◎          | ◎        | ◎              |◎|   ◎|
+| Db2        | ◎           | ◎          | ◎        | ◎              |◎           |    ◎       |
+
+#### Tested version
+* Oracle
+  * 18c / 19c / 21c
+* H2
+  * 2.1.214
+* MySQL
+  * 8.0 (MySQL connector uses 5.1.49)
+* PostgreSQL
+  * 10.0 / 11.5 / 12.2 / 13.2 / 14.0
+* SQL Server
+  * 2017 / 2019
+* Db2
+  * 10.5 / 11.5
 
 
 ### Support status for load-data
@@ -62,7 +76,7 @@ It is not necessary to specify the type name of the column.
 | VARCHAR2      | ○       | text                                                | - |
 
 
-**Postgresql**
+**PostgreSQL**
 
 It is not necessary to specify the type name of the column.
 
@@ -99,7 +113,7 @@ It is not necessary to specify the type name of the column.
 | VARBIT    | ×       | -                            | -   |
 | VARCHAR   | ○       | text                          | -   |
 
-**MS SQL Server**
+**SQL Server**
 
 A column specified as IDENTITY cannot be used. <br />
 It is not necessary to specify the type name of the column.
@@ -139,7 +153,7 @@ It is not necessary to specify the type name of the column.
 | VARBINARY | ○ | 000101001100 | Hexadecimal bit notation |
 | VARCHAR | ○ | text | - |
 
-**DB2**
+**Db2**
 
 A column specified as IDENTITY cannot be used. <br />
 It is not necessary to specify the type name of the column.
@@ -184,6 +198,6 @@ The following restrictions are specific to the general ExportSchema/ImportSchema
 - DATE type
     - Due to load-data restriction, data less than or equal to the time held in DATE type by Oracle is not included.
 
-**SqlServer**
+**SQL Server**
 - BINARY type
     - Not available.
