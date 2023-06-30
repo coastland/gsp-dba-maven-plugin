@@ -3,8 +3,6 @@ package jp.co.tis.gsptest.entity.entity;
 import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
@@ -34,7 +32,6 @@ public class IndexTest2 implements Serializable {
      * @return INDEX_TEST2_ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "INDEX_TEST2_ID", precision = 19, nullable = false, unique = true)
     public Long getIndexTest2Id() {
         return indexTest2Id;

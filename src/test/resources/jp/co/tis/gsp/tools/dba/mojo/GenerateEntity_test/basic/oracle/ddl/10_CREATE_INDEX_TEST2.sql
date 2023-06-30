@@ -9,4 +9,3 @@ COMMENT ON column INDEX_TEST2.SUB_ID_1 is 'SUB_ID_1';
 COMMENT ON column INDEX_TEST2.SUB_ID_2 is 'SUB_ID_2';
 CREATE SEQUENCE INDEX_TEST2_ID_SEQ increment by 1 start with 1;
 
-

@@ -3,8 +3,6 @@ package jp.co.tis.gsptest.entity.entity;
 import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
@@ -23,7 +21,6 @@ public class TestTbl1 implements Serializable {
     /** TEST_TBL1_ID */
 // templateFilePrimaryDir_TEST!
     @Id
-    @GeneratedValue(generator = "generator", strategy = GenerationType.AUTO)
     @Column(name = "TEST_TBL1_ID", precision = 64, nullable = false, unique = true)
     public Long testTbl1Id;
 

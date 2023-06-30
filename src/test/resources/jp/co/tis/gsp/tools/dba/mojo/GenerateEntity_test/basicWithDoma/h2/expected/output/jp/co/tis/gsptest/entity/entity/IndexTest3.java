@@ -4,8 +4,6 @@ import jakarta.annotation.Generated;
 import java.io.Serializable;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
-import org.seasar.doma.GeneratedValue;
-import org.seasar.doma.GenerationType;
 import org.seasar.doma.Id;
 import org.seasar.doma.Table;
 
@@ -22,7 +20,6 @@ public class IndexTest3 implements Serializable {
 
     /** INDEX_TEST3_ID */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "INDEX_TEST3_ID")
     private Long indexTest3Id;
 

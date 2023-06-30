@@ -312,7 +312,7 @@ public class OracleDialect extends Dialect {
 
 	@Override
 	public GenerationType getGenerationType() { return GenerationType.SEQUENCE; }
-
+	
 	/**
 	 * stmtの指定されたインデックスに指定された値をセットする。
 	 * <p>
@@ -419,7 +419,11 @@ public class OracleDialect extends Dialect {
 			
 			String dropObjectTypes = "'" + org.apache.commons.lang.StringUtils.join(objectTypeList, "','") + "'";
 			
-			stmtMeta = conn.prepareStatement("SELECT object_type, object_name FROM dba_objects WHERE object_type in (" + dropObjectTypes + ") and owner = ?");
+			// 12cで追加された自動採番機能で作成されるシーケンスオブジェクトは直接削除できないので、
+			// generated = 'N' を指定して対象に入らないようにしている(generated はシステムが生成したものかどうかのフラグ)
+			stmtMeta = conn.prepareStatement(
+				"SELECT object_type, object_name FROM dba_objects WHERE " +
+						"object_type in (" + dropObjectTypes + ") and owner = ? and generated = 'N'");
 			stmtMeta.setString(1, schema);
 			
 			ResultSet rsMeta = stmtMeta.executeQuery();
