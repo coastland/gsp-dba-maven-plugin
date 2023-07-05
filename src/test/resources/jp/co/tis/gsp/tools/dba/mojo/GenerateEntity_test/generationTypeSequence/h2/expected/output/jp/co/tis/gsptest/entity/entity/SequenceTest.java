@@ -1,6 +1,5 @@
 package jp.co.tis.gsptest.entity.entity;
 
-import java.io.Serializable;
 import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 
 /**
  * SEQUENCE_TEST
