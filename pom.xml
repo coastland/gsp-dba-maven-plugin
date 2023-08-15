@@ -74,7 +74,7 @@
 
     <properties>
         <seasarVersion>2.4.46</seasarVersion>
-        <mavenVersion>3.0.5</mavenVersion>
+        <mavenVersion>3.8.1</mavenVersion>
         <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
         <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
         <builtByUser>${user.name}</builtByUser>
