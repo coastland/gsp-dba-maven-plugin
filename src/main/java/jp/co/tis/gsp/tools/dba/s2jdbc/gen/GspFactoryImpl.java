@@ -95,7 +95,7 @@ public class GspFactoryImpl extends FactoryImpl {
                     showColumnDefinition, useTemporalType,
                     persistenceConvention);
         }
-        return new EntityModelFactoryImpl(packageName, superclass,
+        return new JakartaEntityModelFactoryImpl(packageName, superclass,
                 attributeModelFactory,
                 new AssociationModelFactoryImpl(showJoinColumn),
                 new CompositeUniqueConstraintModelFactoryImpl(), useAccessor,

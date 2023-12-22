@@ -16,8 +16,8 @@
 
 package jp.co.tis.gsp.tools.db.beans;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="RELATION")
 public class Relation {

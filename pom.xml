@@ -8,7 +8,7 @@
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>4.6.0</version>
+    <version>5.0.0</version>
     <name>GSP Maven Mojo for DBA</name>
     <description>
       To automate the routine work of the DBA, it is a tool to be able to concentrate on the data modeling work.
@@ -75,9 +75,10 @@
     <properties>
         <seasarVersion>2.4.46</seasarVersion>
         <mavenVersion>3.0.5</mavenVersion>
-        <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
+        <mavenPluginPluginVersion>3.7.1</mavenPluginPluginVersion>
         <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
         <builtByUser>${user.name}</builtByUser>
+        <jakarta-xml-binding.ci.version>4.0.1</jakarta-xml-binding.ci.version>
     </properties>
 
     <prerequisites>
@@ -168,9 +169,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.2</version>
                     <configuration>
-                        <!-- 依存モジュールJDK8以降のものが存在するためビルドはJDK8で行う -->
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>17</source>
+                        <target>17</target>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
@@ -190,6 +190,24 @@
     </repositories>
 
     <dependencies>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>${jakarta-xml-binding.ci.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>${jakarta-xml-binding.ci.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>2.1.1</version>
+      </dependency>
+
       <dependency>
         <groupId>org.seasar.doma</groupId>
         <artifactId>doma</artifactId>
@@ -312,6 +330,12 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee_1.4_spec</artifactId>
             <version>1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
         </dependency>
 
         <dependency>
@@ -543,7 +567,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.7.6.201602180812</version>
+                        <version>0.8.8</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>
