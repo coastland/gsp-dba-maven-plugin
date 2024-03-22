@@ -2,7 +2,7 @@
 
 All major changes to this project will be documented in this file.
 
-## 5.0.0 (2023-xx-xx)
+## 5.0.0 (2023-12-25)
 ### Updates
 ### Change
 - Support for Jakarta EE package change.
