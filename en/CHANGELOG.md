@@ -2,6 +2,11 @@
 
 All major changes to this project will be documented in this file.
 
+## 4.7.0 (yyyy-mm-dd)
+### Updates
+#### Change
+- Updated version of gsp-dba-maven-plugin referenced in the Sample that Works with Minimum Configuration.
+
 ## 4.6.0 (2023-01-31)
 ### Updates
 #### Change

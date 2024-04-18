@@ -8,7 +8,7 @@
     <groupId>jp.co.tis.gsp</groupId>
     <artifactId>gsp-dba-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>4.6.0-SNAPSHOT</version>
+    <version>4.7.0-SNAPSHOT</version>
     <name>GSP Maven Mojo for DBA</name>
     <description>
       To automate the routine work of the DBA, it is a tool to be able to concentrate on the data modeling work.
@@ -21,39 +21,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-    
-    <developers>
-        <developer>
-            <name>Yoshitaka Kawashima</name>
-            <email>kawasima1016@gmail.com</email>
-            <organization>coastland</organization>
-            <organizationUrl>https://github.com/coastland</organizationUrl>
-        </developer>
-        <developer>
-            <name>Hideo Ariyoshi</name>
-            <email>hariyoshi0427@gmail.com</email>
-            <organization>coastland</organization>
-            <organizationUrl>https://github.com/coastland</organizationUrl>
-        </developer>
-        <developer>
-            <name>Satoshi Kurokawa</name>
-            <email></email>
-            <organization>coastland</organization>
-            <organizationUrl>https://github.com/coastland</organizationUrl>
-        </developer>
-        <developer>
-            <name>morimoto-kenta</name>
-            <email>moriken_judo@yahoo.co.jp</email>
-            <organization>coastland</organization>
-            <organizationUrl>https://github.com/coastland</organizationUrl>
-        </developer>
-        <developer>
-            <name>Naoki Tamura</name>
-            <email>tamu.0.0.tamu@gmail.com</email>
-            <organization>coastland</organization>
-            <organizationUrl>https://github.com/coastland</organizationUrl>
-        </developer>
-    </developers>
     
     <scm>
         <connection>scm:git:git://github.com/coastland/gsp-dba-maven-plugin.git</connection>
