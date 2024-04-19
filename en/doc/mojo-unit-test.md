@@ -218,7 +218,7 @@ If you use a proxy environment, add the proxy settings to [settings.xml](../../s
     mvn -P h2 -s ../../test/resources/settings.xml clean ^
     gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:generate-entity ^
     -Dh2.jdbcDriver=org.h2.Driver ^
-    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dgsp.version=5.1.0-SNAPSHOT ^
     -Dh2.user=gsptest ^
     -Dh2.password=gsptest ^
     -Dh2.adminUser=sa ^
@@ -229,7 +229,7 @@ If you use a proxy environment, add the proxy settings to [settings.xml](../../s
     ```
     mvn -P h2 -s ../../test/resources/settings.xml test ^
     -Dh2.jdbcDriver=org.h2.Driver ^
-    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dgsp.version=5.1.0-SNAPSHOT ^
     -Dh2.user=gsptest ^
     -Dh2.password=gsptest ^
     -Dh2.adminUser=sa ^
