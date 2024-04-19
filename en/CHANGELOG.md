@@ -5,8 +5,8 @@ All major changes to this project will be documented in this file.
 ## 4.7.0 (2024-09-27)
 ### Updates
 #### Change
-- Update the version of H2 Database to 2.1.214.
-- Updated version of gsp-dba-maven-plugin referenced in the Sample.
+- Update the version of H2 Database to 2.2.220.
+- Update the version of gsp-dba-maven-plugin used in the Sample.
 
 ## 4.6.0 (2023-01-31)
 ### Updates
