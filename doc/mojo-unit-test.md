@@ -218,7 +218,7 @@ Linuxの場合、キャレット(^)をバックスラッシュ(\\)に読み替�
     mvn -P h2 -s ../../test/resources/settings.xml clean ^
     gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:generate-entity ^
     -Dh2.jdbcDriver=org.h2.Driver ^
-    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dgsp.version=4.7.0-SNAPSHOT ^
     -Dh2.user=gsptest ^
     -Dh2.password=gsptest ^
     -Dh2.adminUser=sa ^
@@ -229,7 +229,7 @@ Linuxの場合、キャレット(^)をバックスラッシュ(\\)に読み替�
     ```
     mvn -P h2 -s ../../test/resources/settings.xml test ^
     -Dh2.jdbcDriver=org.h2.Driver ^
-    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dgsp.version=4.7.0-SNAPSHOT ^
     -Dh2.user=gsptest ^
     -Dh2.password=gsptest ^
     -Dh2.adminUser=sa ^
