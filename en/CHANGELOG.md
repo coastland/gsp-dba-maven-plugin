@@ -2,7 +2,13 @@
 
 All major changes to this project will be documented in this file.
 
-## 5.0.0 (2023-xx-xx)
+## 5.1.0 (2024-09-27)
+### Updates
+### Change
+- Update the version of H2 Database to 2.2.220.
+- Update the version of gsp-dba-maven-plugin used in the Sample.
+
+## 5.0.0 (2023-12-25)
 ### Updates
 ### Change
 - Support for Jakarta EE package change.
