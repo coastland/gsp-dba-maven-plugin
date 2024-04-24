@@ -17,9 +17,7 @@
 package jp.co.tis.gsp.tools.dba.mojo;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;

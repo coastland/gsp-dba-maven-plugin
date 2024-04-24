@@ -17,17 +17,11 @@
 package jp.co.tis.gsp.tools.dba.dialect;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.persistence.TemporalType;
 
-import org.seasar.extension.jdbc.gen.dialect.GenDialect.ColumnType;
 import org.seasar.extension.jdbc.gen.internal.dialect.Db2GenDialect;
-import org.seasar.extension.jdbc.gen.internal.dialect.OracleGenDialect.OracleColumnType;
-import org.seasar.framework.util.StringUtil;
-
-import jp.co.tis.gsp.tools.dba.dialect.ExtendedOracleGenDialect.ExtendedOracleColumnType;
 
 /**
  * @author Naoki Yamamoto
