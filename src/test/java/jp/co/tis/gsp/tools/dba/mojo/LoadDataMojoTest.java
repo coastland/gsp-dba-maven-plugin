@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.h2.jdbc.JdbcSQLException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
