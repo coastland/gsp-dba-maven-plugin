@@ -1,7 +1,5 @@
 package jp.co.tis.gsp.test.util.dialect;
 
-import java.io.File;
-
 import org.apache.maven.plugin.MojoExecutionException;
 
 import jp.co.tis.gsp.tools.db.TypeMapper;

@@ -33,7 +33,6 @@ import org.seasar.extension.jdbc.gen.internal.factory.FactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.model.AssociationModelFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.model.AttributeModelFactoryImpl;
 import org.seasar.extension.jdbc.gen.internal.model.CompositeUniqueConstraintModelFactoryImpl;
-import org.seasar.extension.jdbc.gen.internal.model.EntityModelFactoryImpl;
 import org.seasar.extension.jdbc.gen.meta.DbTableMetaReader;
 import org.seasar.extension.jdbc.gen.model.EntityModelFactory;
 import org.seasar.framework.convention.PersistenceConvention;
