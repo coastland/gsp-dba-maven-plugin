@@ -75,16 +75,17 @@ mojo(goal) - Test case (test method) - Target DB(db2, h2, etc..)
     * For the relationship between Oracle's JDBC driver and the Java version, see https://www.oracle.com/database/technologies/faq-jdbc.html.
     * As of 2020, the latest drivers for RDBMSs supported by GSP exist in Maven Central.
       If you need to test with an older driver, get the JDBC driver jar and put it in your local repository, and define the dependencies in pom.xml.
-      * PostgreSQL
-        * If you use a version prior to 42.3.0, the result of Entity generation may differ due to a jdbc driver bug.  
-          Specifically, annotations with the attribute `precision = 131089` are generated in  [View2.java](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/GenerateEntity_test/view/postgresql/expected/output/jp/co/tis/gsptest/entity/entity/View2.java).
-          See https://github.com/pgjdbc/pgjdbc/issues/2188 for details.
-          ```java
-          @Column(name = "test2", precision = 131089, nullable = true, unique = false)
-          public BigDecimal getTest2() {
-          ```
-      * SQLServer
-        * If you use a version prior to 10.2, you do not need to set `encrypt=false;` for `sqlserver.url` in [jdbc_test.properties](../../src/test/resources/jdbc_test.properties).
+      * Notes on testing with older drivers
+        * PostgreSQL
+          * If you use a version prior to 42.3.0, the result of Entity generation may differ due to a jdbc driver bug.  
+            Specifically, annotations with the attribute `precision = 131089` are generated in  [View2.java](../../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/GenerateEntity_test/view/postgresql/expected/output/jp/co/tis/gsptest/entity/entity/View2.java).
+            See https://github.com/pgjdbc/pgjdbc/issues/2188 for details.
+            ```java
+            @Column(name = "test2", precision = 131089, nullable = true, unique = false)
+            public BigDecimal getTest2() {
+            ```
+        * SQLServer
+          * If you use a version prior to 10.2, you do not need to set `encrypt=false;` for `sqlserver.url` in [jdbc_test.properties](../../src/test/resources/jdbc_test.properties).
       * Local installation example (change the version accordingly)
         ```shell
         mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.2.0 -Dpackaging=jar
