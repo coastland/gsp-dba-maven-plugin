@@ -79,7 +79,7 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
       もし、古いドライバでテストする必要がある場合は、JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義すること。
       * PostgreSQL
         * 42.3.0以前のバージョンを利用するとjdbcドライバの不具合によってEntityの生成結果が異なる場合がある。  
-          具体的には [View2.java](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/GenerateEntity_test/view/postgresql/expected/output/jp/co/tis/gsptest/entity/entity/View2.java) にて `precision = 131089`属性の付与されアノテーションが生成される。   
+          具体的には [View2.java](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/GenerateEntity_test/view/postgresql/expected/output/jp/co/tis/gsptest/entity/entity/View2.java) にて `precision = 131089`属性の付与されたアノテーションが生成される。   
           詳細は https://github.com/pgjdbc/pgjdbc/issues/2188 を参照。
           ```java
           @Column(name = "test2", precision = 131089, nullable = true, unique = false)
