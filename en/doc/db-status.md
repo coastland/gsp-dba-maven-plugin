@@ -31,15 +31,15 @@ To use this tool, the following tasks are required to be performed in advance de
 
 #### Tested version
 * Oracle
-  * 18c / 19c / 21c
+  * 18c / 19c / 21c / 23c
 * H2
-  * 2.1.214
+  * 2.2.220
 * MySQL
   * 8.0 (MySQL connector uses 5.1.49)
 * PostgreSQL
-  * 10.0 / 11.5 / 12.2 / 13.2 / 14.0
+  * 10.0 / 11.5 / 12.2 / 13.2 / 14.0 /15.2 / 16.2
 * SQL Server
-  * 2017 / 2019
+  * 2017 / 2019 / 2022
 * Db2
   * 10.5 / 11.5
 
