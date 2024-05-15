@@ -46,7 +46,7 @@ public class View2 implements Serializable {
      *
      * @return test2
      */
-    @Column(name = "test2", precision = 131089, nullable = true, unique = false)
+    @Column(name = "test2", nullable = true, unique = false)
     public BigDecimal getTest2() {
         return test2;
     }
