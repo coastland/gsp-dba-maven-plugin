@@ -353,7 +353,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.4</version>
+            <version>42.7.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -374,7 +374,7 @@
             <version>23.2.0.0</version>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <version>12.2.0.jre8</version>
