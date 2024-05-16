@@ -374,7 +374,7 @@
             <version>23.2.0.0</version>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <version>12.2.0.jre8</version>
