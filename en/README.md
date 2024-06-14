@@ -377,7 +377,7 @@ At this time, please do not specify the version of `depenedency` individually, a
   </dependencies>
 </dependencyManagement>
 ```
-Please add the following two `dependencies
+Please add the following two `dependencies`
 
 ```xml
 <dependency>
