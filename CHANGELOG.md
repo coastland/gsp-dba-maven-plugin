@@ -11,6 +11,7 @@
     - PostgreSQL 15.2 / 16.2
     - SQL Server 2022
 - サンプルで使用しているgsp-dba-maven-pluginのバージョンを更新しました。
+- Jakarta EEが提供しているBOMを読み込むように変更しました。
 
 ## 5.0.0 (2023-12-25)
 ### 更新内容
