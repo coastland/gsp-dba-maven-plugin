@@ -361,7 +361,7 @@ Also, when using `generate-entity`, set Maven's JVM option to `--add-opens java.
 Maven's JVM options can be set in the [MAVEN_OPTS environment variable](https://maven.apache.org/configure.html#maven_opts-environment-variable).
 
 If you want to include the generated entities in the compilation, you must add the annotations given to the entities to the `dependencies` of your project.
-At this time, please do not specify the version of `depenedency` individually, and set it to load the BOM provided by Jakarta EE.
+At this time, please set the BOM provided by Jakarta EE to be loaded so that you do not have to specify the `depenedency` version individually.
 
 ```xml
 <dependencyManagement>
