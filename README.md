@@ -357,7 +357,7 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](https://maven.apache.org/configure.html#maven_opts-environment-variable)。
 
 生成されたエンティティをコンパイル対象に含める場合は、エンティティに付与されるアノテーションをプロジェクトの`dependencies`に追加する必要があります。
-このとき個別に`depenedency`のバージョンを指定しなくてもいいように、Jakarta EEが提供しているBOMを読み込むように設定してください。
+このとき個別に`depenedency`のバージョンを指定しなくてもよいように、Jakarta EEが提供しているBOMを読み込むように設定してください。
 
 ```xml
 <dependencyManagement>
