@@ -155,7 +155,7 @@ Configuration items(Y:required N:optional)
 | outputDirectory            | N     | Output directory of DDL. Default is "target/ddl".             |
 | lengthSemantics            | N     | Length semantics. The default is bytes.                        |
 | ddlTemplateFileDir         | N     | Specifies the directory where the project-specific DDL template is placed with a relative path from the work directory. |
-| allocationSize            |  N    | Increment value of sequence generation SQL (INCREMENT BY). Default is "1". <br /> The values of allocationSize and allocationSize of [generate-entity](#generate-entity) must be the same. <br />(Reference: Jakarta Persistence Specification [11.1.48. SequenceGenerator Annotation](https://jakarta.ee/ja/specifications/persistence/3.1/jakarta-persistence-spec-3.1.pdf)) |
+| allocationSize            |  N    | Increment value of sequence generation SQL (INCREMENT BY). Default is "1". <br /> The values of allocationSize and allocationSize of [generate-entity](#generate-entity) must be the same. |
 To customize the template, see [Example of Template Customization for Use with Generate-ddl](./recipe/custom-DdlTemplate.md).
 
 
@@ -394,7 +394,7 @@ Configuration items(Y:required N:optional)
 | entityTemplate         |   N  | Auto-generated template of the entity. Default is "java/gsp_entity.ftl". |
 |javaFileDestDir        |    N   | Directory where the java file of the generated entity is placed |
 |templateFilePrimaryDir |    N   |Path up to entityTemplate. Default is "src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes". <br> Usage example: If the path to the file is "src/main/resource/template/gsp_template.ftl, configure <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> respectively. |
-| allocationSize         |   N   | allocationSize of @SequenceGenerator. Default is "1". <br /> Make sure that the above mentioned allocationSize and allocationSize of [generate-ddl](#generate-ddl) are the same. <br />(Reference: Jakarta Persistence Specification [11.1.48. SequenceGenerator Annotation](https://jakarta.ee/ja/specifications/persistence/3.1/jakarta-persistence-spec-3.1.pdf)) |
+| allocationSize         |   N   | allocationSize of @SequenceGenerator. Default is "1". <br /> Make sure that the above mentioned allocationSize and allocationSize of [generate-ddl](#generate-ddl) are the same. |
 | useJSR310         |   N   | Whether to generate the entity corresponding to JSR301. Default is "false".                   |
 To customize the template, see [Example of Template Customization for Use with Generate-entity](./recipe/custom-EntityTemplate.md).
 
