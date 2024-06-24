@@ -2,7 +2,7 @@
 
 All major changes to this project will be documented in this file.
 
-## 5.1.0 (2024-09-27)
+## 5.1.0 (2024-09-30)
 ### Updates
 #### Change
 - Updated Tested version.
@@ -12,6 +12,16 @@ All major changes to this project will be documented in this file.
     - SQL Server 2022
 - Update the version of gsp-dba-maven-plugin used in the Sample.
 - Changed to load BOM provided by Jakarta EE.
+
+## 4.7.0 (2024-09-30)
+### Updates
+#### Change
+- Updated Tested version.
+  - Oracle 23c
+  - H2 2.2.220
+  - PostgreSQL 15.2 / 16.2
+  - SQL Server 2022
+- Update the version of gsp-dba-maven-plugin used in the Sample.
 
 ## 5.0.0 (2023-12-25)
 ### Updates
