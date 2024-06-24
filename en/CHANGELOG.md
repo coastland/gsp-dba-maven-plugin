@@ -2,7 +2,7 @@
 
 All major changes to this project will be documented in this file.
 
-## 5.1.0 (2024-09-27)
+## 5.1.0 (2024-09-30)
 ### Updates
 #### Change
 - Updated Tested version.
