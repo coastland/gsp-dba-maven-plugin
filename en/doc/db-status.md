@@ -31,7 +31,7 @@ To use this tool, the following tasks are required to be performed in advance de
 
 #### Tested version
 * Oracle
-  * 18c / 19c / 21c / 23c
+  * 18c / 19c / 21c / 23ai
 * H2
   * 2.2.220
 * MySQL

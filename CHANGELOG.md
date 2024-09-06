@@ -6,7 +6,7 @@
 ### 更新内容
 #### 変更
 - 動作確認済みバージョンを更新しました。
-  - Oracle 23c
+  - Oracle 23ai
   - H2 2.2.220
   - PostgreSQL 15.2 / 16.2
   - SQL Server 2022
