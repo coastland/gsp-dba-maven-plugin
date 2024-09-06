@@ -6,7 +6,7 @@ All major changes to this project will be documented in this file.
 ### Updates
 #### Change
 - Updated Tested version.
-    - Oracle 23c
+    - Oracle 23ai
     - H2 2.2.220
     - PostgreSQL 15.2 / 16.2
     - SQL Server 2022
@@ -17,7 +17,7 @@ All major changes to this project will be documented in this file.
 ### Updates
 #### Change
 - Updated Tested version.
-  - Oracle 23c
+  - Oracle 23ai
   - H2 2.2.220
   - PostgreSQL 15.2 / 16.2
   - SQL Server 2022
