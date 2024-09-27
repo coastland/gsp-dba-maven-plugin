@@ -594,7 +594,7 @@ public class GenerateEntityTest extends AbstractDdlMojoTest<GenerateEntity> {
      *
      * <h4>検証内容</h4>
      * <ul>
-     * <li>diconDirに無効なパスを指定する。</li>
+     * <li>diconDirに無効なパス(すでに存在するファイル)を指定する。</li>
      * </ul>
      * <h4>検証結果</h4>
      * <ul>

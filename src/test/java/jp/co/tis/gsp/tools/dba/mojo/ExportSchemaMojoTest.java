@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;

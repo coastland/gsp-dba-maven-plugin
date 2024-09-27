@@ -77,6 +77,17 @@ mojo(goal) - テストケース(テストメソッド) - 対象DB(db2, h2, etc..
     * OracleのJDBCドライバとJavaのバージョンの関係は https://www.oracle.com/database/technologies/faq-jdbc.html を参照。
     * 2020年現在、GSPが対応しているRDBMSの最新のドライバはMavenセントラルに存在する。  
       もし、古いドライバでテストする必要がある場合は、JDBCドライバjarを入手してローカルリポジトリに入れて、pom.xmlに依存関係を定義すること。
+      * 古いドライバでテストする場合の注意点
+        * PostgreSQL
+          * 42.3.0以前のバージョンを利用するとjdbcドライバの不具合によってEntityの生成結果が異なる場合がある。  
+            具体的には [View2.java](../src/test/resources/jp/co/tis/gsp/tools/dba/mojo/GenerateEntity_test/view/postgresql/expected/output/jp/co/tis/gsptest/entity/entity/View2.java) にて `precision = 131089`属性の付与されたアノテーションが生成される。   
+            詳細は https://github.com/pgjdbc/pgjdbc/issues/2188 を参照。
+            ```java
+            @Column(name = "test2", precision = 131089, nullable = true, unique = false)
+            public BigDecimal getTest2() {
+            ```
+        * SQLServer
+          * 10.2以前のバージョンを利用する場合、[jdbc_test.properties](../src/test/resources/jdbc_test.properties)の`sqlserver.url`の`encrypt=false;`の設定は不要。
       * ローカルインストールの例（バージョンは適宜変更してください）
         ```shell
         mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.2.0 -Dpackaging=jar
@@ -218,7 +229,7 @@ Linuxの場合、キャレット(^)をバックスラッシュ(\\)に読み替�
     mvn -P h2 -s ../../test/resources/settings.xml clean ^
     gsp-dba:generate-ddl gsp-dba:execute-ddl gsp-dba:generate-entity ^
     -Dh2.jdbcDriver=org.h2.Driver ^
-    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dgsp.version=4.7.0 ^
     -Dh2.user=gsptest ^
     -Dh2.password=gsptest ^
     -Dh2.adminUser=sa ^
@@ -229,7 +240,7 @@ Linuxの場合、キャレット(^)をバックスラッシュ(\\)に読み替�
     ```
     mvn -P h2 -s ../../test/resources/settings.xml test ^
     -Dh2.jdbcDriver=org.h2.Driver ^
-    -Dgsp.version=4.6.0-SNAPSHOT ^
+    -Dgsp.version=4.7.0 ^
     -Dh2.user=gsptest ^
     -Dh2.password=gsptest ^
     -Dh2.adminUser=sa ^

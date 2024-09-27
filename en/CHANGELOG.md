@@ -2,6 +2,16 @@
 
 All major changes to this project will be documented in this file.
 
+## 4.7.0 (2024-09-30)
+### Updates
+#### Change
+- Updated Tested version.
+  - Oracle 23ai
+  - H2 2.2.220
+  - PostgreSQL 15.2 / 16.2
+  - SQL Server 2022
+- Update the version of gsp-dba-maven-plugin used in the Sample.
+
 ## 4.6.0 (2023-01-31)
 ### Updates
 #### Change
