@@ -1,7 +1,5 @@
 package jp.co.tis.gsp.test.util;
 
-import java.util.regex.Pattern;
-
 public abstract class Entry implements Comparable<Entry> {
 
 	protected String root;

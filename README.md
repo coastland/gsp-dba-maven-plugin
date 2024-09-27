@@ -153,7 +153,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 | outputDirectory            | ×     | DDLの出力ディレクトリ。デフォルトは、"target/ddl"。             |
 | lengthSemantics            | ×     | 長さセマンティクス。デフォルトはバイト。                        |
 | ddlTemplateFileDir         | ×     | プロジェクト固有のDDLテンプレートの配置ディレクトリをワークディレクトリからの相対パスで指定する。 |
-| allocationSize            | ×     | シーケンス生成SQLの増分値(INCREMENT BY)。デフォルトは"1"。<br /> allocationSizeと[generate-entity](#generate-entity)のallocationSizeの値はは一致させるようにして下さい。<br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG)  |
+| allocationSize            | ×     | シーケンス生成SQLの増分値(INCREMENT BY)。デフォルトは"1"。<br /> allocationSizeと[generate-entity](#generate-entity)のallocationSizeの値はは一致させるようにして下さい。|
 テンプレートをカスタマイズする際は、[generate-ddlで使用するテンプレートのカスタマイズ例](./recipe/custom-DdlTemplate.md)を参照してください。
 
 
@@ -357,19 +357,34 @@ CSV形式で定義したデータを、データベースの指定したスキ�
 MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](https://maven.apache.org/configure.html#maven_opts-environment-variable)。
 
 生成されたエンティティをコンパイル対象に含める場合は、エンティティに付与されるアノテーションをプロジェクトの`dependencies`に追加する必要があります。
+このとき個別に`depenedency`のバージョンを指定しなくてもよいように、Jakarta EEが提供しているBOMを読み込むように設定してください。
+
+```xml
+<dependencyManagement>
+  <dependencies>
+    ...
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-bom</artifactId>
+      <version>10.0.0</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+```
+
 以下2つの`depenedency`を追加してください。
 
 ```xml
 <dependency>
   <groupId>jakarta.annotation</groupId>
   <artifactId>jakarta.annotation-api</artifactId>
-  <version>2.1.1</version>
 </dependency>
 
 <dependency>
   <groupId>jakarta.persistence</groupId>
   <artifactId>jakarta.persistence-api</artifactId>
-  <version>3.1.0</version>
 </dependency>
 ```
 
@@ -388,7 +403,7 @@ MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](
 | entityTemplate         | ×    | entity の自動生成テンプレート。デフォルトは、"java/gsp_entity.ftl"。|
 |javaFileDestDir        | ×      | 生成されたentityのjavaファイルを配置するディレクトリ|
 |templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
-| allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。 <br />(eclipseLink) https://wiki.eclipse.org/Introduction_to_EclipseLink_JPA_(ELUG) |
+| allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。|
 | useJSR310         | ×     |JSR301に対応したEntityを生成するかどうか。デフォルトは、”false”。                   |
 テンプレートをカスタマイズする際は、[generate-entityで使用するテンプレートのカスタマイズ例](./recipe/custom-EntityTemplate.md)を参照してください。
 
