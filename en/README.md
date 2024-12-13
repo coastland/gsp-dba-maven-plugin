@@ -410,6 +410,7 @@ Configuration items(Y:required N:optional)
 |templateFilePrimaryDir |    N   |Path up to entityTemplate. Default is "src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes". <br> Usage example: If the path to the file is "src/main/resource/template/gsp_template.ftl, configure <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> respectively. |
 | allocationSize         |   N   | allocationSize of @SequenceGenerator. Default is "1". <br /> Make sure that the above mentioned allocationSize and allocationSize of [generate-ddl](#generate-ddl) are the same. |
 | useJSR310         |   N   | Whether to generate the entity corresponding to JSR301. Default is "false".                   |
+
 To customize the template, see [Example of Template Customization for Use with Generate-entity](./recipe/custom-EntityTemplate.md).
 
 
