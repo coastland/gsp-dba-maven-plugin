@@ -182,7 +182,7 @@ public class SqlserverDialect extends Dialect {
      */
     @Override
     public String getViewDefinitionSql() {
-        return "SELECT VIEW_DEFINITION FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?";
+        return "SELECT OBJECT_DEFINITION(object_id) AS view_definition FROM sys.views WHERE name = ? AND schema_id = SCHEMA_ID(?)";
     }
 
     private boolean existsUser(String adminUser, String adminPassword, String user) throws SQLException {
