@@ -2,7 +2,7 @@
 
 All major changes to this project will be documented in this file.
 
-## 5.2.0 (2025-03-xx)
+## 5.2.0 (2025-03-31)
 ### Updates
 #### Change
 - When using SQL Server, the generate-entity goal had a limit of 4,000 characters for entities that could be generated from a VIEW. This has been resolved.
