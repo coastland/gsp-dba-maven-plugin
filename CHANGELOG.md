@@ -6,13 +6,14 @@
 ### 更新内容
 #### 変更
 - 動作確認済みバージョンを更新しました。
-  - PostgreSQL 17.4
-  - Db2 12.1
-    - Db2は12.1より[DBADM権限にデフォルトでDATAACCESS権限およびACCESSCTRL権限が含まれなくなったため](https://www.ibm.com/docs/en/db2/12.1?topic=121-changed-functionality#c_changed_funct_12-1__title__14)、`adminUser`の説明に補足を追加しました。
-- EOLを迎えたデータベースを対応状況から削除しました。
-  - Oracle 18c
-  - PostgreSQL 10.0 / 11.5
-  - Db2 10.5
+  - 追加
+    - PostgreSQL 17.4
+    - Db2 12.1
+      - Db2は12.1より[DBADM権限にデフォルトでDATAACCESS権限およびACCESSCTRL権限が含まれなくなったため](https://www.ibm.com/docs/en/db2/12.1?topic=121-changed-functionality#c_changed_funct_12-1__title__14)、`adminUser`の説明に補足を追加しました。
+  - EOLを迎えたため削除
+    - Oracle 18c
+    - PostgreSQL 10.0 / 11.5
+    - Db2 10.5
 - SQL Serverを使っている場合、generate-entityのゴールでVIEWから生成できるエンティティは4,000文字までの制限があったため解消しました。
 
 ## 5.1.0 (2024-09-30)
