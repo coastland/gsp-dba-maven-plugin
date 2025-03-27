@@ -74,7 +74,7 @@ pom.xmlに以下の設定を追加することでプラグインが使用でき�
 |:---------------|:-----:|:----------------------------------------------------------------|
 | driver         | ○     | 使用するJDBCドライバ。                                         |
 | url            | ○     | データベースのURL。 jdbc:subprotocol:subname 形式。            |
-| adminUser      | ○     | データベースのadminユーザ名。Oracleの場合はsysは指定出来ません。DB2の場合はデータベース作成ユーザか対象データベースでDBADM権限を持つユーザを指定して下さい(db2adminを指定すると、データベースのバージョンによってはエラーになります)。|
+| adminUser      | ○     | データベースのadminユーザ名。Oracleの場合はsysは指定出来ません。DB2の場合はデータベース作成ユーザか対象データベースでDBADM権限(12.1以降はDATAACCESS権限とACCESSCTRL権限も追加で必要)を持つユーザを指定して下さい(db2adminを指定すると、データベースのバージョンによってはエラーになります)。|
 | adminPassword  | ×     | adminUserに設定したユーザのパスワード。                        |
 | user           | ○     | データベースのユーザ名。 Oracleの場合はsysは指定出来ません。PostgreSQLの場合は常に小文字に変換して処理されます。|
 | password       | ×     | userに設定したユーザのパスワード。                             |
@@ -405,6 +405,7 @@ MavenのJVMオプションは、[環境変数 MAVEN_OPTS で設定できます](
 |templateFilePrimaryDir | ×      |entityTemplateまでのパス。デフォルトは、"src/main/resources/org/seasar/extension/jdbc/gen/internal/generator/tempaltes"。<br>使用例:ファイルまでのパスが"src/main/resource/template/gsp_template.ftlの場合、それぞれ <br> entityTemplate: gsp_template.ftl <br> templateFilePrimaryDir:src/main/resource/template <br> と設定する。|
 | allocationSize         | ×     | @SequenceGeneratorのallocationSize。デフォルトは"1"。 <br />上記allocationSizeと[generate-ddl](#generate-ddl)のallocationSizeは一致させるようにして下さい。|
 | useJSR310         | ×     |JSR301に対応したEntityを生成するかどうか。デフォルトは、”false”。                   |
+
 テンプレートをカスタマイズする際は、[generate-entityで使用するテンプレートのカスタマイズ例](./recipe/custom-EntityTemplate.md)を参照してください。
 
 
