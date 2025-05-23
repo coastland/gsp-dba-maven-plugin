@@ -28,6 +28,16 @@
         <url>https://github.com/coastland/gsp-dba-maven-plugin/tree/master</url>
     </scm>
 
+    <developers>
+      <developer>
+        <id>coastland</id>
+        <name>coastland</name>
+        <email>coastland@tis.co.jp</email>
+        <organization>coastland</organization>
+        <organizationUrl>https://github.com/coastland</organizationUrl>
+      </developer>
+    </developers>
+
     <properties>
         <seasarVersion>2.4.46</seasarVersion>
         <mavenVersion>3.0.5</mavenVersion>
