@@ -480,7 +480,7 @@
             </dependencies>
         </profile>
         <profile>
-            <id>ossrh</id>
+            <id>maven-central</id>
             <build>
                 <plugins>
                     <plugin>
