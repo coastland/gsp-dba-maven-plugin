@@ -21,23 +21,22 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <id>coastland</id>
+            <name>coastland</name>
+            <email>nablarch@tis.co.jp</email>
+            <organization>coastland</organization>
+            <organizationUrl>https://github.com/coastland</organizationUrl>
+        </developer>
+    </developers>
     
     <scm>
         <connection>scm:git:git://github.com/coastland/gsp-dba-maven-plugin.git</connection>
         <developerConnection>scm:git:ssh://github.com/coastland/gsp-dba-maven-plugin.git</developerConnection>
         <url>https://github.com/coastland/gsp-dba-maven-plugin/tree/master</url>
     </scm>
-    
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh-snapshot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <properties>
         <seasarVersion>2.4.46</seasarVersion>
@@ -472,7 +471,7 @@
             </dependencies>
         </profile>
         <profile>
-            <id>ossrh</id>
+            <id>central</id>
             <build>
                 <plugins>
                     <plugin>
@@ -514,6 +513,15 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>    
